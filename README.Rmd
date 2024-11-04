@@ -1,0 +1,24 @@
+---
+output: github_document
+---
+
+<!-- README.md is generated from README.Rmd. Please edit that file -->
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.path = "man/figures/README-",
+  out.width = "100%"
+)
+```
+
+
+# Download 
+
+To install the development version of this package the user must type:
+
+```{.r}
+# install.packages("devtools")
+devtools::install_github("GabrielNakamura/Buccaneer", ref = "main")
+```
