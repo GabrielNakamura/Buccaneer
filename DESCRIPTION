@@ -17,3 +17,4 @@ VignetteBuilder: knitr
 Depends: 
     R (>= 2.10)
 LazyData: true
+URL: https://gabrielnakamura.github.io/Buccaneer/

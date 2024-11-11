@@ -9,7 +9,7 @@ vignette: >
 
 ```{r, include = FALSE}
 knitr::opts_chunk$set(
-  eval = FALSE,
+  eval = TRUE,
   collapse = TRUE,
   comment = "#>"
 )
@@ -17,6 +17,8 @@ knitr::opts_chunk$set(
 
 ```{r setup}
 library(buccaneer)
+library(ggplot2)
+library(dplyr)
 ```
 
 # Background
@@ -207,7 +209,7 @@ We will calculate individual mean coexistence using reach criteria
 
 indiv_species_reach_coex <- 
   IndivSpec_reach_richness(df.TS.TE = df_TS_TE_faurby,
-                           df.occ = df_occ_faurby2,
+                           df.occ = df_occ_faurby,
                            time.slice = 0.1, 
                            round.digits = 1,
                            species = "species",
