@@ -1,0 +1,112 @@
+---
+title: "Building time series based on species coexistence"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{assemblage-time-series}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  eval = FALSE,
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(buccaneer)
+library(ggplot2)
+library(dplyr)
+data("df_TS_TE_faurby")
+data("df_occ_faurby")
+data("df_TS_TE_mass")
+
+```
+
+
+## Assemblage regional richness
+
+```{r}
+df_assemblage_reg_richness <- 
+  Assemblage_regional_richness(df.TS.TE = df_TS_TE_faurby,
+                               df.occ = df_occ_faurby, 
+                               time.slice = 0.1, 
+                               grid.size = 3,
+                               round.digits = 1,
+                               species = "species",
+                               TS = "TS",
+                               TE = "TE",
+                               Max.age = "Max.age",
+                               Min.age = "Min.age", 
+                               lat = "lat", 
+                               lon = "lng", 
+                               crs = 4326)
+
+```
+
+plotting time series based on mean assemblage regional richness
+
+```{r}
+df_assemblage_reg_richness |> 
+  ggplot(aes(x = time.slice, y = mean.rich.by.grid.slice)) +  # Line thickness for better visibility
+  geom_smooth(se = TRUE, method = "loess", size = 1) +
+  labs(title = "",
+       x = "Time",
+       y = "Mean species richness assemblage") +
+  theme_minimal()  +
+  scale_x_continuous(breaks = seq(max(df_assemblage_reg_richness$time.slice), 0, by = -10)) +
+  scale_x_reverse() +
+  theme(legend.position = "none")# Use a clean theme
+```
+
+## Assemblage regional mpd
+
+```{r}
+df_TS_TE_mass2 <- 
+  df_TS_TE_mass |> 
+  rename(species = "Genus")
+
+df_TS_TE_mass3 <-
+  df_TS_TE_mass2 |> 
+  filter(across(c(TS, TE), ~ !is.na(.)))
+
+df_assemblage_reg_mpd <- 
+  Assemblage_regional_mpd(df.TS.TE = df_TS_TE_mass3,
+                        df.occ = df_occ_faurby, 
+                        time.slice = 0.1, 
+                        grid.size = 3, 
+                        trait = "mean.size", 
+                        round.digits = 1, 
+                        species = "species", 
+                        TS = "TS", 
+                        TE = "TE",
+                        Max.age = "Max.age",
+                        Min.age = "Min.age", 
+                        lat = "lat",
+                        lon = "lng",
+                        crs = 4326)
+```
+
+
+plotting mpd assemblage
+
+```{r}
+df_assemblage_reg_mpd2 <- 
+  df_assemblage_reg_mpd |> 
+  mutate(time.slice = as.numeric(time.slice)) 
+
+df_assemblage_reg_mpd2 |> 
+  ggplot(aes(x = time.slice, y = mean.mpd)) +  # Line thickness for better visibility
+  geom_smooth(se = TRUE, method = "loess", size = 1) +
+  labs(title = "",
+       x = "Time",
+       y = "Mean mpd assemblage") +
+  theme_minimal()  +
+  scale_x_continuous(breaks = seq(max(df_assemblage_reg_richness$time.slice), 0, by = -10)) +
+  scale_x_reverse() +
+  theme(legend.position = "none")# Use a clean theme
+```
+
+

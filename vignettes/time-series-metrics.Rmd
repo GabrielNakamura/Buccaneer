@@ -244,3 +244,10 @@ indiv_species_reach_coex2 |>
   theme(legend.position = "none")
 ```
 
+
+### Individual reach coexistence mpd
+
+```{r}
+
+```
+

@@ -1,9 +1,10 @@
-#' Mean richness by communities in a time series
+#' Compute mean pairwise distance for each site in time slices
 #'
 #' @param df.TS.TE
 #' @param df.occ
 #' @param time.slice
 #' @param grid.size
+#' @param trait
 #' @param round.digits
 #' @param species
 #' @param TS
@@ -18,11 +19,12 @@
 #' @export
 #'
 #' @examples
-Assemblage_regional_richness <-
+Assemblage_regional_mpd <-
   function(df.TS.TE,
            df.occ,
            time.slice,
            grid.size,
+           trait,
            round.digits = 1,
            species = "species",
            TS = "TS",
@@ -35,9 +37,9 @@ Assemblage_regional_richness <-
   ){
 
     df.TS.TE <-
-      df.TS.TE[, c(species, TS, TE)]
-    vars <- list(species, TS, TE)
-    name_vars <- c("species", "TS", "TE")
+      df.TS.TE[, c(species, TS, TE, trait)]
+    vars <- list(species, TS, TE, trait)
+    name_vars <- c("species", "TS", "TE", "trait")
     names(vars) <- name_vars
     column.names <- names(unlist(vars))
     colnames(df.TS.TE) <- column.names
@@ -126,33 +128,56 @@ Assemblage_regional_richness <-
 
     names(list_interval) <- seq_interval
 
-    list_res_rich <-
+    # trait data
+    matrix_dist_trait <-
+      as.matrix(dist(x = df.TS.TE[, "trait"], method = "euclidean", upper = T, diag = T))
+
+    rownames(matrix_dist_trait) <- df.TS.TE$species
+    colnames(matrix_dist_trait) <- df.TS.TE$species
+
+    # computing ses mpd
+
+    res_mpd <-
       lapply(1:length(list_interval), function(x){
         if(!is.data.frame(list_interval[[x]]) == TRUE){
-          df_res <- NA
+          NA
         } else{
-          df_res <-
-            list_interval[[x]] |>
-            filter(Max.age >= seq_interval[x] & Min.age <= seq_interval[x]) |>
-            mutate(time.slice = seq_interval[x]) |>
-            group_by(grid_id.x) |>
-            add_count(grid_id.x, name = "rich.by.grid") |>
-            mutate(mean.rich.by.grid.slice = mean(rich.by.grid)) |>
-            as.data.frame()
+          # site names
+          sites_test <- names(table(list_interval[[x]]$grid_id.x))
+
+          # building community matrix
+          comm_mat_test <-
+            lapply(sites_test, function(y){
+              spp <- as.data.frame(list_interval[[x]][which(y == list_interval[[x]]$grid_id.x), "species"])$species
+              comm_mat <- matrix(1, nrow = 1, ncol = length(spp), dimnames = list("comm", spp))
+              comm_mat
+            })
+
+          # calculating mpd
+          list_sesmpd_test <-
+            lapply(comm_mat_test, function(x){
+              ses.mpd.modif(samp = x, dis = matrix_dist_trait, runs = 1, null.model = "taxa.labels")
+            })
+
+          # naming list
+          names(list_sesmpd_test) <- sites_test
+
+          # response data frame
+          data.frame(do.call(rbind, list_sesmpd_test), site = sites_test, time.slice = names(list_interval)[x])
+
         }
-        return(df_res)
       })
 
-    names(list_res_rich) <- seq_interval
+    names(res_mpd) <- seq_interval
 
-    # binding list
+    res <- do.call(rbind, res_mpd)
 
+    res_mean_mpd_grid <-
+      res |>
+      group_by(time.slice) |>
+      mutate(mean.mpd = mean(mpd.obs, na.rm = TRUE))
 
-    list_df_res_rich2 <- list_res_rich[!is.na(list_res_rich)]
-
-    df_long_rich_assemblage <- do.call(rbind, list_df_res_rich2)
-    return(df_long_rich_assemblage)
-
+    return(res_mean_mpd_grid)
 
 
   }
