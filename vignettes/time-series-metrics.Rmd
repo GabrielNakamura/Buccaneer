@@ -1,0 +1,244 @@
+---
+title: "Time series metrics"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{time-series-metrics}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  eval = FALSE,
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(buccaneer)
+```
+
+# Background
+
+Here we will use the same data processed in the article xXXXX.
+
+
+# Loading data and packages
+
+```{r}
+data("df_TS_TE_faurby")
+data("df_TS_TE_mass")
+data("df_occ_faurby")
+
+```
+
+
+## Individual species analysis
+
+### Individual species regional coexistence
+
+```{r}
+indiv_species_coex <- 
+  IndivSpecies_regional_richness(df.TS.TE = df_TS_TE_faurby, 
+                                 time.slice = 0.1,
+                                 round.digits = 1,
+                                 species = "species",
+                                 TS = "TS",
+                                 TE = "TE")
+
+```
+This output contain two data frames, one with all individual coexistences per species in all time slices, and another containing the mean species coexistence considering all time slices
+
+```{r}
+df_mean_individual_species <- indiv_species_coex$mean_species_coexistence
+df_indiv_species_long <- indiv_species_coex$df_IndivSpp_coexist
+```
+
+
+We can plot the results of all time mean species coexistence for three species 
+
+```{r}
+df_indiv_species_long |> 
+  filter(species == "Alopecocyon" | species == "Protursus" | species == "Simocyon") |> 
+  ggplot(aes(x = species, y = n.coexistence, fill = species)) +
+  geom_violin(trim = FALSE) +  # Line thickness for better visibility
+  labs(title = "",
+       x = "Species",
+       y = "mean coexistences by species") +
+  theme_minimal() +
+  theme(legend.position = "none")# Use a clean theme
+```
+
+We can also plot the time series for each species
+
+```{r}
+df_indiv_species_long |> 
+  filter(species == "Alopecocyon" | species == "Protursus" | species == "Simocyon") |> 
+  ggplot(aes(x = time.slice, y = n.coexistence, color = species, group = species)) +  # Line thickness for better visibility
+  geom_smooth(se = TRUE, method = "loess", size = 1) +
+  facet_wrap(~species) +
+  labs(title = "",
+       x = "Time",
+       y = "number of coexistences by species") +
+  theme_minimal()  +
+  scale_x_continuous(breaks = seq(max(df_indiv_species_long$time.slice), 0, by = -10)) +
+  scale_x_reverse() +
+  theme(legend.position = "none")# Use a clean theme
+```
+
+
+### Individual species regional mpd
+
+We can also plot individual species mpd for all species coexisting in regional context.
+For this we will also use data on body mass for all species
+
+
+```{r}
+
+df_TS_TE_mass2 <- 
+  df_TS_TE_mass |> 
+  filter(across(c(TS, TE), ~ !is.na(.)))
+
+indiv_regional_species_mpd <-
+  IndivSpecies_regional_mpd(df.TS.TE = df_TS_TE_mass2, 
+                            time.slice = 0.1, 
+                            trait = "mean.size",
+                            round.digits = 1, 
+                            species = "Genus",
+                            TS = "TS",
+                            TE = "TE")
+
+df_indiv_species_mpd_long<- indiv_regional_species_mpd$df_IndivSpp_mpd
+```
+
+Plotting the results for individual species mpd from the object
+
+```{r}
+df_indiv_species_mpd_long |> 
+  filter(species == "Alopecocyon" | species == "Simocyon" | species == "Prepoecilogale" | species == "Vormela" | species == "Hesperocyon") |> 
+  ggplot(aes(x = time.slice, y = mpd, color = species, group = species)) +  # Line thickness for better visibility
+  geom_smooth(se = TRUE, method = "loess", size = 1) +
+  facet_wrap(~species) +
+  labs(title = "",
+       x = "Time",
+       y = "mean mpd") +
+  theme_minimal()  +
+  scale_x_continuous(breaks = seq(max(df_indiv_species_mpd_long$time.slice), 0, by = -10)) +
+  scale_x_reverse() +
+  theme(legend.position = "none")# Use a clean theme
+```
+
+
+
+
+### Individual species site coexistence
+
+Here we will perform the same calculations but using site criteria for individual species coexistence
+
+```{r}
+indiv_species_site_coex <- 
+  IndivSpec_site_richness(df.TS.TE = df_TS_TE_faurby,
+                          df.occ = df_occ_faurby, 
+                          time.slice = 0.1,
+                          round.digits = 1,
+                          species = "species",
+                          TS = "TS",
+                          TE = "TE",
+                          Max.age = "Max.age",
+                          Min.age = "Min.age",
+                          site = "site")
+
+indiv_species_site_coex2 <- 
+  indiv_species_site_coex |> 
+  mutate(time.slice = as.numeric(time.slice))
+
+
+```
+
+plotting species coexistence considering site coexistence
+
+```{r}
+indiv_species_site_coex2 |> 
+  filter(species == "Alopecocyon" | species == "Simocyon" | species == "Prepoecilogale" | species == "Vormela" | species == "Hesperocyon") |> 
+  ggplot(aes(x = time.slice, y = mean.per.spp, color = species, group = species)) +  # Line thickness for better visibility
+  geom_smooth(se = TRUE, method = "loess", size = 1) +
+  facet_wrap(~species) +
+  labs(title = "",
+       x = "Time",
+       y = "mean coexistence") +
+  theme_minimal()  +
+  scale_x_continuous(breaks = seq(max(indiv_species_site_coex2$time.slice), 0, by = -10)) +
+  scale_x_reverse() +
+  theme(legend.position = "none")
+```
+
+### Individual species site mpd 
+
+We can calculate mean pairwise distances of individual species coexistence metrics based on site co-occurrence
+
+```{r}
+
+df_TS_TE_mass3 <- 
+  df_TS_TE_mass2 |> 
+  rename(species = "Genus")
+
+
+indiv_species_site_mpd <- 
+  IndivSpec_site_mpd(df.TS.TE = df_TS_TE_mass3, 
+                     df.occ = df_occ_faurby, 
+                     time.slice = 0.1, 
+                     trait = "mean.size",
+                     round.digits = 1,
+                     species = "species",
+                     TS = "TS",
+                     TE = "TE",
+                     Max.age = "Max.age",
+                     Min.age = "Min.age",
+                     site = "site")
+```
+
+
+### Individual reach coexistence 
+
+We will calculate individual mean coexistence using reach criteria
+
+```{r}
+
+indiv_species_reach_coex <- 
+  IndivSpec_reach_richness(df.TS.TE = df_TS_TE_faurby,
+                           df.occ = df_occ_faurby2,
+                           time.slice = 0.1, 
+                           round.digits = 1,
+                           species = "species",
+                           TS = "TS",
+                           TE = "TE",
+                           Max.age = "Max.age",
+                           Min.age = "Min.age",
+                           lat = "lat",
+                           lon = "lng")
+
+```
+
+plotting individual species coexistence with reach criteria
+
+```{r}
+
+indiv_species_reach_coex2 <- 
+  indiv_species_reach_coex |> 
+  mutate(time.slice = as.numeric(time.slice))
+
+indiv_species_reach_coex2 |> 
+  filter(species == "Ursus" | species == "Simocyon" | species == "Plionarctos" | species == "Vormela" | species == "Hesperocyon") |> 
+  ggplot(aes(x = time.slice, y = n.coexistence, color = species, group = species)) +  # Line thickness for better visibility
+  geom_smooth(se = TRUE, method = "loess", size = 1) +
+  facet_wrap(~species) +
+  labs(title = "",
+       x = "Time",
+       y = "mean coexistence") +
+  theme_minimal()  +
+  scale_x_continuous(breaks = seq(max(indiv_species_site_coex2$time.slice), 0, by = -10)) +
+  scale_x_reverse() +
+  theme(legend.position = "none")
+```
+
