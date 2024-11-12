@@ -177,7 +177,14 @@ Assemblage_regional_mpd <-
       group_by(time.slice) |>
       mutate(mean.mpd = mean(mpd.obs, na.rm = TRUE))
 
-    return(res_mean_mpd_grid)
+    # returning both mpd and grid
+
+    list_res <- vector(mode = "list")
+
+    list_res$grid <- sf_grid
+    list_res$mean_mpd_grid <- res_mean_mpd_grid
+
+    return(list_res)
 
 
   }

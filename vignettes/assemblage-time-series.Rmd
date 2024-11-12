@@ -51,6 +51,7 @@ plotting time series based on mean assemblage regional richness
 ```{r}
 df_assemblage_reg_richness |> 
   ggplot(aes(x = time.slice, y = mean.rich.by.grid.slice)) +  # Line thickness for better visibility
+  geom_point(aes(x = time.slice, y = mean.rich.by.grid.slice)) +
   geom_smooth(se = TRUE, method = "loess", size = 1) +
   labs(title = "",
        x = "Time",
@@ -94,11 +95,12 @@ plotting mpd assemblage
 
 ```{r}
 df_assemblage_reg_mpd2 <- 
-  df_assemblage_reg_mpd |> 
+  df_assemblage_reg_mpd$mean_mpd_grid |> 
   mutate(time.slice = as.numeric(time.slice)) 
 
 df_assemblage_reg_mpd2 |> 
   ggplot(aes(x = time.slice, y = mean.mpd)) +  # Line thickness for better visibility
+  geom_point(aes(x = time.slice, y = mean.mpd)) +
   geom_smooth(se = TRUE, method = "loess", size = 1) +
   labs(title = "",
        x = "Time",
@@ -109,4 +111,45 @@ df_assemblage_reg_mpd2 |>
   theme(legend.position = "none")# Use a clean theme
 ```
 
+## Mapping diversity in space
+
+Here we will map richness and mpd in space through time
+
+```{r}
+
+# mean by sites
+sf_mean_site <- 
+  df_assemblage_reg_mpd$mean_mpd_grid |> 
+  ungroup() |> 
+  group_by(site) |> 
+  mutate(mean.site = mean(mpd.obs, na.rm = TRUE), 
+         var.site = var(mpd.obs, na.rm = TRUE)
+         )
+
+sf_grid_metric <- 
+  df_assemblage_reg_mpd$grid |> 
+  mutate(grid_id = as.character(grid_id)) |> 
+  left_join(sf_mean_site, by = c(grid_id = "site")) 
+  
+
+
+# plotting in a map
+
+continents <- rnaturalearth::ne_countries(scale = "medium", returnclass = "sf")
+sf_mean_site2 <- sf::st_transform(sf_grid_metric, crs = "+proj=moll +x_0=0 +y_0=0 +lat_0=0 +lon_0=0")
+continents <- sf::st_transform(continents, crs = "+proj=moll +x_0=0 +y_0=0 +lat_0=0 +lon_0=0")
+
+
+
+ggplot() +
+  geom_sf(data = sf_mean_site2, aes(fill = mean.site)) +  # Your data
+  geom_sf(data = continents, fill = NA, color = "black") +  # Continent boundaries
+  scale_fill_viridis_c(name = "plasma") +  # Optional: Use a color scale
+  theme_minimal() +
+  labs(title = "",
+       fill = "Mean mpd by site")
+
+
+
+```
 

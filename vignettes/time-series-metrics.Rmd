@@ -35,6 +35,106 @@ data("df_occ_faurby")
 
 ```
 
+## Clade level analysis 
+
+Calculating time series at clade level 
+
+```{r}
+regional_richness <- 
+  regional_clade_richness(df.TS.TE = df_TS_TE_faurby,
+                          time.slice = 0.1,
+                          round.digits = 1,
+                          species = "species",
+                          TS = "TS",
+                          TE = "TE")
+```
+
+Plotting the results
+
+```{r, out.width="80%", out.height="80%", dpi=300, fig.retina=2}
+regional_richness |> 
+  mutate(time.slice = as.numeric(time.slice)) |> 
+  ggplot(aes(x = time.slice, y = richness)) +
+  geom_smooth(se = TRUE, method = "loess", size = 1) +  # Line thickness for better visibility
+  geom_point(aes(x = time.slice, y = richness)) +
+  labs(title = "",
+       x = "Time",
+       y = "Richness") +
+  scale_x_continuous(breaks = seq(max(as.numeric(regional_richness$time.slice)), 0, by = -10)) +
+  scale_x_reverse() +
+  theme_minimal() +
+  theme(legend.position = "none")# Use a clean theme
+```
+
+### regional clade mpd
+
+Calculating regional clade level mpd with body size
+
+```{r}
+df_TS_TE_mass2 <- 
+  df_TS_TE_mass |> 
+  rename(species = "Genus")
+
+df_TS_TE_mass3 <- 
+  df_TS_TE_mass2 |> 
+  filter(across(c(TS, TE), ~ !is.na(.)))
+
+
+regional_mpd <- 
+  clade_regional_mpd(df.TS.TE = df_TS_TE_mass3, 
+                     time.slice = 0.1,
+                     trait = "mean.size",
+                     round.digits = 1,
+                     species = "species",
+                     TS = "TS",
+                     TE = "TE",
+                     compute.ses.mpd = FALSE)
+```
+
+Plotting mpd results
+
+```{r, out.width="80%", out.height="80%", dpi=300, fig.retina=2}
+regional_mpd |> 
+  ggplot(aes(x = time.slice, y = mpd)) +
+  geom_point(aes(x = time.slice, y = mpd)) +
+  geom_smooth(se = TRUE, method = "loess", size = 1) +  # Line thickness for better visibility
+  labs(title = "",
+       x = "Time",
+       y = "Mean Pairwise Distance") +
+  scale_x_continuous(breaks = seq(max(regional_mpd$time.slice), 0, by = -10)) +
+  scale_x_reverse() +
+  theme_minimal() +
+  theme(legend.position = "none")# Use a clean theme
+```
+
+### Clade site richness
+
+```{r}
+site_richness <- 
+  clade_site_richness(df.TS.TE = df_TS_TE_faurby, 
+                      df.occ = df_occ_faurby, 
+                      time.slice = 0.1, 
+                      round.digits = 1,
+                      species = "species",
+                      TS = "TS",
+                      TE = "TE")
+```
+Plotting the results
+
+```{r}
+site_richness |> 
+  ggplot(aes(x = as.numeric(time.slice), y = mean.richness.site)) +
+  geom_point(aes(x = as.numeric(time.slice), y = mean.richness.site)) +
+  geom_smooth(se = TRUE, method = "loess", size = 1) +  # Line thickness for better visibility
+  labs(title = "",
+       x = "Time",
+       y = "Mean site richness") +
+  scale_x_continuous(breaks = seq(max(as.numeric(site_richness$time.slice)), 0, by = -10)) +
+  scale_x_reverse() +
+  theme_minimal() +
+  theme(legend.position = "none")# Use a clean theme
+```
+
 
 ## Individual species analysis
 
@@ -60,7 +160,7 @@ df_indiv_species_long <- indiv_species_coex$df_IndivSpp_coexist
 
 We can plot the results of all time mean species coexistence for three species 
 
-```{r}
+```{r, out.width="80%", out.height="80%", dpi=300, fig.retina=2}
 df_indiv_species_long |> 
   filter(species == "Alopecocyon" | species == "Protursus" | species == "Simocyon") |> 
   ggplot(aes(x = species, y = n.coexistence, fill = species)) +
@@ -74,7 +174,7 @@ df_indiv_species_long |>
 
 We can also plot the time series for each species
 
-```{r}
+```{r, out.width="80%", out.height="80%", dpi=300, fig.retina=2}
 df_indiv_species_long |> 
   filter(species == "Alopecocyon" | species == "Protursus" | species == "Simocyon") |> 
   ggplot(aes(x = time.slice, y = n.coexistence, color = species, group = species)) +  # Line thickness for better visibility
@@ -116,7 +216,7 @@ df_indiv_species_mpd_long<- indiv_regional_species_mpd$df_IndivSpp_mpd
 
 Plotting the results for individual species mpd from the object
 
-```{r}
+```{r, out.width="80%", out.height="80%", dpi=300, fig.retina=2}
 df_indiv_species_mpd_long |> 
   filter(species == "Alopecocyon" | species == "Simocyon" | species == "Prepoecilogale" | species == "Vormela" | species == "Hesperocyon") |> 
   ggplot(aes(x = time.slice, y = mpd, color = species, group = species)) +  # Line thickness for better visibility
@@ -160,7 +260,7 @@ indiv_species_site_coex2 <-
 
 plotting species coexistence considering site coexistence
 
-```{r}
+```{r, out.width="80%", out.height="80%", dpi=300, fig.retina=2}
 indiv_species_site_coex2 |> 
   filter(species == "Alopecocyon" | species == "Simocyon" | species == "Prepoecilogale" | species == "Vormela" | species == "Hesperocyon") |> 
   ggplot(aes(x = time.slice, y = mean.per.spp, color = species, group = species)) +  # Line thickness for better visibility
@@ -224,7 +324,7 @@ indiv_species_reach_coex <-
 
 plotting individual species coexistence with reach criteria
 
-```{r}
+```{r, out.width="80%", out.height="80%", dpi=300, fig.retina=2}
 
 indiv_species_reach_coex2 <- 
   indiv_species_reach_coex |> 
