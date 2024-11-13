@@ -79,6 +79,14 @@ Assemblage_regional_richness <-
       mutate(mean.age.grid = mean(midpoint),
              var.age.grid = var(midpoint))
 
+    # grid information with age
+    sf_grid_mean_age <-
+      sf::st_join(sf_grid, df_mean_var_age_grid)
+    sf_grid_mean_age2 <-
+      sf_grid_mean_age |>
+      select(grid_id.x, mean.age.grid, var.age.grid, geometry) |>
+      rename(grid_id = "grid_id.x")
+
 
     # joining grid information with occurrence information
 
@@ -151,8 +159,29 @@ Assemblage_regional_richness <-
     list_df_res_rich2 <- list_res_rich[!is.na(list_res_rich)]
 
     df_long_rich_assemblage <- do.call(rbind, list_df_res_rich2)
-    return(df_long_rich_assemblage)
+    df_long_rich_assemblage2 <-
+      df_long_rich_assemblage |>
+      select(grid_id.x, mean.age.grid, var.age.grid, time.slice, rich.by.grid, mean.rich.by.grid.slice, geometry) |>
+      rename(grid_id = grid_id.x)
+
+
+    # list with results
+
+    list_res <- vector(mode = "list")
+
+    # joining grid with mean age
+
+    list_res$grid_mean_age <-
+      sf_grid_mean_age2 |>
+      mutate(grid_id = as.character(grid_id))# metrics at grid level
+    list_res$time_series_rich <- df_long_rich_assemblage2 |>
+      mutate(grid_id = as.character(grid_id))
+    # metrics at time slice level
+    return(list_res)
 
 
 
   }
+
+
+
