@@ -144,6 +144,7 @@ Assemblage_regional_mpd <-
         } else{
           # site names
           sites_test <- names(table(list_interval[[x]]$grid_id.x))
+          geometry_site <- list_interval[[x]][match(sites_test, list_interval[[x]]$grid_id.x), "geometry"]
 
           # building community matrix
           comm_mat_test <-
@@ -163,7 +164,7 @@ Assemblage_regional_mpd <-
           names(list_sesmpd_test) <- sites_test
 
           # response data frame
-          data.frame(do.call(rbind, list_sesmpd_test), site = sites_test, time.slice = names(list_interval)[x])
+          data.frame(do.call(rbind, list_sesmpd_test), site = sites_test, time.slice = names(list_interval)[x], geometry = geometry_site)
 
         }
       })
@@ -172,17 +173,38 @@ Assemblage_regional_mpd <-
 
     res <- do.call(rbind, res_mpd)
 
-    res_mean_mpd_grid <-
+    res_mean_mpd_timeslice <-
       res |>
       group_by(time.slice) |>
-      mutate(mean.mpd = mean(mpd.obs, na.rm = TRUE))
+      mutate(mean.mpd = mean(mpd.obs, na.rm = TRUE)) |>
+      mutate(time.slice = as.numeric(time.slice))
 
-    # returning both mpd and grid
+    # calculating the mean mpd and variance for mpd at grid level
+
+
+    df_grid_mean <-
+      res_mean_mpd_timeslice |>
+      ungroup() |>
+      group_by(site) |>
+      mutate(grid.mean = mean(mpd.obs, na.rm = TRUE)) |>
+      rename(grid_id = site) |>
+      select(grid_id, grid.mean, geometry) |>
+      distinct(grid_id, .keep_all = TRUE)
+
+    # joining with grid information
+
+    #sf_grid_mean_mpd <-
+    #  sf_grid2 |>
+    #  left_join(df_grid_mean, by = c(grid_id = "grid_id")) |>
+    #  distinct(grid_id, .keep_all = TRUE)
+
+
+    # returning both mpd by time slice and mean value per grid
 
     list_res <- vector(mode = "list")
 
-    list_res$grid <- sf_grid
-    list_res$mean_mpd_grid <- res_mean_mpd_grid
+    list_res$mean_mpd_grid <- df_grid_mean
+    list_res$mean_mpd_timeslice <- res_mean_mpd_timeslice
 
     return(list_res)
 
