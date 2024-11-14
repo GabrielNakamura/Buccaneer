@@ -58,8 +58,8 @@ regional_richness |>
   geom_smooth(se = TRUE, method = "loess", size = 1) +  # Line thickness for better visibility
   geom_point(aes(x = time.slice, y = richness)) +
   labs(title = "",
-       x = "Time",
-       y = "Richness") +
+       x = "Tempo",
+       y = "Riqueza") +
   scale_x_continuous(breaks = seq(max(as.numeric(regional_richness$time.slice)), 0, by = -10)) +
   scale_x_reverse() +
   theme_minimal() +
@@ -68,43 +68,82 @@ regional_richness |>
 
 ### regional clade mpd
 
-Calculating regional clade level mpd with body size
+Calculating regional clade level mpd with body size. First with all species
 
 ```{r}
-df_TS_TE_mass2 <- 
-  df_TS_TE_mass |> 
-  rename(species = "Genus")
-
-df_TS_TE_mass3 <- 
-  df_TS_TE_mass2 |> 
-  filter(across(c(TS, TE), ~ !is.na(.)))
-
 
 regional_mpd <- 
-  clade_regional_mpd(df.TS.TE = df_TS_TE_mass3, 
+  clade_regional_mpd(df.TS.TE = df_TS_TE_mass, 
                      time.slice = 0.1,
                      trait = "mean.size",
                      round.digits = 1,
                      species = "species",
                      TS = "TS",
                      TE = "TE",
-                     compute.ses.mpd = FALSE)
+                     compute.ses.mpd = TRUE)
 ```
+
+Calculating comparing mpd between and within groups
+
+```{r}
+regional_mpd_between <- 
+  clade_regional_mpd(df.TS.TE = df_TS_TE_mass, 
+                     time.slice = 0.1,
+                     trait = "mean.size",
+                     round.digits = 1,
+                     species = "species",
+                     TS = "TS",
+                     TE = "TE",
+                     compute.ses.mpd = TRUE,
+                     null.model = "taxa.labels",
+                     runs = 999, 
+                     group = "group", 
+                     group.focal.compare = c("Caniformia", "Feliformia"),
+                     type.comparison = "between")
+```
+Calculating within species considering only Caniformia as the focal group
+
+```{r}
+regional_mpd_within <- 
+  clade_regional_mpd(df.TS.TE = df_TS_TE_mass, 
+                     time.slice = 0.1,
+                     trait = "mean.size",
+                     round.digits = 1,
+                     species = "species",
+                     TS = "TS",
+                     TE = "TE",
+                     compute.ses.mpd = TRUE,
+                     null.model = "taxa.labels",
+                     runs = 999, 
+                     group = "group", 
+                     group.focal.compare = c("Caniformia", "Feliformia"),
+                     type.comparison = "within")
+```
+
+Joining all results to plot in one graphic
+
+```{r}
+all_mpd_regional <- rbind(regional_mpd, regional_mpd_between, regional_mpd_within)
+all_mpd_regional2 <- data.frame(all_mpd_regional, group_res = rep(c("All", "Between", "Within"), each = nrow(regional_mpd_within)))
+
+```
+
+
 
 Plotting mpd results
 
 ```{r, out.width="80%", out.height="80%", dpi=300, fig.retina=2}
-regional_mpd |> 
-  ggplot(aes(x = time.slice, y = mpd)) +
-  geom_point(aes(x = time.slice, y = mpd)) +
+all_mpd_regional2 |> 
+  ggplot(aes(x = time.slice, y = ses.mpd, color = group_res)) +
+  geom_point(aes(x = time.slice, y = ses.mpd)) +
   geom_smooth(se = TRUE, method = "loess", size = 1) +  # Line thickness for better visibility
   labs(title = "",
        x = "Time",
-       y = "Mean Pairwise Distance") +
-  scale_x_continuous(breaks = seq(max(regional_mpd$time.slice), 0, by = -10)) +
-  scale_x_reverse() +
+       y = "Mean Pairwise Distance (ses)") +
+  scale_x_continuous(breaks = seq(40, 0, by = -10)) +
+  xlim(40, 0) +
   theme_minimal() +
-  theme(legend.position = "none")# Use a clean theme
+  theme(legend.position = "bottom")# Use a clean theme
 ```
 
 ### Clade site richness
