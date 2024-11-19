@@ -16,7 +16,7 @@ knitr::opts_chunk$set(
 ```
 
 ```{r setup}
-library(buccaneer)
+#library(buccaneer)
 library(ggplot2)
 library(dplyr)
 data("df_TS_TE_faurby")
@@ -123,21 +123,14 @@ map_grid_rich_var
 ## Assemblage regional mpd
 
 ```{r}
-df_TS_TE_mass2 <- 
-  df_TS_TE_mass |> 
-  rename(species = "Genus")
-
-df_TS_TE_mass3 <-
-  df_TS_TE_mass2 |> 
-  filter(across(c(TS, TE), ~ !is.na(.)))
 
 df_assemblage_reg_mpd <- 
-  Assemblage_regional_mpd(df.TS.TE = df_TS_TE_mass3,
+  Assemblage_regional_mpd(df.TS.TE = df_TS_TE_mass,
                         df.occ = df_occ_faurby, 
                         time.slice = 0.1, 
-                        grid.size = 3, 
+                        grid.size = 5, 
                         trait = "mean.size", 
-                        round.digits = 1, 
+                        round.digits = 1,
                         species = "species", 
                         TS = "TS", 
                         TE = "TE",

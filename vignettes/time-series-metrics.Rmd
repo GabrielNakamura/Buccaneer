@@ -201,23 +201,26 @@ We can plot the results of all time mean species coexistence for three species
 
 ```{r, out.width="80%", out.height="80%", dpi=300, fig.retina=2}
 df_indiv_species_long |> 
-  filter(species == "Alopecocyon" | species == "Protursus" | species == "Simocyon") |> 
+  filter(species == "Canis" | species == "Ursus" | species == "Ursavus") |> 
   ggplot(aes(x = species, y = n.coexistence, fill = species)) +
   geom_violin(trim = FALSE) +  # Line thickness for better visibility
+  geom_point(aes(x = species, y = n.coexistence, fill = species), shape = 21) +
   labs(title = "",
-       x = "Species",
-       y = "mean coexistences by species") +
+       x = "Espécies",
+       y = "Coexistência média") +
   theme_minimal() +
-  theme(legend.position = "none")# Use a clean theme
+  theme(legend.position = "none", 
+        panel.grid.major = element_line(linetype = "dashed"))# Use a clean theme
 ```
 
 We can also plot the time series for each species
 
 ```{r, out.width="80%", out.height="80%", dpi=300, fig.retina=2}
 df_indiv_species_long |> 
-  filter(species == "Alopecocyon" | species == "Protursus" | species == "Simocyon") |> 
+  filter(species == "Canis" | species == "Ursavus" | species == "Ursus" | species == "Panthera") |> 
   ggplot(aes(x = time.slice, y = n.coexistence, color = species, group = species)) +  # Line thickness for better visibility
   geom_smooth(se = TRUE, method = "loess", size = 1) +
+  geom_point(aes(x = time.slice, y = n.coexistence, color = species), shape = 21) +
   facet_wrap(~species) +
   labs(title = "",
        x = "Time",
@@ -242,11 +245,11 @@ df_TS_TE_mass2 <-
   filter(across(c(TS, TE), ~ !is.na(.)))
 
 indiv_regional_species_mpd <-
-  IndivSpecies_regional_mpd(df.TS.TE = df_TS_TE_mass2, 
+  IndivSpecies_regional_mpd(df.TS.TE = df_TS_TE_mass, 
                             time.slice = 0.1, 
                             trait = "mean.size",
                             round.digits = 1, 
-                            species = "Genus",
+                            species = "species",
                             TS = "TS",
                             TE = "TE")
 
@@ -257,13 +260,14 @@ Plotting the results for individual species mpd from the object
 
 ```{r, out.width="80%", out.height="80%", dpi=300, fig.retina=2}
 df_indiv_species_mpd_long |> 
-  filter(species == "Alopecocyon" | species == "Simocyon" | species == "Prepoecilogale" | species == "Vormela" | species == "Hesperocyon") |> 
+  filter(species == "Canis" | species == "Ursavus" | species == "Ursus" | species == "Panthera") |> 
   ggplot(aes(x = time.slice, y = mpd, color = species, group = species)) +  # Line thickness for better visibility
+  geom_point(aes(x = time.slice, y = mpd, color = species), shape = 21) +
   geom_smooth(se = TRUE, method = "loess", size = 1) +
   facet_wrap(~species) +
   labs(title = "",
-       x = "Time",
-       y = "mean mpd") +
+       x = "Tempo",
+       y = "Distância média (mpd)") +
   theme_minimal()  +
   scale_x_continuous(breaks = seq(max(df_indiv_species_mpd_long$time.slice), 0, by = -10)) +
   scale_x_reverse() +
