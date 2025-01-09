@@ -70,7 +70,7 @@ We can plot grid values at different time slices or a summary metric considering
 ```{r}
 df_assemblage_grid_richness <- df_assemblage_reg_richness$grid_mean_age
 
-continents <- rnaturalearth::ne_countries(scale = "medium", returnclass = "sf")
+continents <- rnaturalearth::ne_coastline(scale = "medium", returnclass = "sf")
 sf_mean_site <- sf::st_transform(df_assemblage_grid_richness, crs = "+proj=moll +x_0=0 +y_0=0 +lat_0=0 +lon_0=0")
 continents <- sf::st_transform(continents, crs = "+proj=moll +x_0=0 +y_0=0 +lat_0=0 +lon_0=0")
 

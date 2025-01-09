@@ -14,28 +14,13 @@ clade_regional_mpd(
   TE = "TE",
   compute.ses.mpd = TRUE,
   null.model = "taxa.labels",
-  runs = 999
+  runs = 999,
+  group = NULL,
+  group.focal.compare = NULL,
+  type.comparison = NULL
 )
 }
 \arguments{
-\item{df.TS.TE}{}
-
-\item{time.slice}{}
-
-\item{trait}{}
-
-\item{round.digits}{}
-
-\item{species}{}
-
-\item{TS}{}
-
-\item{TE}{}
-
-\item{compute.ses.mpd}{}
-
-\item{null.model}{}
-
 \item{runs}{}
 }
 \description{

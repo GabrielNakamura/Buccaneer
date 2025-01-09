@@ -9,14 +9,13 @@ vignette: >
 
 ```{r, include = FALSE}
 knitr::opts_chunk$set(
-  eval = TRUE,
+  eval = FALSE,
   collapse = TRUE,
   comment = "#>"
 )
 ```
 
 ```{r setup}
-library(buccaneer)
 library(ggplot2)
 library(dplyr)
 ```
