@@ -8,6 +8,8 @@ IndivSpecies_regional_mpd(
   df.TS.TE,
   time.slice,
   trait,
+  dist.trait,
+  nearest.taxon = "all",
   round.digits = 1,
   species = "species",
   TS = "TS",
@@ -21,6 +23,12 @@ origination time, extinction time and a trait value for each species.}
 \item{time.slice}{scalar indicating the time interval between consecutive time slices}
 
 \item{trait}{Numeric indicating the values of the traits for each species}
+
+\item{dist.trait}{A distance matrix containing pairwise distance between species}
+
+\item{nearest.taxon}{scalar indicating the number of closest species that will be used to compute
+the mean pairwise distance. If "all", the default, all species coexisting in a time slice
+will be used to calculate mpd}
 
 \item{round.digits}{scalar indicating the number of digits for time of origination and time for
 extinction}
