@@ -47,6 +47,8 @@
 <span>  <span class="va">df.TS.TE</span>,</span>
 <span>  <span class="va">time.slice</span>,</span>
 <span>  <span class="va">trait</span>,</span>
+<span>  <span class="va">dist.trait</span>,</span>
+<span>  nearest.taxon <span class="op">=</span> <span class="st">"all"</span>,</span>
 <span>  round.digits <span class="op">=</span> <span class="fl">1</span>,</span>
 <span>  species <span class="op">=</span> <span class="st">"species"</span>,</span>
 <span>  TS <span class="op">=</span> <span class="st">"TS"</span>,</span>
@@ -69,6 +71,16 @@ origination time, extinction time and a trait value for each species.</p></dd>
 
 <dt id="arg-trait">trait<a class="anchor" aria-label="anchor" href="#arg-trait"></a></dt>
 <dd><p>Numeric indicating the values of the traits for each species</p></dd>
+
+
+<dt id="arg-dist-trait">dist.trait<a class="anchor" aria-label="anchor" href="#arg-dist-trait"></a></dt>
+<dd><p>A distance matrix containing pairwise distance between species</p></dd>
+
+
+<dt id="arg-nearest-taxon">nearest.taxon<a class="anchor" aria-label="anchor" href="#arg-nearest-taxon"></a></dt>
+<dd><p>scalar indicating the number of closest species that will be used to compute
+the mean pairwise distance. If "all", the default, all species coexisting in a time slice
+will be used to calculate mpd</p></dd>
 
 
 <dt id="arg-round-digits">round.digits<a class="anchor" aria-label="anchor" href="#arg-round-digits"></a></dt>
