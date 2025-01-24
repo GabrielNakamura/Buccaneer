@@ -3,8 +3,10 @@
 #' @param df.TS.TE a data frame object containing at least four columns. Species names,
 #'     origination time, extinction time and a trait value for each species.
 #' @param time.slice scalar indicating the time interval between consecutive time slices
-#' @param trait Numeric indicating the values of the traits for each species
-#' @param dist.trait A distance matrix containing pairwise distance between species
+#' @param trait Character indicating the name of the column containing values of the traits for each species. If NULL,
+#'     the default, the user must provide a distance matrix
+#' @param dist.trait A distance matrix containing pairwise distance between species. If NULL
+#'     the default, the user must provide a trait in trait argument
 #' @param nearest.taxon scalar indicating the number of closest species that will be used to compute
 #'     the mean pairwise distance. If "all", the default, all species coexisting in a time slice
 #'     will be used to calculate mpd
