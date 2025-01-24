@@ -234,7 +234,12 @@ df_indiv_species_long |>
 ### Individual species regional mpd
 
 We can also plot individual species mpd for all species coexisting in regional context.
-For this we will also use data on body mass for all species
+    For this we will also use data on body mass for all species. There are different ways 
+    in which mpd can be calculated. We can calculate it using a single trait or a combination
+    of traits. The later require a distance trait matrix (passed to `dist` argument)
+    containing the pairwise distances among species.
+    
+Here we show how to calculate mpd using a single trait, in this case body mass.
 
 
 ```{r}
@@ -252,10 +257,10 @@ indiv_regional_species_mpd <-
                             TS = "TS",
                             TE = "TE")
 
-df_indiv_species_mpd_long<- indiv_regional_species_mpd$df_IndivSpp_mpd
+df_indiv_species_mpd_long <- indiv_regional_species_mpd$df_IndivSpp_mpd
 ```
 
-Plotting the results for individual species mpd from the object
+Plotting the results for individual species mpd 
 
 ```{r, out.width="80%", out.height="80%", dpi=300, fig.retina=2}
 df_indiv_species_mpd_long |> 
@@ -273,7 +278,15 @@ df_indiv_species_mpd_long |>
   theme(legend.position = "none")# Use a clean theme
 ```
 
+#### Individual species regional mpd with varying distances and multiple traits
 
+In order to calculate the mpd for multiple traits the user must inform an object
+   of class dist containing all pairwise distances among species. The function can
+   handle distances in different ways. It can use all pairwise distances to obtain
+   the mpd, or the user can inform throught the argument `nearest.taxon` the 
+   number of nearest species that will be used to calculate the mpd. The default is 
+   `all` which is the same as calculating the mpd considering all species co-occurring 
+   in a time slice.
 
 
 ### Individual species site coexistence

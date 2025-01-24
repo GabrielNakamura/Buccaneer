@@ -7,8 +7,8 @@
 IndivSpecies_regional_mpd(
   df.TS.TE,
   time.slice,
-  trait,
-  dist.trait,
+  trait = NULL,
+  dist.trait = NULL,
   nearest.taxon = "all",
   round.digits = 1,
   species = "species",
