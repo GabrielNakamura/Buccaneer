@@ -169,7 +169,8 @@ IndivSpecies_regional_mpd <-
 
     df_IndivSpecies_mpd4 <-
       df_IndivSpecies_mpd3 |>
-      filter(spp != 1)
+      filter(spp != 1) |>
+      rename(species = spp)
 
     # data frame with results
     return(df_IndivSpecies_mpd4)

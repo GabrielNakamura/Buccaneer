@@ -257,7 +257,7 @@ indiv_regional_species_mpd <-
                             TS = "TS",
                             TE = "TE")
 
-df_indiv_species_mpd_long <- indiv_regional_species_mpd$df_IndivSpp_mpd
+df_indiv_species_mpd_long <- indiv_regional_species_mpd
 ```
 
 Plotting the results for individual species mpd 
@@ -287,6 +287,17 @@ In order to calculate the mpd for multiple traits the user must inform an object
    number of nearest species that will be used to calculate the mpd. The default is 
    `all` which is the same as calculating the mpd considering all species co-occurring 
    in a time slice.
+
+```{r}
+IndivSpecies_regional_mpd(df.TS.TE = df_TS_TE_mass, 
+                            time.slice = 0.1, 
+                            trait = "mean.size",
+                            round.digits = 1, 
+                            species = "species",
+                            TS = "TS",
+                            TE = "TE")
+```
+
 
 
 ### Individual species site coexistence

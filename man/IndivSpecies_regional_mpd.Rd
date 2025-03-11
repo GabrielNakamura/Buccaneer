@@ -22,9 +22,11 @@ origination time, extinction time and a trait value for each species.}
 
 \item{time.slice}{scalar indicating the time interval between consecutive time slices}
 
-\item{trait}{Numeric indicating the values of the traits for each species}
+\item{trait}{Character indicating the name of the column containing values of the traits for each species. If NULL,
+the default, the user must provide a distance matrix}
 
-\item{dist.trait}{A distance matrix containing pairwise distance between species}
+\item{dist.trait}{A distance matrix containing pairwise distance between species. If NULL
+the default, the user must provide a trait in trait argument}
 
 \item{nearest.taxon}{scalar indicating the number of closest species that will be used to compute
 the mean pairwise distance. If "all", the default, all species coexisting in a time slice
