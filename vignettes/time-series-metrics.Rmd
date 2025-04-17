@@ -138,18 +138,18 @@ regional_mpd_between2 <-
                           group.focal.compare = c("Caniformia", "Feliformia"), 
                           type.comparison = "between")
 
-regional_mpd_between4 <- 
+regional_mpd_within <- 
   clade_regional_distance(df.TS.TE = df_TS_TE_mass, 
                           time.slice = 0.1,
                           dist.trait = dist_body_mass,
-                          nearest.taxon = 4, 
+                          nearest.taxon = 1, 
                           round.digits = 1, 
                           species = "species", 
                           TS = "TS", 
                           TE = "TE", 
                           group = "group", 
                           group.focal.compare = c("Caniformia", "Feliformia"), 
-                          type.comparison = "between")
+                          type.comparison = "within")
 ```
 
 

@@ -75,16 +75,6 @@ clade_regional_distance <-
         names(which(rowSums(x) >= 1))
       })
 
-    comm_all <- matrix(0, nrow = length(spp_slice), ncol = length(df.TS.TE$species),
-                       dimnames = list(paste("slice", seq_interval, sep = "_"), df.TS.TE$species))
-
-    # community matrix
-    for(i in 1:length(spp_slice)){
-      # i = 552
-      pos_spp <- match(spp_slice[[i]], colnames(comm_all))
-      pos_comm <- i
-      comm_all[i, pos_spp] <- 1
-    }
 
     # trait distance
     if(!is.null(dist.trait) == TRUE){
@@ -96,12 +86,6 @@ clade_regional_distance <-
     rownames(matrix_dist_trait) <- df.TS.TE$species
     colnames(matrix_dist_trait) <- df.TS.TE$species
 
-    # calculating the distances by each timeslice according to at threshold
-    matrix_dist_trait_times <-
-      aux_mpd_general(df.TS.TE = df.TS.TE,
-                      dist.trait = dist.trait,
-                      nearest.taxon = nearest.taxon)
-
 
     # modified trait matrix containing group comparison
     if(!is.null(group.focal.compare) == TRUE){
@@ -111,48 +95,65 @@ clade_regional_distance <-
       spp_compare <- df.TS.TE[which(df.TS.TE$group == compare), "species"]$species
 
       if(type.comparison == "between"){# comparison between species of two groups
-        matrix_dist_trait[spp_focal, spp_focal] <- 0 # removing within groups distances
-        matrix_dist_trait[spp_compare, spp_compare] <- 0 # removing within groups distances
+        matrix_dist_trait_comp <- matrix_dist_trait[spp_focal, spp_compare] # focal speices in lines and comparison in columns
       }
       if(type.comparison == "within"){ # comparison only within the focal group
-        spp_focal <- df.TS.TE[which(df.TS.TE$group == focal), "species"]$species
-        spp_remove <- df.TS.TE[which(focal != df.TS.TE$group), "species"]$species
-        matrix_dist_trait[spp_remove, spp_remove] <- 0
-        matrix_dist_trait[spp_remove, spp_focal] <- 0
-        matrix_dist_trait[spp_focal, spp_remove] <- 0
+        matrix_dist_trait_comp <- matrix_dist_trait[spp_focal, spp_focal]
       }
     }
 
-
-
-    # calculating mpd for all species considering group comparisons and otu co-occurrences in each timeslice
-    res_vec_mean_dist <- numeric(length = length(matrix_dist_trait_times))
-    res_vec_sd_dist <- numeric(length = length(matrix_dist_trait_times))
-    for(i in 1:length(matrix_dist_trait_times)){
-      # i = 211
-      if(all(is.na(matrix_dist_trait_times[[i]])) == TRUE){
-        res_vec_mean_dist[i] <- NA
+    # filtering by timeslices
+    mean_dist_timeslice <- vector(length = length(spp_slice))
+    var_dist_timeslice <- vector(length = length(spp_slice))
+    for(i in 1:length(spp_slice)){
+      # i = 179
+      if(length(spp_slice) == 1){
+        mean_dist_timeslice[i] <- NA
+        var_dist_timeslice <- NA
       } else{
-        matrix_dist_trait_time <- matrix_dist_trait[match(names(matrix_dist_trait_times[[i]]), colnames(matrix_dist_trait)),
-                                                    match(names(matrix_dist_trait_times[[i]]), colnames(matrix_dist_trait))]
-        # matrix with only distances from desired group comparison and otu that occur in a given time slice
-        spp_rows_keep <- spp_focal[match(rownames(matrix_dist_trait_time), spp_focal)]
-        spp_columns_keep <- spp_compare[match(rownames(matrix_dist_trait_time), spp_compare)]
-        if(all(is.na(spp_rows_keep)) == TRUE){
-          res_vec_mean_dist[i] <- NA
+        rows <- match(spp_slice[i][[1]], rownames(matrix_dist_trait_comp))
+        cols <- match(spp_slice[i][[1]], colnames(matrix_dist_trait_comp))
+        # checking the presence of representants of focal and comparison groups
+        if(all(is.na(rows)) | all(is.na(cols))){
+          mean_dist_timeslice[i] <- NA
+          var_dist_timeslice <- NA
         } else{
-          mat_comp_group_time <-
-            matrix_dist_trait_time[na.omit(spp_rows_keep),
-                                   na.omit(spp_columns_keep)]
-          res_vec_mean_dist[i] <- mean(as.vector(mat_comp_group_time))
-          res_vec_sd_dist[i] <- sd(as.vector(mat_comp_group_time))
+          # if there is only one representant of focal and comparison group
+          if(length(rows) == 1 | length(cols) == 1){
+            mean_dist_timeslice[i] <- NA
+            var_dist_timeslice <- NA
+          } else{
+            matrix_dist_comp2 <- matrix_dist_trait_comp[na.omit(match(spp_slice[i][[1]], rownames(matrix_dist_trait_comp))),
+                                                        na.omit(match(spp_slice[i][[1]], colnames(matrix_dist_trait_comp)))]
+            matrix_dist_comp3 <- apply(matrix_dist_comp2, 1, function(x) sort(x))
+            if(type.comparison == "within"){
+              matrix_dist_comp3 <- matrix_dist_comp3[-1,]
+            }
+
+            # filtering by the threshold and keeping only the n nearest species
+            # if the matrix has only one closest distance
+            if(is.vector(matrix_dist_comp3) == TRUE){
+              mean_dist_timeslice[i] <- mean(matrix_dist_comp3)
+              var_dist_timeslice[i] <- var(as.vector(matrix_dist_comp3))
+            } else{ # if the matrix has less close taxon than the threshold get the total number of comparison of the matrix
+              if(nearest.taxon > dim(matrix_dist_comp3)[1]){
+                nearest.taxon <- dim(matrix_dist_comp3)[1]
+                mean_dist_timeslice[i] <- mean(as.vector(matrix_dist_comp3[1:nearest.taxon, ]))
+                var_dist_timeslice[i] <- var(as.vector(matrix_dist_comp3[1:nearest.taxon, ]))
+              }
+
+              mean_dist_timeslice[i] <- mean(as.vector(matrix_dist_comp3[1:nearest.taxon, ]))
+              var_dist_timeslice[i] <- var(as.vector(matrix_dist_comp3[1:nearest.taxon, ]))
+            }
+          }
         }
       }
     }
 
+    # data frame with the results
     df_res <-
-      data.frame(mean.distance = res_vec_mean_dist,
-                 sd.distance = res_vec_sd_dist,
+      data.frame(mean.distance = mean_dist_timeslice,
+                 sd.distance = var_dist_timeslice,
                  time.slice = paste("slice", seq_interval, sep = "_")
       )
 
