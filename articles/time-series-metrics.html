@@ -173,18 +173,18 @@ matrix and a distance threshold (1 = mnnd)</p>
 <span>                          group.focal.compare <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Caniformia"</span>, <span class="st">"Feliformia"</span><span class="op">)</span>, </span>
 <span>                          type.comparison <span class="op">=</span> <span class="st">"between"</span><span class="op">)</span></span>
 <span></span>
-<span><span class="va">regional_mpd_between4</span> <span class="op">&lt;-</span> </span>
+<span><span class="va">regional_mpd_within</span> <span class="op">&lt;-</span> </span>
 <span>  <span class="fu">clade_regional_distance</span><span class="op">(</span>df.TS.TE <span class="op">=</span> <span class="va">df_TS_TE_mass</span>, </span>
 <span>                          time.slice <span class="op">=</span> <span class="fl">0.1</span>,</span>
 <span>                          dist.trait <span class="op">=</span> <span class="va">dist_body_mass</span>,</span>
-<span>                          nearest.taxon <span class="op">=</span> <span class="fl">4</span>, </span>
+<span>                          nearest.taxon <span class="op">=</span> <span class="fl">1</span>, </span>
 <span>                          round.digits <span class="op">=</span> <span class="fl">1</span>, </span>
 <span>                          species <span class="op">=</span> <span class="st">"species"</span>, </span>
 <span>                          TS <span class="op">=</span> <span class="st">"TS"</span>, </span>
 <span>                          TE <span class="op">=</span> <span class="st">"TE"</span>, </span>
 <span>                          group <span class="op">=</span> <span class="st">"group"</span>, </span>
 <span>                          group.focal.compare <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Caniformia"</span>, <span class="st">"Feliformia"</span><span class="op">)</span>, </span>
-<span>                          type.comparison <span class="op">=</span> <span class="st">"between"</span><span class="op">)</span></span></code></pre></div>
+<span>                          type.comparison <span class="op">=</span> <span class="st">"within"</span><span class="op">)</span></span></code></pre></div>
 <p>Joining all results to plot in one graphic</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">all_mpd_regional</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">rbind</a></span><span class="op">(</span><span class="va">regional_mpd</span>, <span class="va">regional_mpd_between</span>, <span class="va">regional_mpd_within</span><span class="op">)</span></span>
