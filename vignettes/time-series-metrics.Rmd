@@ -65,59 +65,16 @@ regional_richness |>
   theme(legend.position = "none")# Use a clean theme
 ```
 
-### regional clade mpd
+### regional clade trait distances
 
-Calculating regional clade level mpd with body size. First with all species
-
-```{r}
-
-regional_mpd <- 
-  clade_regional_mpd(df.TS.TE = df_TS_TE_mass, 
-                     time.slice = 0.1,
-                     trait = "mean.size",
-                     round.digits = 1,
-                     species = "species",
-                     TS = "TS",
-                     TE = "TE",
-                     compute.ses.mpd = TRUE)
-```
-
-Calculating comparing mpd between and within groups
-
-```{r}
-regional_mpd_between <- 
-  clade_regional_mpd(df.TS.TE = df_TS_TE_mass, 
-                     time.slice = 0.1,
-                     trait = "mean.size",
-                     round.digits = 1,
-                     species = "species",
-                     TS = "TS",
-                     TE = "TE",
-                     compute.ses.mpd = TRUE,
-                     null.model = "taxa.labels",
-                     runs = 999, 
-                     group = "group", 
-                     group.focal.compare = c("Caniformia", "Feliformia"),
-                     type.comparison = "between")
-```
-Calculating within species considering only Caniformia as the focal group
-
-```{r}
-regional_mpd_within <- 
-  clade_regional_mpd(df.TS.TE = df_TS_TE_mass, 
-                     time.slice = 0.1,
-                     trait = "mean.size",
-                     round.digits = 1,
-                     species = "species",
-                     TS = "TS",
-                     TE = "TE",
-                     compute.ses.mpd = TRUE,
-                     null.model = "taxa.labels",
-                     runs = 999, 
-                     group = "group", 
-                     group.focal.compare = c("Caniformia", "Feliformia"),
-                     type.comparison = "within")
-```
+Here we calculate the mean distances using a general function that allows to set up the 
+    group comparison in which the mean will be calculate. It can be `between` to calculate 
+    mean distances between a focal and a target group or `within` to calculate the mean trait distance 
+    only within the focal group
+    
+This function is also a general solution to calculate the mean trait distance using different 
+    number of species/genus that are close to each other. This is set up in the argument 
+    `nearest.taxon`. 1 is equivalent of mnnd.
 
 Calculating comparing mpd between and within groups using a distance matrix and a 
     distance threshold (1 = mnnd)
@@ -125,7 +82,8 @@ Calculating comparing mpd between and within groups using a distance matrix and 
 ```{r}
 dist_body_mass <- dist(df_TS_TE_mass$mean.size)
 
-regional_mpd_between2 <- 
+# distances between groups using as focal group Caniformia
+regional_mnd_between <- 
   clade_regional_distance(df.TS.TE = df_TS_TE_mass, 
                           time.slice = 0.1,
                           dist.trait = dist_body_mass,
@@ -138,7 +96,8 @@ regional_mpd_between2 <-
                           group.focal.compare = c("Caniformia", "Feliformia"), 
                           type.comparison = "between")
 
-regional_mpd_within <- 
+# distance within the focal group, in this case is Caniformia
+regional_mnd_within <- 
   clade_regional_distance(df.TS.TE = df_TS_TE_mass, 
                           time.slice = 0.1,
                           dist.trait = dist_body_mass,
@@ -157,8 +116,8 @@ regional_mpd_within <-
 Joining all results to plot in one graphic
 
 ```{r}
-all_mpd_regional <- rbind(regional_mpd, regional_mpd_between, regional_mpd_within)
-all_mpd_regional2 <- data.frame(all_mpd_regional, group_res = rep(c("All", "Between", "Within"), each = nrow(regional_mpd_within)))
+all_mnd_regional <- rbind(regional_mnd_between, regional_mnd_within)
+all_mnd_regional2 <- data.frame(all_mnd_regional, group_res = rep(c("Between", "Within"), each = nrow(regional_mnd_within)))
 
 ```
 
@@ -167,13 +126,14 @@ all_mpd_regional2 <- data.frame(all_mpd_regional, group_res = rep(c("All", "Betw
 Plotting mpd results
 
 ```{r, out.width="80%", out.height="80%", dpi=300, fig.retina=2}
-all_mpd_regional2 |> 
-  ggplot(aes(x = time.slice, y = ses.mpd, color = group_res)) +
-  geom_point(aes(x = time.slice, y = ses.mpd)) +
+all_mnd_regional2 |> 
+  mutate(time.slice.numeric = as.numeric(unlist(lapply(strsplit(time.slice, "_"), function(x) x[2])))) |> 
+  ggplot(aes(x = time.slice.numeric, y = mean.distance, color = group_res)) +
+  geom_point(aes(x = time.slice.numeric, y = mean.distance)) +
   geom_smooth(se = TRUE, method = "loess", size = 1) +  # Line thickness for better visibility
   labs(title = "",
        x = "Time",
-       y = "Mean Pairwise Distance (ses)") +
+       y = "Mean Distance") +
   scale_x_continuous(breaks = seq(40, 0, by = -10)) +
   xlim(40, 0) +
   theme_minimal() +
