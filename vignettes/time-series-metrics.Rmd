@@ -119,6 +119,41 @@ regional_mpd_within <-
                      type.comparison = "within")
 ```
 
+Calculating comparing mpd between and within groups using a distance matrix and a 
+    distance threshold (1 = mnnd)
+    
+```{r}
+dist_body_mass <- dist(df_TS_TE_mass$mean.size)
+
+regional_mpd_between2 <- 
+  clade_regional_distance(df.TS.TE = df_TS_TE_mass, 
+                          time.slice = 0.1,
+                          dist.trait = dist_body_mass,
+                          nearest.taxon = 1, 
+                          round.digits = 1, 
+                          species = "species", 
+                          TS = "TS", 
+                          TE = "TE", 
+                          group = "group", 
+                          group.focal.compare = c("Caniformia", "Feliformia"), 
+                          type.comparison = "between")
+
+regional_mpd_between4 <- 
+  clade_regional_distance(df.TS.TE = df_TS_TE_mass, 
+                          time.slice = 0.1,
+                          dist.trait = dist_body_mass,
+                          nearest.taxon = 4, 
+                          round.digits = 1, 
+                          species = "species", 
+                          TS = "TS", 
+                          TE = "TE", 
+                          group = "group", 
+                          group.focal.compare = c("Caniformia", "Feliformia"), 
+                          type.comparison = "between")
+```
+
+
+
 Joining all results to plot in one graphic
 
 ```{r}

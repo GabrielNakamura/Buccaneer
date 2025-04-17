@@ -10,6 +10,9 @@
 #' @param compute.ses.mpd
 #' @param null.model
 #' @param runs
+#' @param group
+#' @param group.focal.compare
+#' @param type.comparison
 #'
 #' @return
 #' @export
