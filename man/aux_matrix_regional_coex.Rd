@@ -14,16 +14,6 @@ aux_matrix_regional_coex(
 )
 }
 \arguments{
-\item{df.TS.TE}{}
-
-\item{time.slice}{}
-
-\item{round.digits}{}
-
-\item{species}{}
-
-\item{TS}{}
-
 \item{TE}{}
 }
 \description{

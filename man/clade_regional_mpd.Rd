@@ -21,7 +21,7 @@ clade_regional_mpd(
 )
 }
 \arguments{
-\item{runs}{}
+\item{type.comparison}{}
 }
 \description{
 Compute regional clade Mean Pairwise Distance in a time series
