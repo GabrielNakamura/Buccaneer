@@ -106,28 +106,36 @@ clade_regional_distance <-
     mean_dist_timeslice <- vector(length = length(spp_slice))
     var_dist_timeslice <- vector(length = length(spp_slice))
     for(i in 1:length(spp_slice)){
-      # i = 179
+      # i = 22
       if(length(spp_slice) == 1){
         mean_dist_timeslice[i] <- NA
-        var_dist_timeslice <- NA
+        var_dist_timeslice[i] <- NA
       } else{
         rows <- match(spp_slice[i][[1]], rownames(matrix_dist_trait_comp))
         cols <- match(spp_slice[i][[1]], colnames(matrix_dist_trait_comp))
         # checking the presence of representants of focal and comparison groups
         if(all(is.na(rows)) | all(is.na(cols))){
           mean_dist_timeslice[i] <- NA
-          var_dist_timeslice <- NA
+          var_dist_timeslice[i] <- NA
         } else{
           # if there is only one representant of focal and comparison group
           if(length(rows) == 1 | length(cols) == 1){
             mean_dist_timeslice[i] <- NA
-            var_dist_timeslice <- NA
+            var_dist_timeslice[i] <- NA
           } else{
-            matrix_dist_comp2 <- matrix_dist_trait_comp[na.omit(match(spp_slice[i][[1]], rownames(matrix_dist_trait_comp))),
-                                                        na.omit(match(spp_slice[i][[1]], colnames(matrix_dist_trait_comp)))]
+            matrix_dist_comp2 <- matrix_dist_trait_comp[na.omit(rows),
+                                                        na.omit(cols)]
+            if(!is.matrix(matrix_dist_comp2) == TRUE){
+              matrix_dist_comp2 <- as.matrix(matrix_dist_comp2)
+
+            }
             matrix_dist_comp3 <- apply(matrix_dist_comp2, 1, function(x) sort(x))
             if(type.comparison == "within"){
-              matrix_dist_comp3 <- matrix_dist_comp3[-1,]
+              if(is.vector(matrix_dist_comp3) == TRUE){
+                matrix_dist_comp3 <- matrix_dist_comp3
+              } else{
+                matrix_dist_comp3 <- matrix_dist_comp3[-1,]
+              }
             }
 
             # filtering by the threshold and keeping only the n nearest species
@@ -153,7 +161,7 @@ clade_regional_distance <-
     # data frame with the results
     df_res <-
       data.frame(mean.distance = mean_dist_timeslice,
-                 sd.distance = var_dist_timeslice,
+                 var.distance = var_dist_timeslice,
                  time.slice = paste("slice", seq_interval, sep = "_")
       )
 
