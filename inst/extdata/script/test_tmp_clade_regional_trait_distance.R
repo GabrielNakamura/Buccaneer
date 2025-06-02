@@ -1,35 +1,20 @@
-#' Compute regional clade mean trait distance in a time series
-#'
-#' @param df.TS.TE Data frame object containing at least four columns. Species names,
-#'     origination time, extinction time and a trait value for each species.
-#' @param time.slice Scalar indicating the time interval between consecutive time slices.
-#' @param trait Character indicating the name of the column containing values of the traits for each species. If NULL,
-#'     the default, the user must provide a distance matrix.
-#' @param round.digits Scalar indicating the precision of time slices.
-#' @param species Character indicating the name of the column of the data frame
-#'     containing the species name information.
-#' @param TS Character indicating the name of the columns of the data frame
-#'     containing the information on origination time.
-#' @param TE Character indicating the name of the column of the data frame
-#'     containing the information on extinction time.
-#' @param group Character indicating the name of the column that contain the groups that will be used
-#'     in comparison.
-#' @param group.focal.compare Character vector indicating the focal (first element) and comparison (second element)
-#'     groups used in the calculation. If NULL, the default, the metrics  will be calculated
-#'     using all  clades.
-#' @param type.comparison Character. It can be "between" to compute distances only between species/genus of two groups
-#'     or "within" to calculate distance only inside the focal group. If null the distance is computed
-#'     considering all clades together
-#' @param dist.trait A dist object containing the clade pairwise distance matrices.
-#'     The name of the clades in this object must be equal to the name of the
-#'     clades in df.TS.TE data frame.
-#' @param nearest.taxon A scalar indicating the number of nearest species/genus that will be used.
-#'     1 computes mnnd metric and the option "all" computes mpd.
-#'
-#' @return
-#' @export
-#'
-#' @examples
+
+dados_caninae
+trait <- dados_caninae[, c("mass", "rbl")]
+dist_body_mass <- dist(trait)
+df.TS.TE = dados_caninae
+time.slice = 0.1
+dist.trait = dist_body_mass
+nearest.taxon = "all"
+trait = NULL
+round.digits = 1
+species = "spp"
+TS = "TS"
+TE = "TE"
+group = "group"
+group.focal.compare = c("focal_group", "focal_group")
+type.comparison = "within"
+
 clade_regional_distance <-
   function(df.TS.TE,
            time.slice,
