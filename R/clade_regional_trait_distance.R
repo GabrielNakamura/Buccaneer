@@ -1,4 +1,4 @@
-#' Compute regional clade Mean Trait Distance in a time series
+#' Compute regional clade mean trait distance in a time series
 #'
 #' @param df.TS.TE Data frame object containing at least four columns. Species names,
 #'     origination time, extinction time and a trait value for each species.
@@ -14,10 +14,15 @@
 #'     containing the information on extinction time.
 #' @param group Character indicating the name of the column that contain the groups that will be used
 #'     in comparison.
-#' @param group.focal.compare Character vector indicating the focal (first element) and comparison (second element).
+#' @param group.focal.compare Character vector indicating the focal (first element) and comparison (second element)
+#'     groups used in the calculation. If NULL, the default, the metrics  will be calculated
+#'     using all  clades.
 #' @param type.comparison Character. It can be "between" to compute distances only between species/genus of two groups
-#'     or "within" to calculate distance only inside the focal group.
-#' @param dist.trait A dist object containing the pairwise distance matrices
+#'     or "within" to calculate distance only inside the focal group. If null the distance is computed
+#'     considering all clades together
+#' @param dist.trait A dist object containing the clade pairwise distance matrices.
+#'     The name of the clades in this object must be equal to the name of the
+#'     clades in df.TS.TE data frame.
 #' @param nearest.taxon A scalar indicating the number of nearest species/genus that will be used.
 #'     1 computes mnnd metric and the option "all" computes mpd.
 #'
@@ -106,7 +111,7 @@ clade_regional_distance <-
     mean_dist_timeslice <- vector(length = length(spp_slice))
     var_dist_timeslice <- vector(length = length(spp_slice))
     for(i in 1:length(spp_slice)){
-      # i = 22
+      # i = 540
       if(length(spp_slice) == 1){
         mean_dist_timeslice[i] <- NA
         var_dist_timeslice[i] <- NA
@@ -144,14 +149,20 @@ clade_regional_distance <-
               mean_dist_timeslice[i] <- mean(matrix_dist_comp3)
               var_dist_timeslice[i] <- var(as.vector(matrix_dist_comp3))
             } else{ # if the matrix has less close taxon than the threshold get the total number of comparison of the matrix
-              if(nearest.taxon > dim(matrix_dist_comp3)[1]){
-                nearest.taxon <- dim(matrix_dist_comp3)[1]
+              if(nearest.taxon == "all"){ # used to compute mpd - considering all distances
+                mean_dist_timeslice[i] <- mean(as.vector(matrix_dist_comp3[1:nrow(matrix_dist_comp3), ]))
+                var_dist_timeslice[i] <- var(as.vector(matrix_dist_comp3[1:nrow(matrix_dist_comp3), ]))
+              }
+              if(is.numeric(nearest.taxon) == TRUE){ # used to compute mean distances considering thresholds
+                if(nearest.taxon > dim(matrix_dist_comp3)[1]){
+                  nearest.taxon <- dim(matrix_dist_comp3)[1]
+                  mean_dist_timeslice[i] <- mean(as.vector(matrix_dist_comp3[1:nearest.taxon, ]))
+                  var_dist_timeslice[i] <- var(as.vector(matrix_dist_comp3[1:nearest.taxon, ]))
+                }
+
                 mean_dist_timeslice[i] <- mean(as.vector(matrix_dist_comp3[1:nearest.taxon, ]))
                 var_dist_timeslice[i] <- var(as.vector(matrix_dist_comp3[1:nearest.taxon, ]))
               }
-
-              mean_dist_timeslice[i] <- mean(as.vector(matrix_dist_comp3[1:nearest.taxon, ]))
-              var_dist_timeslice[i] <- var(as.vector(matrix_dist_comp3[1:nearest.taxon, ]))
             }
           }
         }

@@ -171,7 +171,26 @@ site_richness |>
 
 ## Individual species analysis
 
-### Individual species regional coexistence
+In individual species analyses the focus is on the "perception" of each individual
+    species with other co-occurring species. There are two main components in this
+    module. The first computes the number of species in which a given species 
+    co-occur. The other is the mean distance between a focal individual and its
+    co-occurring species.
+    
+As the other modules there are four spatial levels in which we compute the metrics.
+   The regional level, that calculates the number of co-occurrence by each focal
+   species and all other species with occurrence data in the specified time-slice. 
+   The site level, that compute the taxonomic and trait metrics considering as 
+   co-existing species only those that present occurrence in the same site
+   (usually defined accordingly to the PBDB definition of a site, or another 
+   definition provided by the user).
+   The reach level, that considers a proxy of species dispersal capacity to infer
+   the species that potentially co-occurr.
+   Finally, the assemblage level, that considers as species co-occurring only 
+   those with an occurrence record in the same assemblage, this last being defined 
+   as a grid of customized size.
+
+### Individual species regional coexistence - taxonomic
 
 ```{r}
 indiv_species_coex <- 
@@ -183,6 +202,7 @@ indiv_species_coex <-
                                  TE = "TE")
 
 ```
+
 This output contain two data frames, one with all individual coexistences per species in all time slices, and another containing the mean species coexistence considering all time slices
 
 ```{r}
