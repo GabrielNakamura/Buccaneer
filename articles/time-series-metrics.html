@@ -199,12 +199,29 @@ matrix and a distance threshold (1 = mnnd)</p>
 <div class="section level3">
 <h3 id="individual-species-analysis">Individual species analysis<a class="anchor" aria-label="anchor" href="#individual-species-analysis"></a>
 </h3>
+<p>In individual species analyses the focus is on the “perception” of
+each individual species with other co-occurring species. There are two
+main components in this module. The first computes the number of species
+in which a given species co-occur. The other is the mean distance
+between a focal individual and its co-occurring species.</p>
+<p>As the other modules there are four spatial levels in which we
+compute the metrics. The regional level, that calculates the number of
+co-occurrence by each focal species and all other species with
+occurrence data in the specified time-slice. The site level, that
+compute the taxonomic and trait metrics considering as co-existing
+species only those that present occurrence in the same site (usually
+defined accordingly to the PBDB definition of a site, or another
+definition provided by the user). The reach level, that considers a
+proxy of species dispersal capacity to infer the species that
+potentially co-occurr. Finally, the assemblage level, that considers as
+species co-occurring only those with an occurrence record in the same
+assemblage, this last being defined as a grid of customized size.</p>
 <div class="section level4">
-<h4 id="individual-species-regional-coexistence">Individual species regional coexistence<a class="anchor" aria-label="anchor" href="#individual-species-regional-coexistence"></a>
+<h4 id="individual-species-regional-coexistence---taxonomic">Individual species regional coexistence - taxonomic<a class="anchor" aria-label="anchor" href="#individual-species-regional-coexistence---taxonomic"></a>
 </h4>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">indiv_species_coex</span> <span class="op">&lt;-</span> </span>
-<span>  <span class="fu"><a href="../reference/IndivSpecies_regional_richness.html">IndivSpecies_regional_richness</a></span><span class="op">(</span>df.TS.TE <span class="op">=</span> <span class="va">df_TS_TE_faurby</span>, </span>
+<span>  <span class="fu">IndivSpecies_regional_richness</span><span class="op">(</span>df.TS.TE <span class="op">=</span> <span class="va">df_TS_TE_faurby</span>, </span>
 <span>                                 time.slice <span class="op">=</span> <span class="fl">0.1</span>,</span>
 <span>                                 round.digits <span class="op">=</span> <span class="fl">1</span>,</span>
 <span>                                 species <span class="op">=</span> <span class="st">"species"</span>,</span>
@@ -317,7 +334,7 @@ all species co-occurring in a time slice.</p>
 for individual species coexistence</p>
 <div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">indiv_species_site_coex</span> <span class="op">&lt;-</span> </span>
-<span>  <span class="fu"><a href="../reference/IndivSpec_site_richness.html">IndivSpec_site_richness</a></span><span class="op">(</span>df.TS.TE <span class="op">=</span> <span class="va">df_TS_TE_faurby</span>,</span>
+<span>  <span class="fu">IndivSpec_site_richness</span><span class="op">(</span>df.TS.TE <span class="op">=</span> <span class="va">df_TS_TE_faurby</span>,</span>
 <span>                          df.occ <span class="op">=</span> <span class="va">df_occ_faurby</span>, </span>
 <span>                          time.slice <span class="op">=</span> <span class="fl">0.1</span>,</span>
 <span>                          round.digits <span class="op">=</span> <span class="fl">1</span>,</span>
@@ -427,7 +444,7 @@ criteria</p>
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.3.</p>
 </div>
 
     </footer>
