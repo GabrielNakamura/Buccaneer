@@ -138,17 +138,17 @@ clade_regional_distance <-
               if(nearest.taxon == "all"){ # used to compute mpd - considering all distances
                 mean_dist_timeslice[i] <- mean(as.vector(matrix_dist_comp3[1:nrow(matrix_dist_comp3), ]))
                 var_dist_timeslice[i] <- var(as.vector(matrix_dist_comp3[1:nrow(matrix_dist_comp3), ]))
-              }
-              if(is.numeric(nearest.taxon) == TRUE){ # used to compute mean distances considering thresholds
-                if(nearest.taxon <= dim(matrix_dist_comp3)[1]){
-                  mean_dist_timeslice[i] <- mean(as.vector(matrix_dist_comp3[1:nearest.taxon, ]))
-                  var_dist_timeslice[i] <- var(as.vector(matrix_dist_comp3[1:nearest.taxon, ]))
-                } else{
-                  nearest.taxon <- dim(matrix_dist_comp3)[1] # n neighbours
-                  mean_dist_timeslice[i] <- mean(as.vector(matrix_dist_comp3[1:nearest.taxon, ]))
-                  var_dist_timeslice[i] <- var(as.vector(matrix_dist_comp3[1:nearest.taxon, ]))
+              } else{
+                if(is.numeric(nearest.taxon) == TRUE){ # used to compute mean distances considering thresholds
+                  if(nearest.taxon <= dim(matrix_dist_comp3)[1]){
+                    mean_dist_timeslice[i] <- mean(as.vector(matrix_dist_comp3[1:nearest.taxon, ]))
+                    var_dist_timeslice[i] <- var(as.vector(matrix_dist_comp3[1:nearest.taxon, ]))
+                  } else{
+                    tmp_nearest_taxon <- dim(matrix_dist_comp3)[1] # n neighbours
+                    mean_dist_timeslice[i] <- mean(as.vector(matrix_dist_comp3[1:tmp_nearest_taxon, ]))
+                    var_dist_timeslice[i] <- var(as.vector(matrix_dist_comp3[1:tmp_nearest_taxon, ]))
+                  } # if the nearest neighbor value are higher than the dimension of the matrix
                 }
-
               }
             }
           }
