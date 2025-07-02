@@ -47,7 +47,7 @@ IndivSpecies_regional_mpd <-
 
 
     # creating time slices
-    seq_interval <- c(seq(from = max(df.TS.TE[, "TS"]), to = min(df.TS.TE[, "TE"]), by = -time.slice), 0)
+    seq_interval <- c(seq(from = max(df.TS.TE[, "TS"]), to = min(df.TS.TE[, "TE"]), by = -time.slice))
     seq_interval <- round(seq_interval, digits = round.digits)
 
     # co-occurrence matrix

@@ -28,7 +28,8 @@ aux_matrix_regional_coex <-
     df_sub_bin <- vector(mode = "list", length = length(seq_interval))
     for (i in 1:length(seq_interval)){
       # i = 1
-      df_sub_bin[[i]] <- df.TS.TE[which(df.TS.TE$TS >= seq_interval[i] & df.TS.TE$TE <= seq_interval[i]), ]
+      df_sub_bin[[i]] <- df.TS.TE[which(round(df.TS.TE$TS, digits = round.digits) >= seq_interval[i] &
+                                          round(df.TS.TE$TE, digits = round.digits) <= seq_interval[i]), ]
     }
     matrix_coex_bin <- vector(mode = "list", length = length(df_sub_bin))
 
