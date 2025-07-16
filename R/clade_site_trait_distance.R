@@ -77,6 +77,7 @@ clade_site_distance <-
     names(vars) <- name_vars
     column.names <- names(unlist(vars))
     colnames(df_occ) <- column.names
+    df_occ$site <- as.factor(df_occ$site)
 
     # Generating time intervals used to compute temporal coexistence
     seq_interval <- seq(from = max(df.TS.TE[, "TS"]), to = min(df.TS.TE[, "TE"]), by = -time.slice)
@@ -123,6 +124,8 @@ clade_site_distance <-
       if(type.comparison == "within"){ # comparison only within the focal group
         matrix_dist_trait_comp <- matrix_dist_trait[spp_focal, spp_focal]
       }
+    } else{
+      matrix_dist_trait_comp <- matrix_dist_trait
     }
 
 
@@ -154,15 +157,19 @@ clade_site_distance <-
               mean_distances[sp, 1] <- "NA_singleton"
             }
           } else{
-            cooccur_species <- names(which(cooccur_matrix[sp, ] > 0 & names(cooccur_matrix[sp, ]) != sp))
+            if(length(species_row) == 1 & length(species_col) == 1){
+              mean_distances[sp, 1] <- dist_matrix
+            } else{
+              cooccur_species <- names(which(cooccur_matrix[sp, ] > 0 & names(cooccur_matrix[sp, ]) != sp))
 
-            # If there are co-occurring species, compute mean distance
-            if (length(cooccur_species) > 0) {
-              distance_sorted <- sort(dist_matrix[sp, cooccur_species], decreasing = FALSE)
-              if(nearest.taxon == "all"){ # calculating for all taxon
-                mean_distances[sp, 1] <- mean(as.numeric(dist_matrix[sp, cooccur_species]), na.rm = TRUE)
-              } else{ # using the threshold distance set by the user
-                mean_distances[sp, 1] <- mean(distance_sorted[1:nearest.taxon], na.rm = TRUE)
+              # If there are co-occurring species, compute mean distance
+              if (length(cooccur_species) > 0) {
+                distance_sorted <- sort(dist_matrix[sp, cooccur_species], decreasing = FALSE)
+                if(nearest.taxon == "all"){ # calculating for all taxon
+                  mean_distances[sp, 1] <- mean(as.numeric(dist_matrix[sp, cooccur_species]), na.rm = TRUE)
+                } else{ # using the threshold distance set by the user
+                  mean_distances[sp, 1] <- mean(distance_sorted[1:nearest.taxon], na.rm = TRUE)
+                }
               }
             }
           }

@@ -4,7 +4,14 @@
 \alias{comp_site_cooccurr}
 \title{Auxiliary function to compute site cooccurrence matrix per timeslice}
 \usage{
-comp_site_cooccurr(spp_slice, df.occ)
+comp_site_cooccurr(
+  spp_slice,
+  df.occ,
+  species = "species",
+  Max.age = "Max.age",
+  Min.age = "Min.age",
+  site = "site"
+)
 }
 \arguments{
 \item{spp_slice}{A list with species name in each timeslice}

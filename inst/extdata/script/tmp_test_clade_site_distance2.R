@@ -10,8 +10,12 @@ dist.trait = dist(df_TS_TE_mass$mean.size)
 nearest.taxon = 1
 trait = NULL
 group = "group"
-group.focal.compare = c("Caniformia", "Feliformia")
-type.comparison = "between"
+# group.focal.compare = c("Caniformia", "Feliformia")
+group.focal.compare = NULL
+type.comparison = NULL
+Max.age = "Max.age"
+Min.age = "Min.age"
+site = "site"
 
 clade_site_distance <-
   function(df.TS.TE,
@@ -100,6 +104,8 @@ clade_site_distance <-
       if(type.comparison == "within"){ # comparison only within the focal group
         matrix_dist_trait_comp <- matrix_dist_trait[spp_focal, spp_focal]
       }
+    } else{
+      matrix_dist_trait_comp <- matrix_dist_trait
     }
 
 
@@ -112,40 +118,45 @@ clade_site_distance <-
     # Ensure same species and same order in both cooccurrence matrix and distance matrix
     list_dist_spp <-
       lapply(list_matrix_cooccur_site, function(x){
-      species_row <- intersect(rownames(x), rownames(matrix_dist_trait_comp))
-      species_col <- intersect(colnames(x), colnames(matrix_dist_trait_comp))
-      cooccur_matrix <- x[species_row, species_col]
-      dist_matrix <- matrix_dist_trait_comp[species_row, species_col]
+        species_row <- intersect(rownames(x), rownames(matrix_dist_trait_comp))
+        species_col <- intersect(colnames(x), colnames(matrix_dist_trait_comp))
+        cooccur_matrix <- x[species_row, species_col]
+        dist_matrix <- matrix_dist_trait_comp[species_row, species_col]
 
-      # Create matrix to store the results of mean pairwise distances
-      mean_distances <- matrix(NA, nrow = length(species_row), ncol = 1,
-                               dimnames = list(species_row, paste("mean.dist.to.cooccur", nearest.taxon, sep = ".")))
+        # Create matrix to store the results of mean pairwise distances
+        mean_distances <- matrix(NA, nrow = length(species_row), ncol = 1,
+                                 dimnames = list(species_row, paste("mean.dist.to.cooccur", nearest.taxon, sep = ".")))
 
-      # calculating distances for all species
-      for (sp in species_row) {
+        # calculating distances for all species
+        for (sp in species_row) {
 
-        #checking if there are no species in the slice or
-        if(length(species_row) == 0 | length(species_col) == 0){
-          mean_distances[sp, 1] <- NA
-          if(length(species_row) != 0){
-            mean_distances[sp, 1] <- "NA_singleton"
-          }
-        } else{
-          cooccur_species <- names(which(cooccur_matrix[sp, ] > 0 & names(cooccur_matrix[sp, ]) != sp))
+          #checking if there are no species in the slice or
+          if(length(species_row) == 0 | length(species_col) == 0){
+            mean_distances[sp, 1] <- NA
+            if(length(species_row) != 0){
+              mean_distances[sp, 1] <- "NA_singleton"
+            }
 
-          # If there are co-occurring species, compute mean distance
-          if (length(cooccur_species) > 0) {
-            distance_sorted <- sort(dist_matrix[sp, cooccur_species], decreasing = FALSE)
-            if(nearest.taxon == "all"){ # calculating for all taxon
-              mean_distances[sp, 1] <- mean(as.numeric(dist_matrix[sp, cooccur_species]), na.rm = TRUE)
-            } else{ # using the threshold distance set by the user
-              mean_distances[sp, 1] <- mean(distance_sorted[1:nearest.taxon], na.rm = TRUE)
+          } else{
+            if(length(species_row) == 1 & length(species_col) == 1){
+              mean_distances[sp, 1] <- dist_matrix
+            } else{
+              cooccur_species <- names(which(cooccur_matrix[sp, ] > 0 & names(cooccur_matrix[sp, ]) != sp))
+
+              # If there are co-occurring species, compute mean distance
+              if (length(cooccur_species) > 0) {
+                distance_sorted <- sort(dist_matrix[sp, cooccur_species], decreasing = FALSE)
+                if(nearest.taxon == "all"){ # calculating for all taxon
+                  mean_distances[sp, 1] <- mean(as.numeric(dist_matrix[sp, cooccur_species]), na.rm = TRUE)
+                } else{ # using the threshold distance set by the user
+                  mean_distances[sp, 1] <- mean(distance_sorted[1:nearest.taxon], na.rm = TRUE)
+                }
+              }
             }
           }
         }
-      }
-      return(mean_distances)
-    })
+        return(mean_distances)
+      })
 
     mean_dist_timeslice <- lapply(list_dist_spp, function(x) mean(x, na.rm = TRUE))
     var_dist_timeslice <- lapply(list_dist_spp, function(x) var(x, na.rm = TRUE))

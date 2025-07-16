@@ -1,14 +1,17 @@
-#' Auxiliary function to compute site cooccurrence matrix per timeslice
+#' Auxiliar function to compute site and grid composition
 #'
-#' @param spp_slice A list with species name in each timeslice
-#' @param df.occ a occurrence data frame with the name of species and the sites in which
-#'     they occur
+#' @param spp_slice
+#' @param df.occ
+#' @param species
+#' @param Max.age
+#' @param Min.age
+#' @param site
 #'
 #' @returns
 #' @export
 #'
 #' @examples
-comp_site_cooccurr <-
+comp_site_occurrence <-
   function(spp_slice,
            df.occ,
            species = "species",
@@ -16,17 +19,23 @@ comp_site_cooccurr <-
            Min.age = "Min.age",
            site = "site"){
 
-    #df_occ <-
-    #  df.occ[, c(species, Max.age, Min.age, site)]
-
+    df_occ <-
+      df.occ[, c(species, Max.age, Min.age, site)]
+    vars <- list(species, Max.age, Min.age, site)
+    name_vars <- c("species", "Max.age", "Min.age", "site")
+    names(vars) <- name_vars
+    column.names <- names(unlist(vars))
+    colnames(df_occ) <- column.names
+    df_occ$site <- as.factor(df_occ$site)
 
     # data frame with species per slice
     list_site_interval <-
+      # x = 1
       lapply(1:length(spp_slice), function(x){
         names_slices <- names(spp_slice)[[x]]
         names_species <- spp_slice[[x]]
         filtered_df <-
-          df.occ |> filter(species %in% names_species)
+          df_occ |> filter(species %in% names_species)
 
         filtered_df_site <-
           filtered_df |>
@@ -48,7 +57,7 @@ comp_site_cooccurr <-
       })
 
     # calculate species cooccurrence matrix for each timeslice besed on site cooccurrence
-    list_matrix_cooccur_site <-
+    list_matrix_occurrence_site <-
       lapply(list_site_interval, function(x){
 
         # Step 1: Remove duplicates to avoid counting same species twice in a site
@@ -63,11 +72,11 @@ comp_site_cooccurr <-
           tidyr::pivot_wider(names_from = species, values_from = present, values_fill = 0)
 
         # Step 3: Convert to a matrix and compute cross-product
-        mat <- as.matrix(site_species_matrix[,-1])  # remove site column
-        cooccur_matrix_sites <- t(mat) %*% mat  # species-by-species co-occurrence
-        cooccur_matrix_sites
+        # mat <- as.matrix(site_species_matrix[,-1])  # remove site column
+        # cooccur_matrix_sites <- t(mat) %*% mat  # species-by-species co-occurrence
+        # cooccur_matrix_sites
+        site_species_matrix
       })
 
-    return(list_matrix_cooccur_site)
+    return(list_matrix_occurrence_site)
   }
-

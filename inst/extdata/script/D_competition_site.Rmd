@@ -1,0 +1,391 @@
+---
+title: "Untitled"
+author: "Gabriel Nakamura"
+date: "2025-07-15"
+output: html_document
+---
+
+
+# Canidae data 
+
+```{r}
+devtools::load_all()
+
+load(here::here("inst", "extdata", "df_can.Rdata"))
+load(here::here("inst", "extdata", "longevities.Rdata"))
+```
+
+Computing mean longevities
+
+```{r}
+list_df_TS_TE <- 
+  lapply(longs, function(x){
+  data.frame(species = rownames(x), TS = x$TS, TE = x$TE)
+})
+
+df_longevities <- do.call(rbind, list_df_TS_TE)
+
+# median values for TS and TE
+df_longevities2 <- 
+  df_longevities |> 
+  group_by(species) |> 
+  mutate(TS = median(TS), 
+         TE = median(TE)) |> 
+  distinct(species, .keep_all = TRUE) 
+
+```
+
+Getting occurrences
+
+```{r}
+
+df_occ <- df_can
+
+```
+
+# trait data
+
+```{r}
+df_traits <- read.csv(here::here("inst", "extdata", "final_data.csv"), sep = ",")
+df_traits2 <- 
+  df_traits |> 
+  select(LD1, log_mass)
+
+dist_traits <- dist(df_traits2)
+```
+
+
+# computing coexisting metrics
+
+
+```{r}
+res_clade_distance_site <- 
+  clade_site_distance(df.TS.TE = df_longevities2, 
+                      df.occ = df_occ, 
+                      time.slice = 0.1, 
+                      dist.trait = dist_traits, 
+                      nearest.taxon = "all",
+                      round.digits = 1,
+                      species = "species",
+                      TS = "TS",
+                      TE = "TE", 
+                      Max.age = "max", 
+                      Min.age = "min",
+                      site = "site")
+```
+
+# computing null model
+
+Computing null model for site scale considering mean distance for all coexisting
+    species in a site 
+
+First computing site occurrences
+
+
+```{r}
+
+# computing species in each timeslice
+time_slice <- 0.1
+seq_interval <- seq(from = max(df_longevities2[, "TS"]), to = min(df_longevities2[, "TE"]), by = -time_slice)
+seq_interval <- c(round(seq_interval, digits = 1))
+
+spp_slice <- 
+  calc_spp_slice(df.TS.TE = df_longevities2,
+                 time.slice = 0.1,
+                 round.digits = 1, 
+                 seq.interval = seq_interval,
+                 species = "species",
+                 TS = "TS",
+                 TE = "TE")
+
+list_composition <- 
+  comp_site_occurrence (spp_slice = spp_slice,
+                        df.occ = df_occ,
+                        species = "species",
+                        Max.age = "max",
+                        Min.age = "min",
+                        site = "site")
+
+```
+
+Now computing null models for sites
+
+```{r}
+
+# first get the complete distance matrix
+
+matrix_dist_complete <- as.matrix(dist_traits)
+rownames(matrix_dist_complete) <- df_longevities2$species
+colnames(matrix_dist_complete) <- df_longevities2$species
+
+df_null_site_all <- 
+  calc_null_model(list_occurrence = list_composition, 
+                  dist_matrix_trait = matrix_dist_complete, 
+                  nearest.taxon = "all",
+                  nperm = 1000)
+```
+
+calculating z scores
+
+```{r}
+vec_mean_null <- apply(df_null_site_all, 2, function(x) mean(x))
+sd_mean_null <- apply(df_null_site_all, 2, function(x) sd(x))
+
+# p values
+
+df_mean_obs_null <- data.frame(mean.null = vec_mean_null, sd.mean.null = sd_mean_null, obs.dist = res_clade_distance_site$mean.distance)
+
+df_mean_obs_null2 <- 
+  df_mean_obs_null |> 
+  mutate(z.values = ((obs.dist - mean.null) / (sd.mean.null))) |> 
+  mutate(dist.values = abs(obs.dist - mean.null)) 
+
+p_values <- 
+  unlist(lapply(1:nrow(df_mean_obs_null2), function(x){
+    mean(abs(df_null_site_all[, x] - df_mean_obs_null2$mean.null[x]) >= df_mean_obs_null2$dist.values[x])
+  }))
+
+# complete data frame for plotting results
+df_mean_obs_null3 <- data.frame(df_mean_obs_null2, p.values = p_values, time.slice = seq_interval)
+
+
+
+
+
+```
+
+
+# Plotting site results
+
+```{r}
+# Example data setup
+# df <- read.csv("your_data.csv")  # if loading from a file
+
+# Ensure variables are numeric
+df_mean_obs_null3$time.slice <- as.numeric(df_mean_obs_null3$time.slice)
+df_mean_obs_null3$z.values <- as.numeric(df_mean_obs_null3$z.values)
+df_mean_obs_null3$p.values <- as.numeric(df_mean_obs_null3$p.values)
+
+
+df_mean_obs_null3$significant <- df_mean_obs_null3$p.values <= 0.05
+
+library(ggplot2)
+
+plot_site_mpd <- 
+  ggplot(df_mean_obs_null3, aes(x = time.slice, y = z.values)) +
+  geom_line(color = "grey50", alpha = 0.4) +  # Transparent line
+  geom_smooth(method = "loess", se = TRUE, color = "#61c2e2", size = 3) +
+  geom_point(aes(color = significant), size = 4, alpha = 0.4) +  # Transparent points
+  scale_color_manual(values = c("TRUE" = "#e12a44", "FALSE" = "#9fb493")) +
+  geom_hline(yintercept = 0, linetype = "dashed", color = "black") +
+  scale_x_reverse() +
+  theme_minimal(base_size = 14) +
+  theme(
+    panel.grid = element_blank(),
+    legend.position = "none",
+    axis.line = element_line(color = "black"),
+    axis.ticks = element_line(color = "black"), 
+    axis.text.x = element_text(size = 26), 
+    axis.text.y = element_text(size = 26), 
+    axis.title.x = element_text(size = 26),
+    axis.title.y = element_text(size = 26)
+  ) +
+  labs(x = "Time", y = "SES - mean pairwise distance")
+
+ggsave(here::here("inst", "extdata", "figures_canidae", "plot_site_sesMPD.png"),
+       plot_site_mpd, 
+       width = 10, 
+       height = 10, 
+       dpi = 800,
+       bg = "white")
+
+```
+
+# For nearest neighbour
+
+Computing mean longevities
+
+```{r}
+list_df_TS_TE <- 
+  lapply(longs, function(x){
+  data.frame(species = rownames(x), TS = x$TS, TE = x$TE)
+})
+
+df_longevities <- do.call(rbind, list_df_TS_TE)
+
+# median values for TS and TE
+df_longevities2 <- 
+  df_longevities |> 
+  group_by(species) |> 
+  mutate(TS = median(TS), 
+         TE = median(TE)) |> 
+  distinct(species, .keep_all = TRUE) 
+
+```
+
+Getting occurrences
+
+```{r}
+
+df_occ <- df_can
+
+```
+
+# trait data
+
+```{r}
+df_traits <- read.csv(here::here("inst", "extdata", "final_data.csv"), sep = ",")
+df_traits2 <- 
+  df_traits |> 
+  select(LD1, log_mass)
+
+dist_traits <- dist(df_traits2)
+```
+
+
+# computing coexisting metrics
+
+
+```{r}
+res_clade_distance_site_nearest <- 
+  clade_site_distance(df.TS.TE = df_longevities2, 
+                      df.occ = df_occ, 
+                      time.slice = 0.1, 
+                      dist.trait = dist_traits, 
+                      nearest.taxon = 1,
+                      round.digits = 1,
+                      species = "species",
+                      TS = "TS",
+                      TE = "TE", 
+                      Max.age = "max", 
+                      Min.age = "min",
+                      site = "site")
+```
+
+# computing null model
+
+Computing null model for site scale considering mean distance for all coexisting
+    species in a site 
+
+First computing site occurrences
+
+
+```{r}
+
+# computing species in each timeslice
+time_slice <- 0.1
+seq_interval <- seq(from = max(df_longevities2[, "TS"]), to = min(df_longevities2[, "TE"]), by = -time_slice)
+seq_interval <- c(round(seq_interval, digits = 1))
+
+spp_slice <- 
+  calc_spp_slice(df.TS.TE = df_longevities2,
+                 time.slice = 0.1,
+                 round.digits = 1, 
+                 seq.interval = seq_interval,
+                 species = "species",
+                 TS = "TS",
+                 TE = "TE")
+
+list_composition <- 
+  comp_site_occurrence (spp_slice = spp_slice,
+                        df.occ = df_occ,
+                        species = "species",
+                        Max.age = "max",
+                        Min.age = "min",
+                        site = "site")
+
+```
+
+Now computing null models for sites
+
+```{r}
+
+# first get the complete distance matrix
+
+matrix_dist_complete <- as.matrix(dist_traits)
+rownames(matrix_dist_complete) <- df_longevities2$species
+colnames(matrix_dist_complete) <- df_longevities2$species
+
+df_null_site_all_nearest <- 
+  calc_null_model(list_occurrence = list_composition, 
+                  dist_matrix_trait = matrix_dist_complete, 
+                  nearest.taxon = 1,
+                  nperm = 1000)
+```
+
+calculating z scores
+
+```{r}
+vec_mean_null_nearest <- apply(df_null_site_all_nearest, 2, function(x) mean(x))
+sd_mean_null_nearest <- apply(df_null_site_all_nearest, 2, function(x) sd(x))
+
+# p values
+
+df_mean_obs_null_nearest <- data.frame(mean.null = vec_mean_null_nearest, sd.mean.null = sd_mean_null_nearest, obs.dist = res_clade_distance_site_nearest$mean.distance)
+
+df_mean_obs_null2_nearest <- 
+  df_mean_obs_null_nearest |> 
+  mutate(z.values = ((obs.dist - mean.null) / (sd.mean.null))) |> 
+  mutate(dist.values = abs(obs.dist - mean.null)) 
+
+p_values_nearest <- 
+  unlist(lapply(1:nrow(df_mean_obs_null2_nearest), function(x){
+    mean(abs(df_null_site_all_nearest[, x] - df_mean_obs_null2_nearest$mean.null[x]) >= df_mean_obs_null2_nearest$dist.values[x])
+  }))
+
+# complete data frame for plotting results
+df_mean_obs_null3_nearest <- data.frame(df_mean_obs_null2_nearest, p.values = p_values_nearest, time.slice = seq_interval)
+
+
+
+
+
+```
+
+
+# Plotting site results
+
+```{r}
+# Example data setup
+# df <- read.csv("your_data.csv")  # if loading from a file
+
+# Ensure variables are numeric
+df_mean_obs_null3_nearest$time.slice <- as.numeric(df_mean_obs_null3_nearest$time.slice)
+df_mean_obs_null3_nearest$z.values <- as.numeric(df_mean_obs_null3_nearest$z.values)
+df_mean_obs_null3_nearest$p.values <- as.numeric(df_mean_obs_null3_nearest$p.values)
+
+
+df_mean_obs_null3_nearest$significant <- df_mean_obs_null3_nearest$p.values <= 0.05
+
+library(ggplot2)
+
+plot_site_mpd_nearest <- 
+  ggplot(df_mean_obs_null3_nearest, aes(x = time.slice, y = z.values)) +
+  geom_line(color = "grey50", alpha = 0.4) +  # Transparent line
+  geom_smooth(method = "loess", se = TRUE, color = "#61c2e2", size = 3) +
+  geom_point(aes(color = significant), size = 4, alpha = 0.4) +  # Transparent points
+  scale_color_manual(values = c("TRUE" = "#e12a44", "FALSE" = "#9fb493")) +
+  geom_hline(yintercept = 0, linetype = "dashed", color = "black") +
+  scale_x_reverse() +
+  theme_minimal(base_size = 14) +
+  theme(
+    panel.grid = element_blank(),
+    legend.position = "none",
+    axis.line = element_line(color = "black"),
+    axis.ticks = element_line(color = "black"), 
+    axis.text.x = element_text(size = 26), 
+    axis.text.y = element_text(size = 26), 
+    axis.title.x = element_text(size = 26),
+    axis.title.y = element_text(size = 26)
+  ) +
+  labs(x = "Time", y = "SES - mean nearest distance")
+
+ggsave(here::here("inst", "extdata", "figures_canidae", "plot_site_sesMPD_nearest.png"),
+       plot_site_mpd_nearest, 
+       width = 10, 
+       height = 10, 
+       dpi = 800,
+       bg = "white")
+
+```
+
