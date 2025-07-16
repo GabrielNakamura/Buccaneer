@@ -16,7 +16,9 @@
 <url><loc>https://gabrielnakamura.github.io/Buccaneer/reference/IndivSpecies_regional_mpd.html</loc></url>
 <url><loc>https://gabrielnakamura.github.io/Buccaneer/reference/aux_matrix_regional_coex.html</loc></url>
 <url><loc>https://gabrielnakamura.github.io/Buccaneer/reference/aux_mpd_general.html</loc></url>
+<url><loc>https://gabrielnakamura.github.io/Buccaneer/reference/calc_null_model.html</loc></url>
 <url><loc>https://gabrielnakamura.github.io/Buccaneer/reference/calc_reach.html</loc></url>
+<url><loc>https://gabrielnakamura.github.io/Buccaneer/reference/calc_spp_slice.html</loc></url>
 <url><loc>https://gabrielnakamura.github.io/Buccaneer/reference/check_crossing_boundaries.html</loc></url>
 <url><loc>https://gabrielnakamura.github.io/Buccaneer/reference/clade_regional_distance.html</loc></url>
 <url><loc>https://gabrielnakamura.github.io/Buccaneer/reference/clade_regional_mpd.html</loc></url>
@@ -24,6 +26,7 @@
 <url><loc>https://gabrielnakamura.github.io/Buccaneer/reference/clade_site_richness.html</loc></url>
 <url><loc>https://gabrielnakamura.github.io/Buccaneer/reference/clean_occ_fossil.html</loc></url>
 <url><loc>https://gabrielnakamura.github.io/Buccaneer/reference/comp_site_cooccurr.html</loc></url>
+<url><loc>https://gabrielnakamura.github.io/Buccaneer/reference/comp_site_occurrence.html</loc></url>
 <url><loc>https://gabrielnakamura.github.io/Buccaneer/reference/get_summary_interval.html</loc></url>
 <url><loc>https://gabrielnakamura.github.io/Buccaneer/reference/get_summary_slices.html</loc></url>
 <url><loc>https://gabrielnakamura.github.io/Buccaneer/reference/index.html</loc></url>
