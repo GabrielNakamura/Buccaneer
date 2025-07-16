@@ -9,11 +9,11 @@ output: html_document
 
 ```{r}
 devtools::load_all()
-
+library(tidyr)
+library(dplyr)
 load(here::here("inst", "extdata", "df_can.Rdata"))
 load(here::here("inst", "extdata", "longevities.Rdata"))
 ```
-
 
 Computing mean longevities
 
@@ -41,7 +41,7 @@ Getting occurrences in cells of 100 km
 
 df_occ <- df_can
 
-df_grid <- palaeoverse::bin_space(occdf = df_occ, lng = "lng", lat = "lat", spacing = 100)
+df_grid <- palaeoverse::bin_space(occdf = df_occ, lng = "lng", lat = "lat", spacing = 30)
 
 df_grid2 <- 
   df_grid |> 
@@ -71,7 +71,7 @@ df_traits2 <-
 dist_traits <- dist(df_traits2)
 ```
 
-# computing coexisting metrics
+# Computing coexisting metrics
 
 
 ```{r}
@@ -90,13 +90,7 @@ res_clade_distance_assemblage <-
                       site = "cell_ID")
 ```
 
-# computing null model
-
-Computing null model for assemblage scale considering mean distance for all coexisting
-    species in a assemblage 
-
-First computing assemblage occurrences
-
+# Composition and trait matrix
 
 ```{r}
 
@@ -122,17 +116,23 @@ list_composition_assemblage <-
                         Min.age = "min",
                         site = "cell_ID")
 
-```
 
-Now computing null models for assemblages
-
-```{r}
-
-# first get the complete distance matrix
+# Trait matrix 
 
 matrix_dist_complete <- as.matrix(dist_traits)
 rownames(matrix_dist_complete) <- df_longevities2$species
 colnames(matrix_dist_complete) <- df_longevities2$species
+
+```
+
+
+# Computing null model for assemblage level
+
+Computing null model for assemblage scale considering mean distance for all coexisting
+    species in a assemblage 
+
+
+```{r}
 
 df_null_assemblage_all <- 
   calc_null_model(list_occurrence = list_composition_assemblage, 
@@ -141,7 +141,7 @@ df_null_assemblage_all <-
                   nperm = 1000)
 ```
 
-calculating z scores
+# Calculating z scores
 
 ```{r}
 vec_mean_null <- apply(df_null_assemblage_all, 2, function(x) mean(x))
@@ -165,13 +165,10 @@ p_values <-
 df_mean_obs_null3 <- data.frame(df_mean_obs_null2, p.values = p_values, time.slice = seq_interval)
 
 
-
-
-
 ```
 
 
-# Plotting site results
+# Plotting assemblages results
 
 ```{r}
 # Example data setup
@@ -208,7 +205,7 @@ plot_assemblage_mpd <-
   ) +
   labs(x = "Time", y = "SES - mean pairwise distance")
 
-ggsave(here::here("inst", "extdata", "figures_canidae", "plot_assemblage_sesMPD.png"),
+ggsave(here::here("inst", "extdata", "figures_canidae", "plot_assemblage_sesMPD_grid30.png"),
        plot_assemblage_mpd, 
        width = 10, 
        height = 10, 
@@ -325,7 +322,7 @@ plot_assemblage_mpd_nearest <-
   ) +
   labs(x = "Time", y = "SES - mean nearest distance")
 
-ggsave(here::here("inst", "extdata", "figures_canidae", "plot_assemblage_sesMPD_nearest.png"),
+ggsave(here::here("inst", "extdata", "figures_canidae", "plot_assemblage_sesMPD_nearest_grid30.png"),
        plot_assemblage_mpd_nearest, 
        width = 10, 
        height = 10, 
