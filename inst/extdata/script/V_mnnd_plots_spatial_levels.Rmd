@@ -1,0 +1,214 @@
+---
+title: "MNND plots for all spatial levels"
+author: "Gabriel Nakamura"
+date: "2025-07-22"
+output: html_document
+---
+
+# Data
+
+```{r}
+devtools::load_all()
+
+load(here::here("inst", "extdata", "df_can.Rdata"))
+load(here::here("inst", "extdata", "longevities.Rdata"))
+
+library(tidyr)
+library(dplyr)
+library(ggplot2)
+```
+
+# Processing occurrence and longevities data
+
+Computing mean longevities
+
+```{r}
+list_df_TS_TE <- 
+  lapply(longs, function(x){
+  data.frame(species = rownames(x), TS = x$TS, TE = x$TE)
+})
+
+df_longevities <- do.call(rbind, list_df_TS_TE)
+
+# median values for TS and TE
+df_longevities2 <- 
+  df_longevities |> 
+  group_by(species) |> 
+  mutate(TS = median(TS), 
+         TE = median(TE)) |> 
+  distinct(species, .keep_all = TRUE) 
+
+```
+
+Getting occurrences
+
+```{r}
+
+df_occ <- df_can
+
+```
+
+# trait data
+
+```{r}
+df_traits <- read.csv(here::here("inst", "extdata", "final_data.csv"), sep = ",")
+df_traits2 <- 
+  df_traits |> 
+  select(LD1, log_mass)
+
+dist_traits <- dist(df_traits2)
+```
+
+# Competition metrics 
+
+Mean Nearest Neighbour Distance for different spatial levels using Canidae data
+
+## Regional MMND
+
+
+```{r}
+regional_mnd_all <- 
+  clade_regional_distance(df.TS.TE = df_longevities2, 
+                          time.slice = 0.1,
+                          dist.trait = dist_traits,
+                          nearest.taxon = 1, 
+                          round.digits = 1, 
+                          species = "species", 
+                          TS = "TS", 
+                          TE = "TE", 
+                          group = NULL, 
+                          group.focal.compare = NULL, 
+                          type.comparison = NULL)
+
+```
+
+
+# Site MNND
+
+```{r}
+res_clade_distance_site_nearest <- 
+  clade_site_distance(df.TS.TE = df_longevities2, 
+                      df.occ = df_occ, 
+                      time.slice = 0.1, 
+                      dist.trait = dist_traits, 
+                      nearest.taxon = 1,
+                      round.digits = 1,
+                      species = "species",
+                      TS = "TS",
+                      TE = "TE", 
+                      Max.age = "max", 
+                      Min.age = "min",
+                      site = "site")
+```
+
+## Assemblage metrics
+
+First calculating grids
+
+```{r}
+df_grid <- palaeoverse::bin_space(occdf = df_occ, lng = "lng", lat = "lat", spacing = 100)
+
+df_grid50 <- palaeoverse::bin_space(occdf = df_occ, lng = "lng", lat = "lat", spacing = 50)
+
+df_grid2 <- 
+  df_grid |> 
+  select(species, max, min, lng, lat, cell_ID, cell_centroid_lng, cell_centroid_lat)
+
+df_grid_richness <- 
+  df_grid2 |> 
+  group_by(cell_ID) |> 
+  count(name = "n.species.grids")
+
+# data with occurrence for each grid
+df_grid3 <- 
+  df_grid2 |> 
+  left_join(df_grid_richness, by = c(cell_ID = "cell_ID"))
+```
+
+Now calculating metrics for two spatial scale: 100 and 50 degrees
+
+```{r}
+res_clade_distance_assemblage_nearest <- 
+  clade_site_distance(df.TS.TE = df_longevities2, 
+                      df.occ = df_grid3, 
+                      time.slice = 0.1, 
+                      dist.trait = dist_traits, 
+                      nearest.taxon = 1,
+                      round.digits = 1,
+                      species = "species",
+                      TS = "TS",
+                      TE = "TE", 
+                      Max.age = "max", 
+                      Min.age = "min",
+                      site = "cell_ID")
+
+
+res_clade_distance_assemblage_nearest50 <- 
+  clade_site_distance(df.TS.TE = df_longevities2, 
+                      df.occ = df_grid50, 
+                      time.slice = 0.1, 
+                      dist.trait = dist_traits, 
+                      nearest.taxon = 1,
+                      round.digits = 1,
+                      species = "species",
+                      TS = "TS",
+                      TE = "TE", 
+                      Max.age = "max", 
+                      Min.age = "min",
+                      site = "cell_ID")
+```
+
+# Joining tables
+
+```{r}
+res_all_mnnd <- 
+  rbind(regional_mnd_all,
+      res_clade_distance_site_nearest, 
+      res_clade_distance_assemblage_nearest, 
+      res_clade_distance_assemblage_nearest50)
+
+res_all_mnnd <- 
+  data.frame(res_all_mnnd, 
+             group = rep(c("Regional", 
+                           "Site",
+                           "Assemblage 100",
+                           "Assemblage 50"), 
+                         each = 371)
+  )
+
+```
+
+# All plots 
+
+```{r}
+all_plots_raw <- 
+  ggplot(res_all_mnnd, aes(x = time.slice, y = mean.distance, color = group)) +
+  geom_smooth(se = TRUE, method = "loess", span = 0.75, alpha = 0.2,  linewidth = 3) +
+  scale_x_reverse() +
+  scale_y_continuous(breaks = pretty(res_all_mnnd$mean.distance, n = 10)) +
+  theme_minimal() +
+  theme(
+    panel.grid = element_blank(),
+    legend.position = "none",
+    axis.line = element_line(color = "black"),
+    axis.ticks = element_line(color = "black"), 
+    axis.text.x = element_text(size = 26), 
+    axis.text.y = element_text(size = 26), 
+    axis.title.x = element_text(size = 26),
+    axis.title.y = element_text(size = 26)
+  ) +
+  scale_color_manual(values = c("Regional" = "#E41A1C", "Site" = "#755649", "Assemblage 100" = "#9fb493", "Assemblage 50" = "#9cc21a")) + # Customize as needed
+  labs(x = "Time", y = "Mean Nearest Distance")
+```
+
+# Saving plots
+
+```{r}
+ggsave(here::here("inst", "extdata", "figures_canidae", "plot_all_scale_mnnd_raw.png"),
+       all_plots_raw, 
+       width = 10, 
+       height = 10, 
+       dpi = 800,
+       bg = "white")
+```
+

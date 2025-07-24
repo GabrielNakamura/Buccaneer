@@ -105,6 +105,8 @@ clade_regional_distance <-
       if(type.comparison == "within"){ # comparison only within the focal group
         matrix_dist_trait_comp <- matrix_dist_trait[spp_focal, spp_focal]
       }
+    } else{
+      matrix_dist_trait_comp <- matrix_dist_trait
     }
 
     # filtering by timeslices
@@ -113,6 +115,7 @@ clade_regional_distance <-
     mean_dist_timeslice <- vector(length = length(spp_slice))
     var_dist_timeslice <- vector(length = length(spp_slice))
     for(i in 1:length(spp_slice)){
+
       if(length(spp_slice[[i]]) == 1){
         mean_dist_timeslice[i] <- NA
         var_dist_timeslice[i] <- NA
@@ -136,11 +139,15 @@ clade_regional_distance <-
 
             }
             matrix_dist_comp3 <- apply(matrix_dist_comp2, 1, function(x) sort(x))
-            if(type.comparison == "within"){
-              if(is.vector(matrix_dist_comp3) == TRUE){
-                matrix_dist_comp3 <- matrix_dist_comp3
-              } else{
-                matrix_dist_comp3 <- matrix_dist_comp3[-1,]
+            if(is.null(type.comparison) == TRUE){
+              matrix_dist_comp3 <- matrix_dist_comp3[-1, ]
+            } else{
+              if(type.comparison == "within"){
+                if(is.vector(matrix_dist_comp3) == TRUE){
+                  matrix_dist_comp3 <- matrix_dist_comp3
+                } else{
+                  matrix_dist_comp3 <- matrix_dist_comp3[-1,]
+                }
               }
             }
 
@@ -175,11 +182,11 @@ clade_regional_distance <-
     df_res <-
       data.frame(mean.distance = mean_dist_timeslice,
                  var.distance = var_dist_timeslice,
-                 time.slice = paste("slice", seq_interval, sep = "_")
-      )
+                 time.slice = seq_interval)
 
 
     # data frame with results
     return(df_res)
 
   }
+

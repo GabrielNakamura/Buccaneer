@@ -428,3 +428,35 @@ ggsave(here::here("inst", "extdata", "figures_canidae", "plot_site_MPD_raw.png")
 
 ```
 
+
+# Additional graphs for raw data
+
+```{r}
+
+plot_site_mnnd_raw <- 
+  ggplot(res_clade_distance_site_nearest, aes(x = time.slice, y = mean.distance)) +
+  geom_line(color = "grey50", alpha = 0.4) +  # Transparent line
+  geom_smooth(method = "loess", se = TRUE, color = "#9fb493", size = 3) +
+  scale_x_reverse() +
+  theme_minimal(base_size = 14) +
+  theme(
+    panel.grid = element_blank(),
+    legend.position = "none",
+    axis.line = element_line(color = "black"),
+    axis.ticks = element_line(color = "black"), 
+    axis.text.x = element_text(size = 26), 
+    axis.text.y = element_text(size = 26), 
+    axis.title.x = element_text(size = 26),
+    axis.title.y = element_text(size = 26)
+  ) +
+  labs(x = "Time", y = "Mean Nearest Distance")
+
+
+ggsave(here::here("inst", "extdata", "figures_canidae", "plot_site_mnnd_raw.png"),
+       plot_site_mnnd_raw, 
+       width = 10, 
+       height = 10, 
+       dpi = 800,
+       bg = "white")
+```
+

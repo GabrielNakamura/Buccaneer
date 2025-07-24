@@ -11,11 +11,11 @@ output: html_document
 devtools::load_all()
 library(tidyr)
 library(dplyr)
-load(here::here("inst", "extdata", "df_can.Rdata"))
-load(here::here("inst", "extdata", "longevities.Rdata"))
+load(here::here("inst", "extdata", "df_can.Rdata")) # canidae occurrences
+load(here::here("inst", "extdata", "longevities.Rdata")) # canidae longevities 
 ```
 
-Computing mean longevities
+Computing mean longevities from all pyrate replicates
 
 ```{r}
 list_df_TS_TE <- 
@@ -43,6 +43,8 @@ df_occ <- df_can
 
 df_grid <- palaeoverse::bin_space(occdf = df_occ, lng = "lng", lat = "lat", spacing = 100)
 
+df_grid50 <- palaeoverse::bin_space(occdf = df_occ, lng = "lng", lat = "lat", spacing = 50)
+
 df_grid2 <- 
   df_grid |> 
   select(species, max, min, lng, lat, cell_ID, cell_centroid_lng, cell_centroid_lat)
@@ -62,6 +64,8 @@ df_grid3 <-
 
 # trait data
 
+That is LD1, a proxy for the level of carnivory/herbivory and body mass
+
 ```{r}
 df_traits <- read.csv(here::here("inst", "extdata", "final_data.csv"), sep = ",")
 df_traits2 <- 
@@ -73,9 +77,10 @@ dist_traits <- dist(df_traits2)
 
 # Computing coexisting metrics
 
+Coexisting metrics for grid scale
 
 ```{r}
-res_clade_distance_assemblage <- 
+res_clade_distance_assemblage100 <- 
   clade_site_distance(df.TS.TE = df_longevities2, 
                       df.occ = df_grid3, 
                       time.slice = 0.1, 
@@ -88,6 +93,21 @@ res_clade_distance_assemblage <-
                       Max.age = "max", 
                       Min.age = "min",
                       site = "cell_ID")
+
+res_clade_distance_assemblage50 <- 
+  clade_site_distance(df.TS.TE = df_longevities2, 
+                      df.occ = df_grid50, 
+                      time.slice = 0.1, 
+                      dist.trait = dist_traits, 
+                      nearest.taxon = "all",
+                      round.digits = 1,
+                      species = "species",
+                      TS = "TS",
+                      TE = "TE", 
+                      Max.age = "max", 
+                      Min.age = "min",
+                      site = "cell_ID")
+
 ```
 
 # Composition and trait matrix
@@ -363,4 +383,34 @@ ggsave(here::here("inst", "extdata", "figures_canidae", "plot_assemblage_MPD_raw
 
 ```
 
+# Additional individual plots
+
+```{r}
+
+plot_assemblage_mnnd_raw_100 <- 
+  ggplot(res_clade_distance_assemblage_nearest, aes(x = time.slice, y = mean.distance)) +
+  geom_line(color = "grey50", alpha = 0.4) +  # Transparent line
+  geom_smooth(method = "loess", se = TRUE, color = "#9fb493", size = 3) +
+  scale_x_reverse() +
+  theme_minimal(base_size = 14) +
+  theme(
+    panel.grid = element_blank(),
+    legend.position = "none",
+    axis.line = element_line(color = "black"),
+    axis.ticks = element_line(color = "black"), 
+    axis.text.x = element_text(size = 26), 
+    axis.text.y = element_text(size = 26), 
+    axis.title.x = element_text(size = 26),
+    axis.title.y = element_text(size = 26)
+  ) +
+  labs(x = "Time", y = "Mean Nearest Distance")
+
+
+ggsave(here::here("inst", "extdata", "figures_canidae", "plot_assemblage_mnnd_raw100.png"),
+       plot_assemblage_mnnd_raw_100, 
+       width = 10, 
+       height = 10, 
+       dpi = 800,
+       bg = "white")
+```
 
