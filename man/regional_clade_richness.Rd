@@ -14,17 +14,24 @@ regional_clade_richness(
 )
 }
 \arguments{
-\item{df.TS.TE}{}
+\item{df.TS.TE}{Data frame object containing at least four columns. Species names,
+origination time, extinction time and a trait value for each species.}
 
-\item{time.slice}{}
+\item{time.slice}{Scalar indicating the time interval between consecutive time slices.}
 
-\item{round.digits}{}
+\item{round.digits}{Scalar indicating the precision of time slices.}
 
-\item{species}{}
+\item{species}{Character indicating the name of the column of the data frame
+containing the species name information.}
 
-\item{TS}{}
+\item{TS}{Character indicating the name of the columns of the data frame
+containing the information on origination time.}
 
-\item{TE}{}
+\item{TE}{Character indicating the name of the column of the data frame
+containing the information on extinction time.}
+}
+\value{
+A data frame with richness information in each timeslice
 }
 \description{
 Calculates regional clade richness for lineages

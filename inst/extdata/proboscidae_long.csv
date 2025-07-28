@@ -1,0 +1,186 @@
+"";"Taxon";"Region";"MinAge";"MaxAge";"Locality";"max.age";"min.age"
+"1";"Eritherium azzouzorum";"Africa";56;59,2;"Sidi Chennane_siteSet_1";59,2;56
+"2";"Daouitherium rebouli";"Africa";53;56;"Grand Daoui Quarries - Ouled Abdoun Basin_siteSet_1";56;53
+"3";"Phosphatherium escuilliei";"Africa";53;56;"Grand Daoui Quarries - Ouled Abdoun Basin_siteSet_1";56;53
+"4";"Khamsaconus bulbosus";"Africa";52,5;53;"N'Tagourt 2, Ouazarzate_siteSet_1";53;52,5
+"5";"Numidotherium koholense";"Africa";51;52;"El Kohol_siteSet_1";52;51
+"6";"Moeritherium chehbeurameuri";"Africa";38;39;"Bir El Ater_siteSet_1";39;38
+"7";"Moeritherium lyonsi";"Africa";38;39;"Dor et Talah - Evaporite Unit_siteSet_1";39;32
+"8";"Numidotherium savagei";"Africa";38;39;"Dor et Talah - Evaporite Unit_siteSet_1";39;38
+"9";"Barytherium grave";"Africa";38;39;"Dor et Talah - Idam Unit_siteSet_1";39;32
+"10";"Moeritherium trigodon";"Africa";38;39;"Dor et Talah - Idam Unit_siteSet_1";39;32
+"11";"Palaeomastodon beadnelli";"Africa";32;35,8;"NNW of Birket Qarun_siteSet_1";35,8;32
+"12";"Phiomia serridens";"Africa";32;35,8;"NNW of Birket Qarun_siteSet_1";35,8;32
+"13";"Moeritherium andrewsi";"Africa";27,8;33,9;"Fayum 1_siteSet_1";33,9;27,8
+"14";"Omanitherium dhofarensis";"Africa";28,4;33,9;"DPP-2010-1_siteSet_1";33,9;28,4
+"15";"Gomphotherium basal";"Africa";28;29;"Harrat Al Ujayfa_siteSet_1";29;22,1
+"16";"Chilgatherium harrisi";"Africa";27;28;"Chilga_siteSet_1";28;27
+"17";"Phiomia major";"Africa";27;28;"Chilga_siteSet_1";28;27
+"18";"Eritreum melakeghebrekristosi";"Africa";26,8;28;"Dogali_siteSet_1";28;26,8
+"19";"Losodokodon losodokius";"Africa";24,2;27,5;"Benson's Site_siteSet_1";27,5;24,2
+"20";"Hemimastodon crepusculi";"Asia";25;27;"Dera Bugti Level J_siteSet_1";27;25
+"21";"Prodeinotherium hobleyi";"Africa";22,1;24,6;"Mai Gobro 1_siteSet_1";24,6;7,25
+"22";"Prodeinotherium pentapotamiae";"Asia";20,5;23,8;"Kangra Valley_siteSet_1";23,8;11,2
+"23";"Eozygodon morotoensis";"Africa";20,5;23,8;"Moroto I_siteSet_1";23,8;17
+"24";"Progomphotherium maraisi";"Africa";20,6;21;"Moroto II_siteSet_1";21;19
+"25";"Archaeobelodon filholi";"Africa";19,2;20,5;"Mwiti_siteSet_1";20,5;11,2
+"26";"Gomphotherium angustidens";"Africa";15,97;20,44;"Siwa_siteSet_1";20,44;7,1
+"27";"Platybelodon dangheensis";"Asia";18,317;20,162;"Danghe-xishuigou_siteSet_1";20,162;18,317
+"28";"Choerolophodon corrugatus";"Asia";17,2;19,5;"Dera Bugti 5_siteSet_1";19,5;7
+"29";"Gomphotherium cooperi";"Asia";17,2;19,5;"Dera Bugti 5_siteSet_1";19,5;16,4
+"30";"Prodeinotherium bavaricum";"Europe";18,4;19,5;"Gavathas_siteSet_1";19,5;7,1
+"31";"Gomphotherium hannibali";"Europe";16,4;19,5;"Le Mazet_siteSet_1";19,5;16,4
+"32";"Gomphotherium sylvaticum";"Europe";17,2;19,5;"Navère_siteSet_1";19,5;16,4
+"33";"Afrochoerodon kisumuensis";"Africa";19;19,16;"Bukwa_siteSet_1";19,16;11,63
+"34";"Gomphotherium mongoliense";"Asia";15,6;18,45;"Ulan-Tologoj_siteSet_1";18,45;13,82
+"35";"Miomastodon gobiensis";"Asia";15,6;18,45;"Ulan-Tologoj_siteSet_1";18,45;7,1
+"36";"Stegolophodon pseudolatidens";"Asia";17;18,3;"Kusebara_siteSet_1";18,3;16
+"37";"Zygolophodon aegyptensis";"Africa";17;18;"Wadi Moghara_siteSet_1";18;17
+"38";"Zygolophodon turicensis";"Europe";15,2;18;"Bourg-Saint-Bernard_siteSet_1";18;6,7
+"39";"Stegolophodon hueiheensis";"Asia";16;18;"Sihong-shuanggou_siteSet_1";18;16
+"40";"Gomphotherium subtapiroideum";"Europe";16,4;17,2;"Baggersee Freudenegg 3_siteSet_1";17,2;9,5
+"41";"Gomphotherium annectens";"Asia";16,4;17,2;"Bestobe_siteSet_1";17,2;16,4
+"42";"Gomphotherium browni";"Asia";16,4;17,2;"Dera Bugti 6_siteSet_1";17,2;13,094
+"43";"Miomastodon metachinjiensis";"Asia";16,4;17,2;"Dera Bugti 6_siteSet_1";17,2;16,4
+"44";"Protanancus chinjiensis";"Asia";16,4;17,2;"Dera Bugti 6_siteSet_1";17,2;11,2
+"45";"Platybelodon danovi";"Europe";15,2;17;"Belometchetskaja_siteSet_1";17;9
+"46";"Afromastodon coppensi";"Africa";14,2;16,4;"Arrisdrift_siteSet_1";16,4;14,2
+"47";"Choerolophodon chioticus";"Europe";14,2;16,4;"Chios_siteSet_1";16,4;14,2
+"48";"Gomphotherium inopinatum";"Asia";14,2;16,4;"Dzhilanchik (Uly-Dzhilanchik)_siteSet_1";16,4;14,2
+"49";"Platybelodon grangeri";"Asia";14,8;16,4;"Bel'karasu_siteSet_1";16,4;9,5
+"50";"Miomastodon proavus";"North America";14,8;16;"Northern Great Basin NB18A_siteSet_1";16;10,65
+"51";"Stegolophodon nasaiensis";"Asia";11,63;15,97;"Ban Na Sai_siteSet_1";15,97;11,63
+"52";"Protanancus macinnesi";"Africa";13,82;15,97;"Kaloma_siteSet_1";15,97;12,4
+"53";"Choerolophodon ngorora";"Africa";13,82;15,97;"Mbagathi_siteSet_1";15,97;7,25
+"54";"Gomphotherium productum";"North America";13,6;15,97;"Annie's Geese Crossing Quarry_siteSet_1";15,97;9
+"55";"Deinotherium indicum";"Asia";11,6;15,9;"Pasuda_siteSet_1";15,9;11,6
+"56";"Gomphotherium connexum";"Asia";11,2;15,2;"Huangzhong-diaogou_siteSet_1";15,2;11,2
+"57";"Gomphotherium wimani";"Asia";11,2;15,2;"Huangzhong-diaogou_siteSet_1";15,2;5,3
+"58";"Platybelodon tongxinensis";"Asia";12,5;15,2;"Tongxin-gujiazhuang_siteSet_1";15,2;12,5
+"59";"Protanancus brevirostris";"Asia";13,5;15;"Dalanggou (Hongliugou Fm, Linxia Bs)_siteSet_1";15;13,5
+"60";"Aphanobelodon zhaoi";"Asia";13,5;15;"Maerzuizigou_siteSet_1";15;13,5
+"61";"Choerolophodon guangheensis";"Asia";13,5;15;"Dalanggou (Hongliugou Fm, Linxia Bs)_siteSet_1";15;13,5
+"62";"Protanancus tobieni";"Asia";13,5;15;"Tongxin-dingjiaergou_siteSet_1";15;13,5
+"63";"Eubelodon morrilli";"North America";12,5;14,8;"Central Great Plains CP114C_siteSet_1";14,8;10,1
+"64";"Megabelodon joraki";"North America";12,5;14,8;"Southern Great Basin SB32D_siteSet_1";14,8;12,5
+"65";"Deinotherium giganteum";"Europe";11,2;14,2;"Devínská Nová Ves - Sandhill_siteSet_1";14,2;5,3
+"66";"Deinotherium levius";"Asia";12,85;14,2;"Pasalar_siteSet_1";14,2;12,85
+"67";"Gomphotherium tassyi";"Asia";11,1;13,5;"Laogou - Hujialiang Formation_siteSet_1";13,5;11,1
+"68";"Stegolophodon latidens";"Asia";13,094;13,263;"Mae Moh_siteSet_1";13,263;9
+"69";"Tetralophodon longirostris";"Africa";11;13;"Cherichera_siteSet_1";13;5,3
+"70";"Tetralophodon xiaolongtanensis";"Asia";11,2;12,85;"Chiang Muan_siteSet_1";12,85;11,2
+"71";"Gomphotherium steinheimense";"Europe";9,5;12,85;"Giggenhausen_siteSet_1";12,85;9,5
+"72";"Anancus arvernensis";"Europe";11,2;12,85;"Serbian lake_siteSet_1";12,85;1,95
+"73";"Choerolophodon pentelici";"Asia";11,2;12,85;"Sofca_siteSet_1";12,85;4,2
+"74";"Megabelodon lulli";"North America";12,1;12,5;"Central Great Plains CP114D_siteSet_1";12,5;12,1
+"75";"Zygolophodon chinjiensis";"Asia";11,2;12,5;"Kaiyuan-Xiaolongtan_siteSet_1";12,5;11,2
+"76";"Serbelodon burnhami";"North America";10,3;12,4;"Dove Spring (Lower)_siteSet_1";12,4;10,3
+"77";"Torynobelodon barnumbrowni";"North America";10,3;12,4;"Platybelodon Quarry_siteSet_1";12,4;10,3
+"78";"Serbelodon barbourensis";"North America";10,3;12,4;"Xmas Quarry_siteSet_1";12,4;10,3
+"79";"Pediolophodon campester";"North America";9;12,1;"Central Great Plains CP116B_siteSet_1";12,1;9
+"80";"Gnathabelodon buckneri";"North America";10,1;12,1;"Gulf Coast GC6A_siteSet_1";12,1;10,1
+"81";"Megabelodon minor";"North America";10,1;12,1;"Gulf Coast GC6B_siteSet_1";12,1;10,1
+"82";"Konobelodon robustus";"Asia";9,7;11,5;"Guonigou (LX200042) - Liushu Fm_siteSet_1";11,5;9
+"83";"Paratetralophodon exoletus";"Asia";9,5;11,2;"Guonigou_siteSet_1";11,2;5,3
+"84";"Choerolophodon anatolicus";"Asia";9;11,2;"Sinap 45_siteSet_1";11,2;9
+"85";"Stegolophodon stegodontoides";"Asia";6;10;"Irrawaddy 1_siteSet_2";10;2,6
+"86";"Deinotherium bozasi";"Africa";9,7;9,9;"Nakali_siteSet_1";9,9;1,15
+"87";"Konobelodon atticus";"Asia";9;9,5;"Yulafli (CY)_siteSet_1";9,5;5,3
+"88";"Tetralophodon euryrostris";"Asia";9;9,5;"Linxia Basin (locality unknown)_siteSet_1";9,5;9
+"89";"Rhynchotherium tlascalae";"North America";7,6;9;"Central America CA10_siteSet_1";9;1,9
+"90";"Torynobelodon loomisi";"North America";4,9;9;"Central Great Plains CP116II_siteSet_1";9;4,9
+"91";"Amebelodon floridanus";"North America";7,6;9;"Central Great Plains CP123C_siteSet_1";9;4,9
+"92";"Gnathabelodon thorpei";"North America";7,6;9;"Central Great Plains CP123C_siteSet_1";9;7,6
+"93";"Anancus lehmanni";"Europe";8,2;9;"Dorn Dürkheim 1_siteSet_1";9;7
+"94";"Anancus sinensis";"Asia";5,3;9;"Guide-heerjia_siteSet_1";9;2,433
+"95";"Konobelodon britti";"North America";7,6;9;"Gulf Coast GC10D_siteSet_1";9;5,9
+"96";"Paratetralophodon hasnotensis";"Asia";5,3;9;"Huachi_siteSet_1";9;5,3
+"97";"Deinotherium proavum";"Asia";8,2;9;"Kayadibi_siteSet_1";9;6,9
+"98";"Mammut borsoni";"Europe";5,3;9;"Morskaya 2_siteSet_1";9;1,95
+"99";"Amebelodon fricki";"North America";7,6;9;"Northern Great Plains NP45_siteSet_1";9;6,8
+"100";"Stegotetrabelodon syrticus";"Asia";5,3;9;"Ruwais_siteSet_1";9;5,3
+"101";"Sinomammut tobieni";"Asia";5,3;9;"Yanghecun (above Xihanshui group)_siteSet_1";9;5,3
+"102";"Anancus kenyensis";"Africa";6,54;7,44;"Lower Nawata (Lothagam)_siteSet_1";7,44;1,785
+"103";"Primelephas korotorensis";"Africa";6,54;7,44;"Lower Nawata (Lothagam)_siteSet_1";7,44;2,6
+"104";"Stegotetrabelodon orbus";"Africa";6,54;7,44;"Lothagam-Lower Nawata Mb._siteSet_1";7,44;4,2
+"105";"Stegodon zdanskyi";"Asia";5,3;7,2;"Xili_siteSet_1";7,2;2,6
+"106";"Mammut obliquelophus";"Europe";6,9;7,2;"Samos Main Bone Beds_siteSet_1";7,2;5,3
+"107";"Mammuthus subplanifrons";"Africa";5,3;7,1;"Albertine 1_siteSet_1";7,1;3,6
+"108";"Stegodon kaisensis";"Africa";5,3;7,1;"Albertine 1_siteSet_1";7,1;2,91
+"109";"Konobelodon cyrenaicus";"Africa";5,3;7,1;"Sahabi_siteSet_1";7,1;5,3
+"110";"Anancus osiris";"Africa";5,3;7,1;"Wadi Natrun_siteSet_1";7,1;1,6
+"111";"Anancus petrocchii";"Africa";5,3;7,1;"Sahabi_siteSet_1";7,1;5,3
+"112";"Sinomastodon praeintermedius";"Asia";6;6,5;"Shuitangba_siteSet_1";6,5;6
+"113";"Stegodibelodon schneideri";"Africa";5,2;6,48;"Middle Awash - Adu mbr._siteSet_1";6,48;3,6
+"114";"Loxodonta cookei";"Africa";5,6;6,2;"Tugen Hills_siteSet_1";6,2;5,15
+"115";"Loxodonta exoptata";"Africa";3,6;5,33;"Albertine 2_siteSet_1";5,33;2,32
+"116";"Mammuthus africanavus";"Africa";3,6;5,33;"Koula_siteSet_1";5,33;1,95
+"117";"Stegodon elephantoides";"Asia";2,6;5,33;"Gwebin_siteSet_1";5,33;1,5
+"118";"Anancus ultimus";"Africa";2,6;5,33;"Kubi Algi_siteSet_1";5,33;2,6
+"119";"Elephas ekorensis";"Africa";2,6;5,33;"Kubi Algi_siteSet_1";5,33;2,6
+"120";"Loxodonta adaurora";"Africa";2,6;5,33;"Kubi Algi_siteSet_1";5,33;2,32
+"121";"Sinomastodon sendaicus";"Asia";4,5;5,33;"Kitayama 3–7, Sendai_siteSet_1";5,33;4,5
+"122";"Sinomastodon huananensis";"Asia";2,6;5,3;"Mianxian-yangjiawan_siteSet_1";5,3;2,6
+"123";"Sinomastodon intermedius";"Asia";3,6;4,9;"Yushe_siteSet_2";4,9;3,6
+"124";"Stegomastodon mirificus";"North America";2,5;4,9;"California CC43A_siteSet_1";4,9;0,85
+"125";"Stegomastodon primitivus";"North America";2,5;4,9;"Central Great Plains CP118_siteSet_1";4,9;1,9
+"126";"Mammut americanum";"North America";1,8;4,9;"Asphalto Number 2_siteSet_1";4,9;0
+"127";"Anancus kazachstanensis";"Asia";3,875;4,825;"Ajgyrzhal_siteSet_1";4,825;1,95
+"128";"Elephas planifrons";"Europe";2,275;4,2;"Groznyj (Solenyj)_siteSet_1";4,2;0,63
+"129";"Stegodon bombifrons";"Asia";1,95;3,6;"Rato Khola 2_siteSet_1";3,6;1,95
+"130";"Stegodon sompoensis";"Asia";2,588;3,6;"Batuasange_siteSet_1";3,6;0,781
+"131";"Stegoloxodon celebensis";"Asia";2,588;3,6;"Celeko_siteSet_1";3,6;2,588
+"132";"Mammuthus meridionalis";"Africa";2,6;3,56;"Bel Hacel_siteSet_1";3,56;0,3
+"133";"Elephas atavus";"Africa";2,6;3,56;"Chiwondo 2 (Unit 3A)_siteSet_1";3,56;1,15
+"134";"Anancus perimensis";"Asia";2,6;3,56;"Tatrot_siteSet_1";3,56;2,6
+"135";"Platelephas platycephalus";"Asia";2,6;3,56;"Tatrot_siteSet_1";3,56;0,63
+"136";"Stegodon insignis";"Asia";2,6;3,56;"Tatrot_siteSet_1";3,56;0,0117
+"137";"Mammuthus gromovi";"Europe";2,5;3,5;"Rostov (na Donu) - Taganrog_siteSet_2";3,5;2,433
+"138";"Mammuthus rumanus";"Europe";2,6;3,4;"Cernatesti_siteSet_1";3,4;2,6
+"139";"Stegodon orientalis";"Asia";2,6;3,4;"Hang Hum I_siteSet_1";3,4;0,012
+"140";"Stegodon huananensis";"Asia";2,6;3,4;"Baoshan_siteSet_1";3,4;1
+"141";"Stegoloxodon indonesicus";"Asia";2;3;"Cijulang_siteSet_1";3;1,5
+"142";"Stegodon ganesa";"Asia";1,81;2,59;"Saketi_siteSet_1";2,59;0,117
+"143";"Stegolophodon lydekkeri";"Asia";0,778;2,588;"Brunei 1_siteSet_1";2,588;0,778
+"144";"Elephas hysudricus";"Asia";0,0117;2,588;"Ghod_siteSet_1";2,588;0,0117
+"145";"Sinomastodon bumiajuensis";"Asia";1,5;2,588;"Kali Glagah_siteSet_1";2,588;1,2
+"146";"Stegodon trigonocephalus";"Asia";1,5;2,588;"Kali Glagah_siteSet_1";2,588;0,117
+"147";"Stegodon luzonensis";"Asia";0,117;2,588;"Luzon_siteSet_1";2,588;0,117
+"148";"Stegodon mindanensis";"Asia";0,117;2,588;"Mindanao_siteSet_1";2,588;0,117
+"149";"Stegomastodon aftoniae";"North America";0,781;2,588;"Akron_siteSet_1";2,588;0,126
+"150";"Stegodon aurorae";"Asia";0,781;2,58;"JR Chou Line Bridge, Hino City_siteSet_1";2,58;0,781
+"151";"Loxodonta atlantica";"Africa";2,4;2,53;"Shungura D_siteSet_1";2,53;0,126
+"152";"Rhynchotherium falconeri";"North America";1,9;2,5;"Gulf Coast GC14A_siteSet_1";2,5;1,9
+"153";"Cuvieronius hyodon";"North America";1,9;2,5;"Gulf Coast GC15B_siteSet_1";2,5;0,011
+"154";"Sinomastodon yangziensis";"Asia";1,77;2,14;"""Inexplicit Site""_siteSet_1";2,14;0,6
+"155";"Anancus sivalensis";"Asia";0,63;2;"Pinjor_siteSet_1";2;0,63
+"156";"Stegodon pinjorensis";"Asia";0,63;2;"Pinjor_siteSet_1";2;0,63
+"157";"Palaeoloxodon recki";"Africa";1,53;1,88;"Kalochoro VI_siteSet_1";1,88;0,74
+"158";"Stegodon zhaotongensis";"Asia";1,2;1,8;"Chaotung_siteSet_1";1,8;0
+"159";"Palaeoloxodon namadicus";"Asia";1,2;1,8;"Hang Hum II_siteSet_1";1,8;0,012
+"160";"Palaeoloxodon falconeri";"Europe";0,781;1,8;"Cozzo Schinaldo_siteSet_1";1,8;0,781
+"161";"Elephas maximus";"Asia";0,6;1,3;"Huahong Cave I_siteSet_1";1,3;0
+"162";"Elephas hysudrindicus";"Asia";0,6;1,3;"Kedung Brubus_siteSet_1";1,3;0
+"163";"Sinomastodon jiangnanensis";"Asia";1,2;1,2;"Renzidong Cave (Sanhe)_siteSet_1";1,2;1,2
+"164";"Mammuthus trogontherii";"Europe";0,781;1,03;"Slivia FU_siteSet_1";1,03;0,117
+"165";"Mammuthus protomammonteus";"Asia";0,5;1;"Kinki District_siteSet_1";1;0,5
+"166";"Stegodon sondaari";"Asia";0,83;0,97;"Tangi Talo_siteSet_1";0,97;0,83
+"167";"Mammuthus creticus";"Europe";0,7;0,8;"Cape Meleka_siteSet_1";0,8;0,7
+"168";"Stegodon florensis";"Asia";0,126;0,781;"Boa Leza_siteSet_1";0,781;0,126
+"169";"Palaeoloxodon antiquus";"Europe";0,126;0,781;"Abbeville (Somme River terrace), Pas de Calais_siteSet_1";0,781;0,039
+"170";"Stegomastodon platensis";"South America";0,117;0,781;"Casil Quarry_siteSet_1";0,781;0,01
+"171";"Mammuthus columbi";"North America";0,126;0,781;"Cerros Negros Locality_siteSet_1";0,781;0,0117
+"172";"Mammuthus primigenius";"North America";0,126;0,781;"Cheney mammoth_siteSet_1";0,781;0,004
+"173";"Palaeoloxodon cypriotes";"Asia";0,126;0,781;"Island fossil ungulates_siteSet_1";0,781;0,126
+"174";"Loxodonta africana";"Africa";0,117;0,781;"Lake Eyasi_siteSet_1";0,781;0
+"175";"Palaeoloxodon jolensis";"Africa";0,126;0,774;"Ain Maarouf_siteSet_1";0,774;0,104
+"176";"Palaeoloxodon naumanni";"Asia";0,012;0,7;"Xujiayao_siteSet_1";0,7;0,0117
+"177";"Palaeoloxodon mnaidriensis";"Europe";0,13;0,43;"Island fossil ungulates and their predators_siteSet_2";0,43;0,13
+"178";"Mammuthus exilis";"North America";0,012;0,3;"Canada Tecolote_siteSet_1";0,3;0,012
+"179";"Mammuthus lamarmorai";"Europe";0,14;0,29;"Tramariglio_siteSet_1";0,29;0,029
+"180";"Stegodon namadicus";"Asia";0,048;0,236;"Narmada_siteSet_1";0,236;0,048
+"181";"Stegodon timorensis";"Asia";0,13;0,168;"Ainaro Gravels - Atambua - Timor_siteSet_1";0,168;0,13
+"182";"Palaeoloxodon creutzburgi";"Europe";0,012;0,126;"Island fossil ungulates_siteSet_2";0,126;0,012
+"183";"Palaeoloxodon tiliensis";"Europe";0,012;0,126;"Charkadio Cave_siteSet_1";0,126;0,012
+"184";"Palaeoloxodon lomolinoi";"Europe";0,012;0,126;"Trypiti River-Naxos_siteSet_1";0,126;0,012
+"185";"Loxodonta cyclotis";"Africa";0,01;0,012;"Current distribution_siteSet_1";0,012;0,01
