@@ -1,4 +1,4 @@
-#' Compute mean distance for species cooccurring in sites
+#' Compute mean distance for species co occurring in sites
 #'
 #' @param df.TS.TE Data frame object containing at least four columns. Species names,
 #'     origination time, extinction time and a trait value for each species.
@@ -24,7 +24,7 @@
 #' @param round.digits Scalar indicating the precision of time slices.
 #' @param species Character indicating the name of the column of the data frame
 #'     containing the species name information.
-#' @param TS haracter indicating the name of the columns of the data frame
+#' @param TS Character indicating the name of the columns of the data frame
 #'     containing the information on origination time.
 #' @param TE Character indicating the name of the column of the data frame
 #'     containing the information on extinction time.

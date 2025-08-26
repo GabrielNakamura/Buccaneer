@@ -2,7 +2,7 @@
 % Please edit documentation in R/clade_site_trait_distance.R
 \name{clade_site_distance}
 \alias{clade_site_distance}
-\title{Compute mean distance for species cooccurring in sites}
+\title{Compute mean distance for species co occurring in sites}
 \usage{
 clade_site_distance(
   df.TS.TE,
@@ -59,7 +59,7 @@ the default, the user must provide a distance matrix.}
 \item{species}{Character indicating the name of the column of the data frame
 containing the species name information.}
 
-\item{TS}{haracter indicating the name of the columns of the data frame
+\item{TS}{Character indicating the name of the columns of the data frame
 containing the information on origination time.}
 
 \item{TE}{Character indicating the name of the column of the data frame
@@ -72,5 +72,5 @@ containing the information on extinction time.}
 \item{site}{Character indicating the name of the column containing the information on site location.}
 }
 \description{
-Compute mean distance for species cooccurring in sites
+Compute mean distance for species co occurring in sites
 }

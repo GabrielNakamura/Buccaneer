@@ -11,23 +11,52 @@ clade_site_richness(
   round.digits = 1,
   species = "species",
   TS = "TS",
-  TE = "TE"
+  TE = "TE",
+  Max.age = "Max.age",
+  Min.age = "Min.age",
+  site = "site",
+  group = NULL,
+  group.focal.compare = NULL,
+  type.comparison = NULL
 )
 }
 \arguments{
-\item{df.TS.TE}{}
+\item{df.TS.TE}{Data frame object containing at least four columns. Species names,
+origination time, extinction time and a trait value for each species.}
 
-\item{df.occ}{}
+\item{df.occ}{a data frame object containing the occurrence records for each species.
+This must have at least a column indicating the name of species, its minimum and maximum age estimate,
+and its site location ID.}
 
-\item{time.slice}{}
+\item{time.slice}{Scalar indicating the time interval between consecutive time slices.}
 
-\item{round.digits}{}
+\item{round.digits}{Scalar indicating the precision of time slices.}
 
-\item{species}{}
+\item{species}{Character indicating the name of the column of the data frame
+containing the species name information.}
 
-\item{TS}{}
+\item{TS}{Character indicating the name of the columns of the data frame
+containing the information on origination time.}
 
-\item{TE}{}
+\item{TE}{Character indicating the name of the column of the data frame
+containing the information on extinction time.}
+
+\item{Max.age}{Character indicating the name of the column containing the upper age limit for occurrence record.}
+
+\item{Min.age}{Character indicating the name of the column containing the lower age limit for occurrence record.}
+
+\item{site}{Character indicating the name of the column containing the information on site location.}
+
+\item{group}{Character indicating the name of the column that contain the groups that will be used
+in comparison.}
+
+\item{group.focal.compare}{Character vector indicating the focal (first element) and comparison (second element)
+groups used in the calculation. If NULL, the default, the metrics  will be calculated
+using all  clades.}
+
+\item{type.comparison}{Character. It can be "between" to compute distances only between species/genus of two groups
+or "within" to calculate distance only inside the focal group. If null the distance is computed
+considering all clades together}
 }
 \description{
 Compute time series based on mean site richness
