@@ -50,7 +50,13 @@
 <span>  round.digits <span class="op">=</span> <span class="fl">1</span>,</span>
 <span>  species <span class="op">=</span> <span class="st">"species"</span>,</span>
 <span>  TS <span class="op">=</span> <span class="st">"TS"</span>,</span>
-<span>  TE <span class="op">=</span> <span class="st">"TE"</span></span>
+<span>  TE <span class="op">=</span> <span class="st">"TE"</span>,</span>
+<span>  Max.age <span class="op">=</span> <span class="st">"Max.age"</span>,</span>
+<span>  Min.age <span class="op">=</span> <span class="st">"Min.age"</span>,</span>
+<span>  site <span class="op">=</span> <span class="st">"site"</span>,</span>
+<span>  group <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  group.focal.compare <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  type.comparison <span class="op">=</span> <span class="cn">NULL</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -59,31 +65,66 @@
 
 
 <dl><dt id="arg-df-ts-te">df.TS.TE<a class="anchor" aria-label="anchor" href="#arg-df-ts-te"></a></dt>
-<dd></dd>
+<dd><p>Data frame object containing at least four columns. Species names,
+origination time, extinction time and a trait value for each species.</p></dd>
 
 
 <dt id="arg-df-occ">df.occ<a class="anchor" aria-label="anchor" href="#arg-df-occ"></a></dt>
-<dd></dd>
+<dd><p>a data frame object containing the occurrence records for each species.
+This must have at least a column indicating the name of species, its minimum and maximum age estimate,
+and its site location ID.</p></dd>
 
 
 <dt id="arg-time-slice">time.slice<a class="anchor" aria-label="anchor" href="#arg-time-slice"></a></dt>
-<dd></dd>
+<dd><p>Scalar indicating the time interval between consecutive time slices.</p></dd>
 
 
 <dt id="arg-round-digits">round.digits<a class="anchor" aria-label="anchor" href="#arg-round-digits"></a></dt>
-<dd></dd>
+<dd><p>Scalar indicating the precision of time slices.</p></dd>
 
 
 <dt id="arg-species">species<a class="anchor" aria-label="anchor" href="#arg-species"></a></dt>
-<dd></dd>
+<dd><p>Character indicating the name of the column of the data frame
+containing the species name information.</p></dd>
 
 
 <dt id="arg-ts">TS<a class="anchor" aria-label="anchor" href="#arg-ts"></a></dt>
-<dd></dd>
+<dd><p>Character indicating the name of the columns of the data frame
+containing the information on origination time.</p></dd>
 
 
 <dt id="arg-te">TE<a class="anchor" aria-label="anchor" href="#arg-te"></a></dt>
-<dd></dd>
+<dd><p>Character indicating the name of the column of the data frame
+containing the information on extinction time.</p></dd>
+
+
+<dt id="arg-max-age">Max.age<a class="anchor" aria-label="anchor" href="#arg-max-age"></a></dt>
+<dd><p>Character indicating the name of the column containing the upper age limit for occurrence record.</p></dd>
+
+
+<dt id="arg-min-age">Min.age<a class="anchor" aria-label="anchor" href="#arg-min-age"></a></dt>
+<dd><p>Character indicating the name of the column containing the lower age limit for occurrence record.</p></dd>
+
+
+<dt id="arg-site">site<a class="anchor" aria-label="anchor" href="#arg-site"></a></dt>
+<dd><p>Character indicating the name of the column containing the information on site location.</p></dd>
+
+
+<dt id="arg-group">group<a class="anchor" aria-label="anchor" href="#arg-group"></a></dt>
+<dd><p>Character indicating the name of the column that contain the groups that will be used
+in comparison.</p></dd>
+
+
+<dt id="arg-group-focal-compare">group.focal.compare<a class="anchor" aria-label="anchor" href="#arg-group-focal-compare"></a></dt>
+<dd><p>Character vector indicating the focal (first element) and comparison (second element)
+groups used in the calculation. If NULL, the default, the metrics  will be calculated
+using all  clades.</p></dd>
+
+
+<dt id="arg-type-comparison">type.comparison<a class="anchor" aria-label="anchor" href="#arg-type-comparison"></a></dt>
+<dd><p>Character. It can be "between" to compute distances only between species/genus of two groups
+or "within" to calculate distance only inside the focal group. If null the distance is computed
+considering all clades together</p></dd>
 
 </dl></div>
 
