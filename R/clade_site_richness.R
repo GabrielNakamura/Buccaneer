@@ -49,8 +49,7 @@ clade_site_richness <-
     if(!is.null(group) == TRUE){
       df.TS.TE <- df.TS.TE[, c(species, TS, TE, group)]
       colnames(df.TS.TE) <- c("species", "TS", "TE", "group")
-    }
-    else{
+    } else{
       df.TS.TE <- df.TS.TE[, c(species, TS, TE)]
       colnames(df.TS.TE) <- c("species", "TS", "TE")
     }
@@ -108,11 +107,13 @@ clade_site_richness <-
 
     # calculating mean coexistence and variance in coexistence for each species in each timeslice
 
-    mean_species_site_coex <-
+    n_coexistence <-
       lapply(list_matrix_cooccur_site,
              function(x){
-               mean(which((rowSums(x) -1) != 0))
+               rowSums(x) - 1
              })
+
+    mean_species_site_coex <- lapply(n_coexistence, function(x) mean(x))
 
     var_species_site_coex <-
       lapply(list_matrix_cooccur_site,
