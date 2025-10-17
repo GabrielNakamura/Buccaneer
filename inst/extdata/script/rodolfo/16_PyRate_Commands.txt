@@ -1,0 +1,24 @@
+# PyRate scripts framework
+## Please refer to https://github.com/dsilvestro/PyRate/tree/master/tutorials
+
+# 01 - Defining the preservation model:
+PyRate.py Canidae_N_america_PyRate.py -qShift nalmas.txt -PPmodeltest
+## You can set the -qShift to any .txt with your time windows of interest
+
+# 02 - Diversification and preservation alayses:
+PyRate.py Canidae_N_america_PyRate.py -mG -A 4 -qShift nalmas.txt -n 30000000 -s 10000 -log_sp_q_rates -out rep_1  -j j > canidae_nam_j.txt
+
+# 03- Extract true times of speciation and extinction (needed for PyRateContinuous and R script 04):
+PyRate.py -ginput Canidae_N_america_jrep_j_Grj_mcmc.log -b 100
+## this creates j _se_ext.txt files for j replicas
+
+# 04 - PyRateContinuous:
+## R script 12_Competition_metrics.R advises how to create separate directories for PyRateContinuous setup
+### Model setting and testing
+PyRateContinuous.py -d Canidae_N_america_jrep_j_Grj_se_est.txt -m m -c time_series.txt -A 1
+PyRateContinuous.py -mL ./pyrate_mcmc_logs -b 100
+
+## 05 - Analysis:
+python3 PyRateContinuous.py -d Canidae_N_america_jrep_j_Grj_se_est.txt -m 1 -c time_series.txt -n 30000000 -s 10000 -stimes 34 23 5 2 -equal_G 0 -equal_R 0
+
+

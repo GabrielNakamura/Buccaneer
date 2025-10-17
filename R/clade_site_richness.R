@@ -65,12 +65,14 @@ clade_site_richness <-
     df_occ$site <- as.factor(df_occ$site)
 
     # Generating time intervals used to compute temporal coexistence
-    seq_interval <- seq(from = max(df.TS.TE[, "TS"]), to = min(df.TS.TE[, "TE"]), by = -time.slice)
-    seq_interval <- c(round(seq_interval, digits = round.digits))
+    seq_interval <- seq(from = ceiling(max(df.TS.TE[, "TS"])), to = ceiling(min(df.TS.TE[, "TE"])), by = -time.slice)
+
+
+    # seq_interval <- c(round(seq_interval, digits = round.digits))
 
     # Time coexistence matrix for all species
     matrix_coex <-
-      aux_matrix_regional_coex(df.TS.TE, time.slice, round.digits = 1,
+      aux_matrix_regional_coex(df.TS.TE, time.slice, round.digits = round.digits,
                                species = "species",
                                TS = "TS",
                                TE = "TE")
@@ -98,27 +100,28 @@ clade_site_richness <-
         names(which(rowSums(x) >= 1))
       })
 
-    names(spp_slice) <- seq_interval
+    names(spp_slice) <- format(seq_interval, trim = TRUE, scientific = FALSE)
 
     # calculating matrix of species cooccurrence for site
 
     list_matrix_cooccur_site <-
       comp_site_cooccurr(spp_slice = spp_slice, df.occ = df_occ)
 
+    # only presence-absence
+    list_matrix_cooccur_site2 <- lapply(list_matrix_cooccur_site, function(x) ifelse(x >= 1, 1, 0))
+
     # calculating mean coexistence and variance in coexistence for each species in each timeslice
 
-    n_coexistence <-
-      lapply(list_matrix_cooccur_site,
+    mean_species_site_coex <-
+      lapply(list_matrix_cooccur_site2,
              function(x){
-               rowSums(x) - 1
+               mean((rowSums(x) - 1))
              })
 
-    mean_species_site_coex <- lapply(n_coexistence, function(x) mean(x))
-
     var_species_site_coex <-
-      lapply(list_matrix_cooccur_site,
+      lapply(list_matrix_cooccur_site2,
              function(x){
-               var(which((rowSums(x) -1) != 0))
+               var((rowSums(x) - 1))
              })
 
     # function output

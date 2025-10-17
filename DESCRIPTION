@@ -12,9 +12,11 @@ Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.2
 Suggests: 
     knitr,
-    rmarkdown
+    rmarkdown,
+    testthat (>= 3.0.0)
 VignetteBuilder: knitr
 Depends: 
     R (>= 2.10)
 LazyData: true
 URL: https://gabrielnakamura.github.io/Buccaneer/
+Config/testthat/edition: 3

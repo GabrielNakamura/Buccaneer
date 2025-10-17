@@ -14,15 +14,16 @@
 aux_matrix_regional_coex <-
   function(df.TS.TE,
            time.slice,
-           round.digits = 1,
+           round.digits = 10,
            species = "species",
            TS = "TS",
            TE = "TE"){
     df.TS.TE <- df.TS.TE[, c(species, TS, TE)]
 
     # Generating time intervals used to compute temporal coexistence
-    seq_interval <- c(seq(from = max(df.TS.TE[, "TS"]), to = min(df.TS.TE[, "TE"]), by = -time.slice))
-    seq_interval <- round(seq_interval, digits = round.digits)
+    seq_interval <- c(seq(from = ceiling(max(df.TS.TE[, "TS"])),
+                          to = ceiling(min(df.TS.TE[, "TE"])),
+                          by = -time.slice))
 
     # defining species per bin and subsetting longevities data frame
     df_sub_bin <- vector(mode = "list", length = length(seq_interval))

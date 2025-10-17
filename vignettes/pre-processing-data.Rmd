@@ -72,6 +72,11 @@ df.faurby3 <-
   df.faurby2 |> 
   filter(Continent == "Europe" | Continent == "Asia")
 
+
+df.faurby3 <- 
+  df.faurby2 |> 
+  filter(Continent == "Europe")
+
 ```
 
 
