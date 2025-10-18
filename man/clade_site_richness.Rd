@@ -15,6 +15,7 @@ clade_site_richness(
   Max.age = "Max.age",
   Min.age = "Min.age",
   site = "site",
+  remove.singletons = TRUE,
   group = NULL,
   group.focal.compare = NULL,
   type.comparison = NULL
@@ -47,6 +48,10 @@ containing the information on extinction time.}
 
 \item{site}{Character indicating the name of the column containing the information on site location.}
 
+\item{remove.singletons}{Logical. If TRUE (default) the singleton species (i.e.
+species with no coexistence with another species in a site) are removed from
+the calculation of the mean and variance coexistence}
+
 \item{group}{Character indicating the name of the column that contain the groups that will be used
 in comparison.}
 
@@ -57,6 +62,11 @@ using all  clades.}
 \item{type.comparison}{Character. It can be "between" to compute distances only between species/genus of two groups
 or "within" to calculate distance only inside the focal group. If null the distance is computed
 considering all clades together}
+}
+\value{
+a data frame with three columns indicating the mean number of species
+coexisting in sites in each times slice; the time slice and the variance of
+mean coexistence
 }
 \description{
 Compute time series based on mean site richness

@@ -135,10 +135,20 @@ clade_site_richness <-
   }
 
 
+# Loading Rodolfo's data
+
+load(here::here("inst", "extdata", "script", "rodolfo", "longevities.RData"))
+# load("./PBDB/df_can.Rdata")
+load(here::here("inst", "extdata", "script", "rodolfo", "df_can.Rdata"))
+load(here::here("inst", "extdata", "script", "rodolfo", "div_curves.Rdata"))
+NALMA <- c("Duchesnean", "Chadronian","Orellan","Whitneyan","Arikareean","Hemingfordian","Barstovian","Clarendonian","Hemphillian","Blancan","Irvingtonian","Rancholabrean_Present") # Barnsosky 2014
+NALMA_age <- c(39.7, 37, 33.9, 31.8, 29.5, 18.5, 16.3, 12.5, 9.4, 4.7, 1.4, 0.21,0) # Barnosky 2014
+
 
 
 #####
 # Using only replicate number 10 - actually are all the same
+library(dplyr)
 
 longs2 <- data.frame(species = rownames(longs[[50]]), longs[[50]])
 res_rodolfo <-
@@ -158,10 +168,10 @@ res_rodolfo <-
        )
 
 
-df_occ_good <- read_csv(here::here("inst", "extdata", "script", "rodolfo", "PBDB_NEW_Canidae_NA_simpler_PyRate_high_resol.csv"))
+df_occ_good <- readr::read_csv(here::here("inst", "extdata", "script", "rodolfo", "PBDB_NEW_Canidae_NA_simpler_PyRate_high_resol.csv"))
 
 df_occ_good_low <-
-  df_occ_good %>%
+  df_occ_good |>
   mutate(max_low_res = case_when(
     MaxT < 29.50 & MaxT > 18.50 ~ 29.5,
     MaxT < 16.30 & MaxT > 12.50 ~ 16.30,
@@ -191,7 +201,18 @@ df_occ_good_low2 <-
   mutate(site.char = paste("site", Site, sep = "_")
          )
 
-# using low resolution
+
+# calculating regional metrics with package function
+res_regional_function <-
+  clade_regional_richness(df.TS.TE = longs2,
+                          time.slice = 0.1,
+                          round.digits = 10,
+                          species = "species",
+                          TS = "TS",
+                          TE = "TE")
+
+
+# calculating site metrics using low resolution - same as used in Rodolfo
 
 res_clade_site_low <-
   clade_site_richness(df.TS.TE = longs2,
@@ -208,22 +229,8 @@ res_clade_site_low <-
                       group.focal.compare = NULL,
                       type.comparison = NULL)
 
-res_clade_site_low_digit10 <-
-  clade_site_richness(df.TS.TE = longs2,
-                      df.occ = df_occ_good_low2,
-                      time.slice = 0.1,
-                      round.digits = 10,
-                      species = "species",
-                      TS = "TS",
-                      TE = "TE",
-                      Max.age = "max_low_res",
-                      Min.age = "min_low_res",
-                      site = "site.char",
-                      group = NULL,
-                      group.focal.compare = NULL,
-                      type.comparison = NULL)
 
-# using high resolution
+# using high resolution - different than used by rodolfo
 
 res_clade_site_good_high <-
   clade_site_richness(df.TS.TE = longs2,
@@ -240,40 +247,29 @@ res_clade_site_good_high <-
                       group.focal.compare = NULL,
                       type.comparison = NULL)
 
-# without zeros
 
-res_clade_site_good_low_nozero <-
-  clade_site_richness2(df.TS.TE = longs2,
-                      df.occ = df_occ_good_low2,
-                      time.slice = 0.1,
-                      round.digits = 1,
-                      species = "species",
-                      TS = "TS",
-                      TE = "TE",
-                      Max.age = "max_low_res",
-                      Min.age = "min_low_res",
-                      site = "site.char",
-                      group = NULL,
-                      group.focal.compare = NULL,
-                      type.comparison = NULL)
+# plotting results from regional coexistence
 
-res_regional_function <-
-  clade_regional_richness(df.TS.TE = longs2,
-                          time.slice = 0.1,
-                          round.digits = 10,
-                          species = "species",
-                          TS = "TS",
-                          TE = "TE")
-
-
-quartz()
-plot(-div.curves.frame[[50]]$time, div.curves.frame[[50]]$div, type = "l") # Rodolfo
+plot(-as.numeric(names(div.curves[[50]])), div.curves[[50]], type = "l") # Rodolfo
 lines(-res_regional_function$time.slice, res_regional_function$richness, type = "l", col = "red") # low resolution
 
-
-quartz()
+# plotting results from site coexistence
 plot(-res_rodolfo$time, res_rodolfo$site_diversity, type = "l") # Rodolfo
 lines(-res_clade_site_low$time.slice, res_clade_site_low$mean.coexistence, type = "l", col = "red") # low resolution
+
+# plotting results from site coexistence but removing zeroes and self coex
+plot(-res_rodolfo$time, res_rodolfo$site_diversity, type = "l") # Rodolfo
+lines(-df_res_nozero$time.slice, df_res_nozero$mean.coexistence, type = "l", col = "red") # low resolution
+
+# ploting with singletons
+plot(-res_rodolfo$time, res_rodolfo$site_diversity, type = "l") # Rodolfo
+lines(-df_res_singleton$time.slice, df_res_singleton$mean.coexistence, type = "l", col = "red") # low resolution
+
+# plotting removing completely singleton
+plot(-res_rodolfo$time, res_rodolfo$site_diversity, type = "l") # Rodolfo
+lines(-df_res_removingsingleton$time.slice, df_res_removingsingleton$mean.coexistence, type = "l", col = "red") # low resolution
+
+
 
 plot(-res_rodolfo$time, res_rodolfo$site_diversity, type = "l") # Rodolfo
 lines(-df_res$time.slice, df_res$mean.coexistence, type = "l", col = "red") # low resolution

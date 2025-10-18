@@ -7,7 +7,7 @@
 aux_matrix_regional_coex(
   df.TS.TE,
   time.slice,
-  round.digits = 1,
+  round.digits = 10,
   species = "species",
   TS = "TS",
   TE = "TE"

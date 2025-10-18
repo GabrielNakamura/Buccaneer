@@ -24,8 +24,14 @@
 #' @param Max.age Character indicating the name of the column containing the upper age limit for occurrence record.
 #' @param Min.age Character indicating the name of the column containing the lower age limit for occurrence record.
 #' @param site Character indicating the name of the column containing the information on site location.
+#' @param remove.singletons Logical. If TRUE (default) the singleton species (i.e.
+#'     species with no coexistence with another species in a site) are removed from
+#'     the calculation of the mean and variance coexistence
 #'
-#' @return
+#' @return a data frame with three columns indicating the mean number of species
+#'     coexisting in sites in each times slice; the time slice and the variance of
+#'     mean coexistence
+#'
 #' @export
 #'
 #' @examples
@@ -40,6 +46,7 @@ clade_site_richness <-
            Max.age = "Max.age",
            Min.age = "Min.age",
            site = "site",
+           remove.singletons = TRUE,
            group = NULL,
            group.focal.compare = NULL,
            type.comparison = NULL){
@@ -67,8 +74,6 @@ clade_site_richness <-
     # Generating time intervals used to compute temporal coexistence
     seq_interval <- seq(from = ceiling(max(df.TS.TE[, "TS"])), to = ceiling(min(df.TS.TE[, "TE"])), by = -time.slice)
 
-
-    # seq_interval <- c(round(seq_interval, digits = round.digits))
 
     # Time coexistence matrix for all species
     matrix_coex <-
@@ -100,38 +105,36 @@ clade_site_richness <-
         names(which(rowSums(x) >= 1))
       })
 
+    # naming list with time slices
     names(spp_slice) <- format(seq_interval, trim = TRUE, scientific = FALSE)
 
     # calculating matrix of species cooccurrence for site
-
     list_matrix_cooccur_site <-
       comp_site_cooccurr(spp_slice = spp_slice, df.occ = df_occ)
+    # naming list with time slices
+    names(list_matrix_cooccur_site) <- format(seq_interval, trim = TRUE, scientific = FALSE)
 
     # only presence-absence
     list_matrix_cooccur_site2 <- lapply(list_matrix_cooccur_site, function(x) ifelse(x >= 1, 1, 0))
+    names(list_matrix_cooccur_site2) <- format(seq_interval, trim = TRUE, scientific = FALSE)
 
-    # calculating mean coexistence and variance in coexistence for each species in each timeslice
+    # number of coexistences including self coexistence
+    list_n_coex_all <- lapply(list_matrix_cooccur_site2, function(x) rowSums(x)) # including self coex
+    list_n_coex_all2 <- lapply(list_n_coex_all, function(x) x - 1) # removing self coexistence
 
-    mean_species_site_coex <-
-      lapply(list_matrix_cooccur_site2,
-             function(x){
-               mean((rowSums(x) - 1))
-             })
+    if(remove.singletons == TRUE){
+      mean_species_site_coex <- lapply(list_n_coex_all2, function(x) mean(x)) # including zeros (singletons)
+      var_species_site_coex <- lapply(list_n_coex_all2, function(x) var(x)) # including zeros (singletons)
+    } else{
+      list_n_coex_all3 <- lapply(list_n_coex_all2, function(x) ifelse(x == 0, NA, x))
+      mean_species_site_coex <- lapply(list_n_coex_all3, function(x) mean(x, na.rm = TRUE)) # removing singletons
+      var_species_site_coex <- lapply(list_n_coex_all2, function(x) var(x, na.rm = TRUE))
+    }
 
-    var_species_site_coex <-
-      lapply(list_matrix_cooccur_site2,
-             function(x){
-               var((rowSums(x) - 1))
-             })
-
-    # function output
-
+    # function output - dataframe
     df_res <-
       data.frame(mean.coexistence = unlist(mean_species_site_coex),
                  var.distance = unlist(var_species_site_coex),
                  time.slice = seq_interval)
-
     return(df_res)
-
-
   }
