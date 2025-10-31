@@ -122,7 +122,7 @@ clade_site_richness <-
     list_n_coex_all <- lapply(list_matrix_cooccur_site2, function(x) rowSums(x)) # including self coex
     list_n_coex_all2 <- lapply(list_n_coex_all, function(x) x - 1) # removing self coexistence
 
-    if(remove.singletons == TRUE){
+    if(remove.singletons != TRUE){
       mean_species_site_coex <- lapply(list_n_coex_all2, function(x) mean(x)) # including zeros (singletons)
       var_species_site_coex <- lapply(list_n_coex_all2, function(x) var(x)) # including zeros (singletons)
     } else{
