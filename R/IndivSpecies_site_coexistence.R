@@ -25,8 +25,8 @@
 #' @param Min.age Character indicating the name of the column containing the lower age limit for occurrence record.
 #' @param site Character indicating the name of the column containing the information on site location.
 #' @param remove.singletons Logical. If TRUE (default) the singleton species (i.e.
-#'     species with no coexistence with another species in a site) are removed from
-#'     the calculation of the mean and variance coexistence
+#'     species with no coexistence with another species in a site) are removed from the
+#'     output
 #'
 #'
 #' @return A data frame containing the name of species, its mean coexistence value calculated by each time slice
