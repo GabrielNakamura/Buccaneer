@@ -1,8 +1,9 @@
 
 
 # Loading Rodolfo's data
-
+load(here::here("inst", "extdata", "script", "rodolfo", "df_can_tot.RData"))
 load(here::here("inst", "extdata", "script", "rodolfo", "longevities.RData"))
+data("longevities_canidae")
 # load("./PBDB/df_can.Rdata")
 load(here::here("inst", "extdata", "script", "rodolfo", "df_can.Rdata"))
 load(here::here("inst", "extdata", "script", "rodolfo", "div_curves.Rdata"))
@@ -35,7 +36,12 @@ res_rodolfo <-
        )
 
 
-df_occ_good <- readr::read_csv(here::here("inst", "extdata", "script", "rodolfo", "PBDB_NEW_Canidae_NA_simpler_PyRate_high_resol.csv"))
+  df_occ_good <-
+    readr::read_csv(here::here("inst",
+                               "extdata",
+                               "script",
+                               "rodolfo",
+                               "PBDB_NEW_Canidae_NA_simpler_PyRate_high_resol.csv"))
 
 df_occ_good_low <-
   df_occ_good |>
@@ -69,7 +75,8 @@ df_occ_good_low2 <-
   mutate(site.char = paste("site", Site, sep = "_")
          )
 
-# checking the data that crosses the boundaries
+# checking the data that crosses the boundaries and transforming it using the
+# midpoint to place the nalma - this follows Rodolfo's approach
 
 crossing.nalma.occ <-
   lapply(NALMA_age,
@@ -77,17 +84,62 @@ crossing.nalma.occ <-
                              df_occ_good_low2$MinT < x)
   )
 
-unlist(crossing.nalma.occ)
 
 # data frame with occurrence records that cross nalma
-df_crossing_nalma <- df_occ_good_low2[unlist(crossing.nalma.occ), ]
+df_crossing_nalma <- df_occ_good_low2[unique(unlist(crossing.nalma.occ)), ]
+df_crossing_nalma2 <-
+  df_crossing_nalma |>
+  mutate(midpoint = ((MaxT + MinT)/2))
+
+# occurrence table with midpoints for data that cross nalmas
+df_occ_good_low3 <-
+  df_occ_good_low2 |>
+  left_join(df_crossing_nalma2)
+
+# calculating midpoints
+midpoints <- df_occ_good_low3$midpoint[!is.na(df_occ_good_low3$midpoint)]
+
+# positioning the midpoint in a given nalma
+df_occ_good_low4 <-
+  df_occ_good_low3 |>
+  mutate(max_index = lapply(midpoint, function(x){
+
+    res1 <- which(NALMA_age > x)
+    res2 <- res1[length(res1)]
+    nalma_max <- NALMA_age[res2]
+    return(nalma_max)
+
+  }),
+  min_index = lapply(midpoint, function(x){
+
+    res1 <- which(NALMA_age > x)
+    res2 <- res1[length(res1)]
+    nalma_min <- NALMA_age[res2 + 1]
+    return(nalma_min)
+
+  }),
+  max_index = as.numeric(max_index),
+  min_index = as.numeric(min_index)
+  )
+
+# this is the occurrence table that will be used to run the analyses that is supposed to be equal to rodolfo
+df_occ_good_low5 <-
+  df_occ_good_low4 |>
+  mutate(max_T = case_when(is.na(max_index) ~ max_low_res,
+                   TRUE ~ max_index),
+         min_T = case_when(is.na(min_index) ~ min_low_res,
+                           TRUE ~ min_index))
+
+write.csv(df_occ_good_low5, here::here("inst", "extdata", "script", "rodolfo", "df_occ_processed.csv"))
 
 # removing the occurrences that cross nalma
 df_occ_good_low_nocrossing <- df_occ_good_low2[-unlist(crossing.nalma.occ), ]
 
-# calculating site coexistence withouth occ records crossing nalmas
+# calculating site coexistence without occ records crossing nalmas
+
+devtools::load_all() # reading package functions
 res_clade_site_low_nocrossing <-
-  clade_site_richness(df.TS.TE = longs2,
+  clade_site_coexistence(df.TS.TE = longs2,
                       df.occ = df_occ_good_low_nocrossing,
                       time.slice = 0.1,
                       round.digits = 10,
@@ -101,32 +153,33 @@ res_clade_site_low_nocrossing <-
                       group.focal.compare = NULL,
                       type.comparison = NULL, remove.singletons = TRUE)
 
-
-# calculating regional metrics with package function
-res_regional_function <-
-  clade_regional_richness(df.TS.TE = longs2,
-                          time.slice = 0.1,
-                          round.digits = 10,
-                          species = "species",
-                          TS = "TS",
-                          TE = "TE")
-
-
 # calculating site metrics using low resolution - same as used in Rodolfo
 res_clade_site_low <-
-  clade_site_richness(df.TS.TE = longs2,
-                      df.occ = df_occ_good_low2,
+  clade_site_coexistence(df.TS.TE = longs2,
+                      df.occ = df_occ_good_low5,
                       time.slice = 0.1,
                       round.digits = 10,
                       species = "species",
                       TS = "TS",
                       TE = "TE",
-                      Max.age = "max_low_res",
-                      Min.age = "min_low_res",
+                      Max.age = "max_T",
+                      remove.singletons = T,
+                      Min.age = "min_T",
                       site = "site.char",
                       group = NULL,
                       group.focal.compare = NULL,
-                      type.comparison = NULL, remove.singletons = TRUE)
+                      type.comparison = NULL)
+
+
+# calculating regional metrics with package function
+res_regional_function <-
+  clade_regional_coexistence(df.TS.TE = longs2,
+                             time.slice = 0.1,
+                             round.digits = 10,
+                             species = "species",
+                             TS = "TS",
+                             TE = "TE")
+
 
 
 # using high resolution - different than used by rodolfo
@@ -149,10 +202,11 @@ res_clade_site_good_high <-
 
 # plotting results from regional coexistence
 
-plot(-as.numeric(names(div.curves[[50]])), div.curves[[50]], type = "l") # Rodolfo
-lines(-res_regional_function$time.slice, res_regional_function$richness, type = "l", col = "red") # low resolution
+par(mfrow = c(2, 2))
+plot(-as.numeric(names(div.curves[[20]])), div.curves[[20]], type = "l") # Rodolfo
+lines(-res_regional_function$time.slice, res_regional_function$coexistence, type = "l", col = "red") # low resolution
 
-# plotting results from site coexistence removing records crossing nalma
+# plotting results from site coexistence results removing records crossing nalma
 plot(-res_rodolfo$time, res_rodolfo$site_diversity, type = "l") # Rodolfo
 lines(-res_clade_site_low_nocrossing$time.slice, res_clade_site_low_nocrossing$mean.coexistence, type = "l", col = "red") # low resolution
 
@@ -200,3 +254,9 @@ unique(df_can_tot2$min)
 sort(unique(df_can_tot2$max), decreasing = T)
 sort(unique(df_can_tot2$min), decreasing = T)
 NALMA_age
+
+
+# comparisons
+
+res_rodolfo2 <- res_rodolfo[order(res_rodolfo$time, decreasing = TRUE), ]
+res_clade_site_low

@@ -35,7 +35,7 @@
 #' @export
 #'
 #' @examples
-clade_site_richness <-
+clade_site_coexistence <-
   function(df.TS.TE,
            df.occ,
            time.slice,
