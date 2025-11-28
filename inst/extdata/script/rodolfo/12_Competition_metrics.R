@@ -3,11 +3,20 @@
 rm(list = ls());gc()
 
 # loading ####
-load("./Spatio_temporal_analyses/Time_coex/long_alive.Rdata")
-load("./Spatio_temporal_analyses/Time_coex/longevities.RData")
-root_ages <- sapply(longs, function (x) floor(max(x$TS) * 10) /10) 
+# load("./Spatio_temporal_analyses/Time_coex/long_alive.Rdata")
+load(here::here("inst", "extdata", "script", "rodolfo", "long_alive.Rdata"))
+# load("./Spatio_temporal_analyses/Time_coex/longevities.RData")
+load(here::here("inst", "extdata", "script", "rodolfo", "longevities.RData"))
+root_ages <- sapply(longs, function (x) floor(max(x$TS) * 10) /10)
 
-ms_data <- read.table("./final_data.csv", header = T, sep = ",")
+# ms_data <- read.table("./final_data.csv", header = T, sep = ",")
+ms_data <- read.table(here::here("inst",
+                                 "extdata",
+                                 "script",
+                                 "rodolfo",
+                                 "Ecomorphological_data",
+                                 "morphospace",
+                                 "final_data.csv"), header = T, sep = ",")
 
 # factoring diet_categories
 ms_data$diet_cat = factor(ms_data$diet, labels = c("hyper", "meso", "hypo"))
@@ -36,7 +45,7 @@ diet <- ms_data$diet_cat
 names(diet) <- ms_data$species
 diet
 
-# remember, we only want to limit competition to not occur between hyper and hypo 
+# remember, we only want to limit competition to not occur between hyper and hypo
 # carnivorous, but meso can compete with both
 mat_diet <- sapply(diet, function(x) sapply(diet, function(y) x == y)) # determining which species share the same diet category
 
@@ -47,7 +56,7 @@ mat_diet[diet == "hypo", diet == "meso"] <- 1
 mat_diet[diet == "meso", diet == "hypo"] <- 1
 
 # now we multiply the distances by the species allowed to compete under this scenario
-mat_ms_diet <- mat_ms * mat_diet 
+mat_ms_diet <- mat_ms * mat_diet
 
 # time_space_multiplications ####
 # once again, this section requires a computer with a good amount of RAM
@@ -76,7 +85,7 @@ for (k in 1:50){ # here the "50" is the number of replicas you have
 # here you can also change the size depending on the points in time scale
 
 nnd_ms_ts <- vector("list", 50)
-mnnd_ms_ts <- vector("list", 50) 
+mnnd_ms_ts <- vector("list", 50)
 
 for (k in 1:50){
   nnd_ms_ts[[k]] <- vector("list", length(long.alive[[k]]))
@@ -85,7 +94,7 @@ for (k in 1:50){
 
 # MNND loop - some workaround was required when there are 0 or only 1 species in a bin, so as to not produce false 0 distances
 for (k in 1:50){ # here the "50" is the number of replicas you have
-  for (i in 1:length(long.alive[[k]])){ 
+  for (i in 1:length(long.alive[[k]])){
     for (j in 1:length(long.alive[[k]][[i]])) {
       if (rlang::is_empty(long.alive[[k]][[i]])) {
       nnd_ms_ts[[k]][[i]][j] <- NaN
@@ -141,7 +150,7 @@ mpd_ms_diet_ts <- vector("list", 50) # here the "50" is the number of replicas y
 
 # you can see the MPD algorithm is a lot simpler because it averages between all possible combinations of competing species, but it adds the diet filter
 for (k in 1:50){ # here the "50" is the number of replicas you have
-  for (i in 1:length(mat_ms_diet_ts[[k]])){ 
+  for (i in 1:length(mat_ms_diet_ts[[k]])){
     mpd_ms_diet_ts[[k]][[i]] <- mean(mat_ms_diet_ts[[k]][[i]][lower.tri(mat_ms_diet_ts[[k]][[i]])][mat_ms_diet_ts[[k]][[i]][lower.tri(mat_ms_diet_ts[[k]][[i]])] > 0], na.rm = T)
   }
 }
@@ -185,7 +194,7 @@ for (k in 1:50){ # here the "50" is the number of replicas you have
 }
 
 nnd_ms_ts <- vector("list", 50)
-mnnd_ms_ts <- vector("list", 50) 
+mnnd_ms_ts <- vector("list", 50)
 
 for (k in 1:50){
   nnd_ms_ts[[k]] <- vector("list", length(long.alive[[k]]))
@@ -292,7 +301,7 @@ for (k in 1:50){ # here the "50" is the number of replicas you have
 # here you can also change the size depending on thepoints in time scale
 
 nnd_ms_ts <- vector("list", 50)
-mnnd_ms_ts <- vector("list", 50) 
+mnnd_ms_ts <- vector("list", 50)
 
 for (k in 1:50){
   nnd_ms_ts[[k]] <- vector("list", length(long.alive[[k]]))
@@ -302,7 +311,7 @@ for (k in 1:50){
 
 # MNND loop - some workaround was required when there are 0 or only 1 species in a bin, so as to not produce false 0 distances
 for (k in 1:50){ # here the "50" is the number of replicas you have
-  for (i in 1:length(long.alive[[k]])){ 
+  for (i in 1:length(long.alive[[k]])){
     for (j in 1:length(long.alive[[k]][[i]])) {
       if (rlang::is_empty(long.alive[[k]][[i]])) {
         nnd_ms_ts[[k]][[i]][j] <- NaN
@@ -357,7 +366,7 @@ mpd_ms_diet_ts <- vector("list", 50) # here the "50" is the number of replicas y
 
 # you can see the MPD algorithm is a lot simpler because it averages between all possible combinations of competing species, but it adds the diet filter
 for (k in 1:50){ # here the "50" is the number of replicas you have
-  for (i in 1:length(mat_ms_diet_ts[[k]])){ 
+  for (i in 1:length(mat_ms_diet_ts[[k]])){
     mpd_ms_diet_ts[[k]][[i]] <- mean(mat_ms_diet_ts[[k]][[i]][lower.tri(mat_ms_diet_ts[[k]][[i]])][mat_ms_diet_ts[[k]][[i]][lower.tri(mat_ms_diet_ts[[k]][[i]])] > 0], na.rm = T)
   }
 }

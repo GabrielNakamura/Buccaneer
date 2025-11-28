@@ -2,7 +2,7 @@
 % Please edit documentation in R/aux_matrix_regional_coex.R
 \name{aux_matrix_regional_coex}
 \alias{aux_matrix_regional_coex}
-\title{Auxiliary function to compute regional coexistence matrix}
+\title{Generate Regional Species Co-occurrence Matrices Across Time Slices}
 \usage{
 aux_matrix_regional_coex(
   df.TS.TE,
@@ -14,8 +14,112 @@ aux_matrix_regional_coex(
 )
 }
 \arguments{
-\item{TE}{}
+\item{df.TS.TE}{A data frame containing species temporal data with at least
+three columns: species names, origination times (TS), and extinction
+times (TE). Each row represents one species with its temporal range.}
+
+\item{time.slice}{Numeric. The time interval (in the same units as TS and TE)
+between consecutive time slices. Negative values will create backwards
+intervals from maximum TS to minimum TE.}
+
+\item{round.digits}{Integer. The number of decimal places to round time values
+when checking temporal overlap. Default is 10. Higher values provide more
+precise temporal binning.}
+
+\item{species}{Character. The name of the column in \code{df.TS.TE} containing
+species identifiers. Default is "species".}
+
+\item{TS}{Character. The name of the column in \code{df.TS.TE} containing
+origination (first appearance) times for each species. Default is "TS".}
+
+\item{TE}{Character. The name of the column in \code{df.TS.TE} containing
+extinction (last appearance) times for each species. Default is "TE".}
+}
+\value{
+A list of binary co-occurrence matrices, with one matrix per time slice.
+Each matrix has the following properties:
+\itemize{
+\item Dimensions: n × n, where n = total number of species in \code{df.TS.TE}
+\item Row and column names: Species identifiers
+\item Cell values: 1 if both species' temporal ranges overlap with the
+time slice, 0 otherwise
+\item Diagonal elements: 1 for species present in the time slice, 0 for absent
+}
+The list length equals the number of time slices, ordered from oldest to youngest.
 }
 \description{
-Auxiliary function to compute regional coexistence matrix
+This auxiliary function creates species-by-species co-occurrence matrices for
+each time slice based on temporal range overlap at the regional scale. Species
+are considered to co-occur in a time slice if their longevities (origination
+to extinction) overlap with that temporal interval. The function returns a list
+of binary matrices indicating which species pairs were temporally contemporaneous
+in each time slice.
+}
+\details{
+The function performs the following steps:
+\enumerate{
+\item Creates a sequence of time slices from maximum TS to minimum TE
+\item For each time slice, identifies species whose temporal ranges overlap:
+\itemize{
+\item Species is present if: TS >= time slice AND TE <= time slice
+}
+\item Creates a square matrix for all species (including absent ones)
+\item Sets matrix values to 1 for all pairwise combinations of present species
+\item Sets matrix values to 0 for absent species or non-overlapping pairs
+}
+
+Matrix interpretation:
+\itemize{
+\item \strong{Diagonal = 1}: Species is present in the time slice
+\item \strong{Diagonal = 0}: Species is absent from the time slice
+\item \strong{Off-diagonal = 1}: Both species co-occur (temporal overlap)
+\item \strong{Off-diagonal = 0}: At least one species is absent
+}
+
+This function is typically used internally by other functions in the package
+to determine regional-scale temporal co-occurrence patterns. The matrices
+maintain constant dimensions across all time slices, facilitating comparisons
+and downstream analyses.
+}
+\examples{
+\dontrun{
+# Create example temporal data
+df_temporal <- data.frame(
+  species = c("sp1", "sp2", "sp3", "sp4"),
+  TS = c(100, 95, 90, 85),
+  TE = c(60, 55, 50, 45)
+)
+
+# Generate co-occurrence matrices with 10 Ma time slices
+cooccur_matrices <- aux_matrix_regional_coex(
+  df.TS.TE = df_temporal,
+  time.slice = 10
+)
+
+# View first time slice matrix (most recent)
+cooccur_matrices[[1]]
+
+# Check which species co-occur in the first time slice
+species_present <- rownames(cooccur_matrices[[1]])[diag(cooccur_matrices[[1]]) == 1]
+species_present
+
+# Count number of co-occurring species for each species in first slice
+cooccur_counts <- rowSums(cooccur_matrices[[1]]) - 1  # subtract self
+cooccur_counts[cooccur_counts >= 0]  # only for present species
+
+# Use custom column names
+df_custom <- data.frame(
+  taxon = c("sp1", "sp2", "sp3"),
+  first_appearance = c(100, 95, 90),
+  last_appearance = c(70, 65, 60)
+)
+
+cooccur_custom <- aux_matrix_regional_coex(
+  df.TS.TE = df_custom,
+  time.slice = 5,
+  species = "taxon",
+  TS = "first_appearance",
+  TE = "last_appearance"
+)
+}
 }

@@ -1,8 +1,8 @@
-#' Calculate Mean Trait Distance for Individual Species Co-occurring at Local Sites
+#' Calculate Mean Trait Distance for Individual Species Co-occurring at Regional Scale
 #'
 #' This function computes mean pairwise trait distances between species that
-#' co-occur at specific fossil sites across different time slices. For each
-#' species present at a site, it calculates the mean distance to its co-occurring
+#' co-occur in regional scale across different time slices. For each
+#' species present at a time, it calculates the mean distance to its co-occurring
 #' species, supporting both mean nearest neighbor distance (MNND) and mean
 #' pairwise distance (MPD) metrics. The function can perform comparisons between
 #' groups or within a single group.
@@ -11,9 +11,6 @@
 #'     trait data with at least three columns: species names, origination times (TS), extinction
 #'     times (TE), and, optionally, trait values.
 #'     Additional columns may include group assignments.
-#' @param df.occ A data frame containing fossil occurrence records with at least
-#'     four columns: species names, minimum age, maximum age, and site location ID.
-#'     Each row represents a single occurrence record at a specific site.
 #' @param time.slice Numeric. The time interval (in the same units as TS and TE)
 #'     between consecutive time slices for binning occurrences.
 #' @param dist.trait A distance matrix object (class \code{dist} or \code{matrix})
@@ -48,12 +45,6 @@
 #'     origination times for each species. Default is "TS".
 #' @param TE Character. The name of the column in \code{df.TS.TE} containing
 #'     extinction times for each species. Default is "TE".
-#' @param Max.age Character. The name of the column in \code{df.occ} containing
-#'     the maximum time estimate for each occurrence record. Default is "Max.age".
-#' @param Min.age Character. The name of the column in \code{df.occ} containing
-#'     the minimum age estimate for each occurrence record. Default is "Min.age".
-#' @param site Character. The name of the column in \code{df.occ} containing
-#'     site location identifiers. Default is "site".
 #'
 #' @return A data frame with four columns:
 #'   \item{species}{Character. The name of each species.}
@@ -95,17 +86,9 @@
 #'   group = c("A", "A", "B", "B")
 #' )
 #'
-#' df_occurrences <- data.frame(
-#'   species = c("sp1", "sp1", "sp2", "sp3", "sp4"),
-#'   Max.age = c(90, 95, 95, 95, 85),
-#'   Min.age = c(60, 65, 50, 80, 80),
-#'   site = c("site1", "site2", "site2", "site1", "site2")
-#' )
-#'
 #' # Calculate MPD for all species at each site
-#' result <- IndivSpec_site_distance(
+#' result <- IndivSpec_regional_distance(
 #'   df.TS.TE = df_longevities,
-#'   df.occ = df_occurrences,
 #'   trait = "trait",
 #'   time.slice = 5,
 #'   dist.trait = NULL,
@@ -113,9 +96,8 @@
 #' )
 #'
 #' # Calculate MNND between groups at each site
-#' result_between <- IndivSpec_site_distance(
+#' result_between <- IndivSpec_regional_distance(
 #'   df.TS.TE = df_longevities,
-#'   df.occ = df_occurrences,
 #'   time.slice = 5,
 #'   trait = "trait",
 #'   dist.trait = NULL,
@@ -126,9 +108,8 @@
 #' )
 #'
 #'
-#' result_within <- IndivSpec_site_distance(
+#' result_within <- IndivSpec_regional_distance(
 #'   df.TS.TE = df_longevities,
-#'   df.occ = df_occurrences,
 #'   time.slice = 5,
 #'   trait = "trait",
 #'   dist.trait = NULL,
@@ -137,10 +118,8 @@
 #'   group.focal.compare = c("A", "B"),
 #'   type.comparison = "within"
 #' )
-
-IndivSpec_site_distance <-
+IndivSpec_regional_distance <-
   function(df.TS.TE,
-           df.occ,
            time.slice,
            dist.trait,
            nearest.taxon,
@@ -151,10 +130,7 @@ IndivSpec_site_distance <-
            round.digits = 1,
            species = "species",
            TS = "TS",
-           TE = "TE",
-           Max.age = "Max.age",
-           Min.age = "Min.age",
-           site = "site"){
+           TE = "TE"){
     # subseting columns
     if(!is.null(group) == TRUE){
       df.TS.TE <- df.TS.TE[, c(species, trait, TS, TE, group)]
@@ -171,14 +147,6 @@ IndivSpec_site_distance <-
         colnames(df.TS.TE) <- c("species", "trait", "TS", "TE")
       }
     }
-
-    df_occ <-
-      df.occ[, c(species, Max.age, Min.age, site)]
-    vars <- list(species, Max.age, Min.age, site)
-    name_vars <- c("species", "Max.age", "Min.age", "site")
-    names(vars) <- name_vars
-    column.names <- names(unlist(vars))
-    colnames(df_occ) <- column.names
 
     # Generating time intervals used to compute temporal coexistence
     seq_interval <- seq(from = ceiling(max(df.TS.TE[, "TS"])),
@@ -238,15 +206,9 @@ IndivSpec_site_distance <-
       matrix_dist_trait_comp <- matrix_dist_trait
     }
 
-    # calculating matrix of species cooccurrence for site
-    list_matrix_cooccur_site <-
-      comp_site_cooccurr(spp_slice = spp_slice, df.occ = df_occ)
-    # Only species co-occurrence
-    list_matrix_cooccur_site2 <- lapply(list_matrix_cooccur_site, function(x) ifelse(x >= 1, 1, 0))
-
     # Ensure same species and same order in both cooccurrence matrix and distance matrix
     list_dist_spp <-
-      lapply(list_matrix_cooccur_site2, function(x){
+      lapply(matrix_coex, function(x){
         species_row <- intersect(rownames(x), rownames(matrix_dist_trait_comp))
         species_col <- intersect(colnames(x), colnames(matrix_dist_trait_comp))
         cooccur_matrix <- x[species_row, species_col, drop = FALSE]
@@ -289,9 +251,6 @@ IndivSpec_site_distance <-
         }
         return(mean_distances)
       })
-
-    mean_dist_timeslice <- lapply(list_dist_spp, function(x) mean(x, na.rm = TRUE))
-    var_dist_timeslice <- lapply(list_dist_spp, function(x) var(x, na.rm = TRUE))
 
     names(list_dist_spp) <- format(seq_interval, trim = TRUE, scientific = FALSE)
 

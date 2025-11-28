@@ -1,10 +1,15 @@
 
+# Reading data for vignettes
+data("longevities_canidae") # longevities 50 replicates
+data("occurrences_canidae") # occurrence data
+data("traits_canidae") # trait data
 
 # Loading Rodolfo's data
-load(here::here("inst", "extdata", "script", "rodolfo", "df_can_tot.RData"))
-load(here::here("inst", "extdata", "script", "rodolfo", "longevities.RData"))
+# load(here::here("inst", "extdata", "script", "rodolfo", "df_can_tot.RData"))
+# load(here::here("inst", "extdata", "script", "rodolfo", "longevities.RData"))
 data("longevities_canidae")
 # load("./PBDB/df_can.Rdata")
+# Rodolfo's results for comparison
 load(here::here("inst", "extdata", "script", "rodolfo", "df_can.Rdata"))
 load(here::here("inst", "extdata", "script", "rodolfo", "div_curves.Rdata"))
 NALMA <- c("Duchesnean", "Chadronian","Orellan","Whitneyan","Arikareean",
@@ -35,7 +40,7 @@ res_rodolfo <-
                         "div_curves.RData")
        )
 
-
+# this is the occurrence table used by Graciotti et al in Evolution paper
   df_occ_good <-
     readr::read_csv(here::here("inst",
                                "extdata",
@@ -43,6 +48,7 @@ res_rodolfo <-
                                "rodolfo",
                                "PBDB_NEW_Canidae_NA_simpler_PyRate_high_resol.csv"))
 
+# this is the the same table as before but restricting the Tmax and Tmin to NALMAs
 df_occ_good_low <-
   df_occ_good |>
   mutate(max_low_res = case_when(
@@ -170,6 +176,25 @@ res_clade_site_low <-
                       group.focal.compare = NULL,
                       type.comparison = NULL)
 
+# using the criteria used by Rodolfo when the timeslice matches with Tmin and Tmax -
+# in this case the Tmin or Tmax must cross the timeslice
+
+res_clade_site_low_2 <-
+  clade_site_coexistence_rodolfo(df.TS.TE = longs2,
+                                 df.occ = df_occ_good_low5,
+                                 time.slice = 0.1,
+                                 round.digits = 10,
+                                 species = "species",
+                                 TS = "TS",
+                                 TE = "TE",
+                                 Max.age = "max_T",
+                                 remove.singletons = T,
+                                 Min.age = "min_T",
+                                 site = "site.char",
+                                 group = NULL,
+                                 group.focal.compare = NULL,
+                                 type.comparison = NULL)
+
 
 # calculating regional metrics with package function
 res_regional_function <-
@@ -213,15 +238,10 @@ lines(-res_clade_site_low_nocrossing$time.slice, res_clade_site_low_nocrossing$m
 
 # plotting results from site coexistence
 plot(-res_rodolfo$time, res_rodolfo$site_diversity, type = "l") # Rodolfo
-lines(-res_clade_site_low$time.slice, res_clade_site_low$mean.coexistence, type = "l", col = "red") # low resolution
+lines(-res_clade_site_low$time.slice, res_clade_site_low$mean.coexistence, type = "l", col = "green") # low resolution
 lines(-res_clade_site_low_nocrossing$time.slice, res_clade_site_low_nocrossing$mean.coexistence, type = "l", col = "green") # low resolution
-abline(v = -33.9)
-abline(v = -31.8)
-abline(v = -20.44, col = "orange")
-abline(v = -15.98, col = "orange")
-abline(v = -16.3, col = "blue")
-abline(v = -18.5, col = "blue")
-abline(v = -1.4, col = "gray")
+
+lines(-res_clade_site_low_2$time.slice, res_clade_site_low_2$mean.coexistence, type = "l", col = "red")
 
 
 # plotting results from site coexistence but removing zeroes and self coex

@@ -2,7 +2,7 @@
 % Please edit documentation in R/clade_regional_trait_distance.R
 \name{clade_regional_distance}
 \alias{clade_regional_distance}
-\title{Compute regional clade mean trait distance in a time series}
+\title{Calculate Regional Mean Trait Distances Across Time Slices}
 \usage{
 clade_regional_distance(
   df.TS.TE,
@@ -20,43 +20,168 @@ clade_regional_distance(
 )
 }
 \arguments{
-\item{df.TS.TE}{Data frame object containing at least four columns. Species names,
-origination time, extinction time and a trait value for each species.}
+\item{df.TS.TE}{A data frame containing species temporal and trait data with
+at least three columns: species names, origination times (TS), extinction
+times (TE). Trait values are optional in this object.
+Additional columns may include group assignments.}
 
-\item{time.slice}{Scalar indicating the time interval between consecutive time slices.}
+\item{time.slice}{Numeric. The time interval (in the same units as TS and TE)
+between consecutive time slices for temporal binning.}
 
-\item{dist.trait}{A dist object containing the clade pairwise distance matrices.
-The name of the clades in this object must be equal to the name of the
-clades in df.TS.TE data frame.}
+\item{dist.trait}{A distance matrix object (class \code{dist} or \code{matrix})
+containing pairwise trait distances between species. Row and column names
+must match species names in \code{df.TS.TE}. If NULL, distances will be
+computed from the trait column using Euclidean distance.}
 
-\item{nearest.taxon}{A scalar indicating the number of nearest species/genus that will be used.
-1 computes mnnd metric and the option "all" computes mpd.}
+\item{nearest.taxon}{Numeric or character. The number of nearest neighbors to
+consider when calculating mean distances. Use \code{1} for mean nearest
+neighbor distance (MNND), or \code{"all"} for mean pairwise distance (MPD).}
 
-\item{trait}{Character indicating the name of the column containing values of the traits for each species. If NULL,
-the default, the user must provide a distance matrix.}
+\item{trait}{Character. The name of the column in \code{df.TS.TE} containing
+trait values. If NULL (default), \code{dist.trait} must be provided.}
 
-\item{round.digits}{Scalar indicating the precision of time slices.}
+\item{round.digits}{Integer. The number of decimal places to round time slice
+values. Default is 1. This affects temporal binning precision.}
 
-\item{species}{Character indicating the name of the column of the data frame
-containing the species name information.}
+\item{species}{Character. The name of the column in \code{df.TS.TE} containing
+species identifiers. Default is "species".}
 
-\item{TS}{Character indicating the name of the columns of the data frame
-containing the information on origination time.}
+\item{TS}{Character. The name of the column in \code{df.TS.TE} containing
+origination (first appearance) times for each species. Default is "TS".}
 
-\item{TE}{Character indicating the name of the column of the data frame
-containing the information on extinction time.}
+\item{TE}{Character. The name of the column in \code{df.TS.TE} containing
+extinction (last appearance) times for each species. Default is "TE".}
 
-\item{group}{Character indicating the name of the column that contain the groups that will be used
-in comparison.}
+\item{group}{Character. The name of the column in \code{df.TS.TE} containing
+group assignments for species (e.g., clade, family). Required if using
+\code{group.focal.compare}. Default is NULL.}
 
-\item{group.focal.compare}{Character vector indicating the focal (first element) and comparison (second element)
-groups used in the calculation. If NULL, the default, the metrics  will be calculated
-using all  clades.}
+\item{group.focal.compare}{Character vector of length 2. The first element
+specifies the focal group and the second specifies the comparison group.
+If NULL (default), distances are calculated across all species regardless
+of group membership.}
 
-\item{type.comparison}{Character. It can be "between" to compute distances only between species/genus of two groups
-or "within" to calculate distance only inside the focal group. If null the distance is computed
-considering all clades together}
+\item{type.comparison}{Character. Specifies the type of distance comparison:
+\itemize{
+\item \code{"between"}: Calculate distances only between species from
+the focal and comparison groups.
+\item \code{"within"}: Calculate distances only among species within
+the focal group.
+\item NULL (default): Calculate distances among all species together.
+}}
+}
+\value{
+A data frame with three columns:
+\item{mean.distance}{Numeric. The mean trait distance among species present
+in each time slice. Returns NA when insufficient data is available
+(e.g., only one species present, or no representatives from required groups).}
+\item{var.distance}{Numeric. The variance of trait distances among species
+in each time slice. Returns NA when insufficient data is available.}
+\item{time.slice}{Numeric. The time point representing each slice, typically
+the upper (older) boundary of the time bin.}
 }
 \description{
-Compute regional clade mean trait distance in a time series
+This function computes mean pairwise trait distances between species at the
+regional scale across different time slices. For each time slice, it calculates
+the mean distance among all species whose temporal ranges overlap with that
+interval, supporting both mean nearest neighbor distance (MNND) and mean
+pairwise distance (MPD) metrics. The function can perform comparisons between
+groups (e.g., clades, families) or within a single group.
+}
+\details{
+The function performs the following steps:
+\enumerate{
+\item Creates a sequence of time slices from maximum TS to minimum TE
+\item Generates regional co-occurrence matrices using \code{aux_matrix_regional_coex()}
+\item For each time slice, identifies species whose temporal ranges overlap
+\item Computes pairwise trait distances among overlapping species
+\item Optionally filters comparisons by group membership
+\item Calculates mean and variance of distances based on \code{nearest.taxon}
+}
+
+Distance calculation options:
+\itemize{
+\item \strong{MPD (nearest.taxon = "all")}: Calculates mean pairwise distance
+considering all pairwise comparisons among species
+\item \strong{MNND (nearest.taxon = 1)}: Calculates mean nearest neighbor
+distance using only the closest species for each focal species
+\item \strong{Threshold (nearest.taxon = n)}: Uses the \code{n} nearest
+neighbors for each focal species
+}
+
+Missing values (NA) are returned for time slices where:
+\itemize{
+\item Only one species is present
+\item No species from required groups are present (when using group comparisons)
+\item Insufficient data for distance calculations
+}
+
+This function calculates distances at the regional (pool) scale, considering
+all species present during each time slice regardless of their geographic
+distribution. For site-level distance calculations, see \code{IndivSpec_site_distance()}.
+}
+\examples{
+\dontrun{
+# Create example fossil data with traits
+df_temporal <- data.frame(
+  species = c("sp1", "sp2", "sp3", "sp4"),
+  TS = c(100, 95, 90, 85),
+  TE = c(50, 45, 40, 35),
+  trait = c(1.2, 2.5, 3.1, 4.0),
+  group = c("A", "A", "B", "B")
+)
+
+# Calculate regional MPD through time
+result_mpd <- clade_regional_distance(
+  df.TS.TE = df_temporal,
+  time.slice = 10,
+  dist.trait = NULL,
+  nearest.taxon = "all",
+  trait = "trait"
+)
+
+# View results
+head(result_mpd)
+
+# Plot mean distance through time
+plot(result_mpd$time.slice,
+     result_mpd$mean.distance,
+     type = "l",
+     xlab = "Time (Ma)",
+     ylab = "Mean Trait Distance",
+     main = "Regional Trait Distance Through Time")
+
+# Calculate MNND between groups
+result_between <- clade_regional_distance(
+  df.TS.TE = df_temporal,
+  time.slice = 10,
+  dist.trait = NULL,
+  nearest.taxon = 1,
+  trait = "trait",
+  group = "group",
+  group.focal.compare = c("A", "B"),
+  type.comparison = "between"
+)
+
+# Calculate distances within a single group
+result_within <- clade_regional_distance(
+  df.TS.TE = df_temporal,
+  time.slice = 10,
+  dist.trait = NULL,
+  nearest.taxon = "all",
+  trait = "trait",
+  group = "group",
+  group.focal.compare = c("A", "B"),
+  type.comparison = "within"
+)
+
+# Using a pre-computed distance matrix
+dist_matrix <- dist(df_temporal$trait)
+result_custom_dist <- clade_regional_distance(
+  df.TS.TE = df_temporal,
+  time.slice = 10,
+  dist.trait = dist_matrix,
+  nearest.taxon = "all"
+)
+}
 }

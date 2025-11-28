@@ -11,18 +11,32 @@ require(purrr)
 require(dplyr)
 
 # Canidae tree and morphological data ####
-Canidae_trees <- read.tree(file = "./Canidae_trees.tree")
+# Canidae_trees <- read.tree(file = "./Canidae_trees.tree")
+Canidae_trees <-
+  ape::read.tree(file = here::here("inst",
+                              "extdata",
+                              "script",
+                              "rodolfo",
+                              "Canidae_trees.tree")
+  )
 
 # Read the raw data from CSV
-df <- read.csv(file = "./eco_morph.csv", header = TRUE, sep = ";")
+# df <- read.csv(file = "./eco_morph.csv", header = TRUE, sep = ";")
+df <-
+  read.csv(file = here::here("inst",
+                             "extdata",
+                             "script",
+                             "rodolfo",
+                             "eco_morph.csv"),
+           header = TRUE, sep = ";")
 df <- df %>%
   mutate(species = case_when(
     species == "Aenocyon_dirus" ~ "Canis_dirus",
     species == "Eucyon_ferox" ~ "Canis_ferox",
     species== "Ferrucyon_avius" ~ "Cerdocyon_avius",
-    TRUE ~ species  
+    TRUE ~ species
   ))
-data <- df[, !names(df) %in% c("status")] 
+data <- df[, !names(df) %in% c("status")]
 
 # Create a list to store ordered data
 list_data <- list()
@@ -79,16 +93,50 @@ df_list <- cbind(species_list_mean)
 
 # Write the final data frame to a CSV file for all species ####
 # Creates directory for output data
-dir.create("./Ecomorphological_data/morphospace/", recursive = T)
-write.table(df_list, "./Ecomorphological_data/morphospace/input_values.csv", row.names = FALSE, sep = ",")
+# dir.create("./Ecomorphological_data/morphospace/", recursive = T)
+dir.create(here::here("inst",
+                      "extdata",
+                      "script",
+                      "rodolfo", "Ecomorphological_data", "morphospace"), recursive = T)
+# write.table(df_list, "./Ecomorphological_data/morphospace/input_values.csv", row.names = FALSE, sep = ",")
+write.table(df_list, here::here("inst",
+                                "extdata",
+                                "script",
+                                "rodolfo",
+                                "Ecomorphological_data",
+                                "morphospace",
+                                "input_values.csv"),
+            row.names = FALSE, sep = ",")
 
 # Preparing the fossil data for the LDA analysis ####
 
-ed <- read.csv("./Training_set.csv", header = TRUE, sep = ";")
+# ed <- read.csv("./Training_set.csv", header = TRUE, sep = ";")
+ed <- read.csv(here::here("inst",
+                          "extdata",
+                          "script",
+                          "rodolfo",
+                          "Training_set.csv"), header = TRUE, sep = ";")
 
-fossil_species <- df_list %>% 
+fossil_species <- df_list %>%
   filter(!species %in% ed$species)
 
-write.table(fossil_species, "./Ecomorphological_data/morphospace/fossil_data.csv", row.names = FALSE, sep = ",")
-saveRDS(p_lambda_ancrecon, "./Ecomorphological_data/morphospace/output_imputation.rds")
+# write.table(fossil_species, "Ecomorphological_data/morphospace/fossil_data.csv", row.names = FALSE, sep = ",")
+write.table(fossil_species,
+            here::here("inst",
+                       "extdata",
+                       "script",
+                       "rodolfo",
+                       "Ecomorphological_data",
+                       "morphospace",
+                       "fossil_data.csv"),
+            row.names = FALSE, sep = ",")
+# saveRDS(p_lambda_ancrecon, "./Ecomorphological_data/morphospace/output_imputation.rds")
+saveRDS(p_lambda_ancrecon, here::here("inst",
+                                      "extdata",
+                                      "script",
+                                      "rodolfo",
+                                      "Ecomorphological_data",
+                                      "morphospace",
+                                      "output_imputation.rds")
+        )
 

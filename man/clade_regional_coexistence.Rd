@@ -2,7 +2,7 @@
 % Please edit documentation in R/clade_regional_coexistence.R
 \name{clade_regional_coexistence}
 \alias{clade_regional_coexistence}
-\title{Calculates regional clade coexistence for lineages}
+\title{Calculate Regional Species Richness Across Time Slices}
 \usage{
 clade_regional_coexistence(
   df.TS.TE,
@@ -14,41 +14,97 @@ clade_regional_coexistence(
 )
 }
 \arguments{
-\item{df.TS.TE}{Data frame object containing at least three columns. Species names,
-origination time, extinction time.}
+\item{df.TS.TE}{A data frame containing species temporal data with at least
+three columns: species names, origination times (TS), and extinction
+times (TE). Each row represents one species with its temporal range.}
 
-\item{time.slice}{Scalar indicating the time interval between consecutive
-time slices in which coexistence will be calculated.}
+\item{time.slice}{Numeric. The time interval (in the same units as TS and TE)
+between consecutive time slices. Negative values will create backwards
+intervals from maximum TS to minimum TE.}
 
-\item{round.digits}{Scalar indicating the precision of time slices. This corresponds
-to the number of digits to be considered in the calculation of time
-coexistence in each time slice.}
+\item{round.digits}{Integer. The number of decimal places to round time slice
+values. Default is 1. This affects the precision of temporal binning.}
 
-\item{species}{Character indicating the name of the column of the data frame
-containing the species name information. The default is "species".}
+\item{species}{Character. The name of the column in \code{df.TS.TE} containing
+species identifiers. Default is "species".}
 
-\item{TS}{Character indicating the name of the columns of the data frame
-containing the information on origination time. The default is "TS".}
+\item{TS}{Character. The name of the column in \code{df.TS.TE} containing
+origination (first appearance) times for each species. Default is "TS".}
 
-\item{TE}{Character indicating the name of the column of the data frame
-containing the information on extinction time. The default is "TE".}
+\item{TE}{Character. The name of the column in \code{df.TS.TE} containing
+extinction (last appearance) times for each species. Default is "TE".}
 }
 \value{
-A two column data frame object containing the number of coexisting
-clades (coexistence) at each time slice (time.slice).
+A data frame with two columns:
+\item{coexistence}{Numeric. The number of species present (coexisting) in
+each time slice at the regional scale.}
+\item{time.slice}{Numeric. The time point representing each slice, typically
+the upper (older) boundary of the time bin.}
 }
 \description{
-Calculates regional clade coexistence for lineages
+This function computes the number of species (or lineages) present at the
+regional scale for each time slice based on species temporal ranges. It
+divides the temporal range into discrete intervals and counts how many species'
+longevities (origination to extinction) overlap with each time slice. This
+provides a time series of regional taxonomic richness through geological time.
+}
+\details{
+The function performs the following steps:
+\enumerate{
+\item Creates a sequence of time slices from the maximum TS to minimum TE
+\item Generates regional co-occurrence matrices using \code{aux_matrix_regional_coex()}
+\item For each time slice, identifies species whose temporal ranges overlap
+with that interval (TS >= time slice AND TE <= time slice)
+\item Counts the number of overlapping species (richness) for each time slice
+}
+
+The term "coexistence" refers to the number of species whose temporal ranges
+overlap with each time slice, representing standing diversity at the regional
+scale. This is equivalent to species richness through time when all species
+in the region are considered.
+
+Note: This function calculates richness at the regional (pool) scale, not
+at individual sites. For site-level or assemblage-level richness, see
+\code{Assemblage_regional_richness()}.
 }
 \examples{
-data(longevities_canidae) # list containing longevities for canidae species
-longs_1 <- data.frame(longs[[1]], species = rownames(longs[[1]])) # extracting only one replicate
-res_regional_coexistence <- clade_regional_coexistence(df.TS.TE = longs_1,
-                                                       time.slice,
-                                                       round.digits = 1,
-                                                       species = "species",
-                                                       TS = "TS",
-                                                       TE = "TE")
+# Create example fossil data with temporal ranges
+df_longevities <- data.frame(
+  species = c("sp1", "sp2", "sp3", "sp4"),
+  TS = c(100, 98, 98, 85),
+  TE = c(50, 45, 40, 35)
+)
 
+# Calculate regional richness through time with 5 Ma time slices
+res_regional_coexistence <- clade_regional_coexistence(
+  df.TS.TE = df_longevities,
+  time.slice = 5,
+  round.digits = 1
+)
 
+# View results
+head(res_regional_coexistence)
+
+# Plot richness through time
+plot(res_regional_coexistence$time.slice,
+     res_regional_coexistence$coexistence,
+     type = "l",
+     xlab = "Time (Ma)",
+     ylab = "Regional Species Richness",
+     main = "Species Richness Through Time")
+
+# Using custom column names
+df_custom <- data.frame(
+  taxon = c("sp1", "sp2", "sp3"),
+  first_appearance = c(100, 95, 90),
+  last_appearance = c(60, 55, 50)
+)
+
+res_custom <- clade_regional_coexistence(
+  df.TS.TE = df_custom,
+  time.slice = 10,
+  species = "taxon",
+  TS = "first_appearance",
+  TE = "last_appearance"
+)
 }

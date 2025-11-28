@@ -1,40 +1,163 @@
-#' Compute time series based on mean site richness
+#' Calculate Mean Site-Level Species Coexistence Across Time Slices
 #'
-#' @param df.TS.TE Data frame object containing at least four columns. Species names,
-#'     origination time, extinction time and a trait value for each species.
-#' @param df.occ a data frame object containing the occurrence records for each species.
-#'     This must have at least a column indicating the name of species, its minimum and maximum age estimate,
-#'     and its site location ID.
-#' @param time.slice Scalar indicating the time interval between consecutive time slices.
-#' @param round.digits Scalar indicating the precision of time slices.
-#' @param species Character indicating the name of the column of the data frame
-#'     containing the species name information.
-#' @param TS Character indicating the name of the columns of the data frame
-#'     containing the information on origination time.
-#' @param TE Character indicating the name of the column of the data frame
-#'     containing the information on extinction time.
-#' @param group Character indicating the name of the column that contain the groups that will be used
-#'     in comparison.
-#' @param group.focal.compare Character vector indicating the focal (first element) and comparison (second element)
-#'     groups used in the calculation. If NULL, the default, the metrics  will be calculated
-#'     using all  clades.
-#' @param type.comparison Character. It can be "between" to compute distances only between species/genus of two groups
-#'     or "within" to calculate distance only inside the focal group. If null the distance is computed
-#'     considering all clades together
-#' @param Max.age Character indicating the name of the column containing the upper age limit for occurrence record.
-#' @param Min.age Character indicating the name of the column containing the lower age limit for occurrence record.
-#' @param site Character indicating the name of the column containing the information on site location.
-#' @param remove.singletons Logical. If TRUE (default) the singleton species (i.e.
-#'     species with no coexistence with another species in a site) are removed from
-#'     the calculation of the mean and variance coexistence
+#' This function computes the mean number of co-occurring species at individual
+#' sites across different time slices. For each time slice, it determines which
+#' species co-occur at each site based on occurrence records and temporal ranges,
+#' then calculates the mean and variance of coexistence across all species for
+#' time slice.
 #'
-#' @return a data frame with three columns indicating the mean number of species
-#'     coexisting in sites in each times slice; the time slice and the variance of
-#'     mean coexistence
+#' @param df.TS.TE A data frame containing species temporal data with at least
+#'     three columns: species names, origination times (TS), and extinction
+#'     times (TE). Additional columns may include group assignments.
+#' @param df.occ A data frame containing fossil occurrence records with at least
+#'     four columns: species names, minimum age, maximum age, and site location ID.
+#'     Each row represents a single occurrence record at a specific site.
+#' @param time.slice Numeric. The time interval (in the same units as TS and TE)
+#'     between consecutive time slices for temporal binning.
+#' @param round.digits Integer. The number of decimal places to round time slice
+#'     values. Default is 1. This affects temporal binning precision.
+#' @param species Character. The name of the column in \code{df.TS.TE} and
+#'     \code{df.occ} containing species identifiers. Default is "species".
+#' @param TS Character. The name of the column in \code{df.TS.TE} containing
+#'     origination (first appearance) times for each species. Default is "TS".
+#' @param TE Character. The name of the column in \code{df.TS.TE} containing
+#'     extinction (last appearance) times for each species. Default is "TE".
+#' @param Max.age Character. The name of the column in \code{df.occ} containing
+#'     the maximum (oldest) age estimate for each occurrence record. Default is "Max.age".
+#' @param Min.age Character. The name of the column in \code{df.occ} containing
+#'     the minimum (youngest) age estimate for each occurrence record. Default is "Min.age".
+#' @param site Character. The name of the column in \code{df.occ} containing
+#'     site location identifiers. Default is "site".
+#' @param remove.singletons Logical. Should singleton species (species occurring
+#'     alone at a site with no co-occurring species) be excluded from mean and
+#'     variance calculations? Default is TRUE. When TRUE, singletons are treated
+#'     as NA; when FALSE, they contribute 0 to the mean.
+#' @param group Character. The name of the column in \code{df.TS.TE} containing
+#'     group assignments for species (e.g., clade, family). Required if using
+#'     \code{group.focal.compare}. Default is NULL.
+#' @param group.focal.compare Character vector of length 2. The first element
+#'     specifies the focal group and the second specifies the comparison group.
+#'     If NULL (default), coexistence is calculated across all species regardless
+#'     of group membership.
+#' @param type.comparison Character. Specifies the type of coexistence comparison:
+#'     \itemize{
+#'       \item \code{"between"}: Count only co-occurrences between species from
+#'             the focal and comparison groups.
+#'       \item \code{"within"}: Count only co-occurrences among species within
+#'             the focal group.
+#'       \item NULL (default): Count all co-occurrences regardless of group.
+#'     }
+#'
+#' @return A data frame with three columns:
+#'   \item{mean.coexistence}{Numeric. The mean number of co-occurring species in
+#'       each time slice. This represents average local coexistence
+#'       (excluding or including singletons based on \code{remove.singletons}).}
+#'   \item{var.distance}{Numeric. The variance in the number of co-occurring
+#'       species in each time slice.}
+#'   \item{time.slice}{Numeric. The time point representing each slice, typically
+#'       the upper (older) boundary of the time bin.}
+#'
+#' @details
+#' The function performs the following steps:
+#' \enumerate{
+#'   \item Creates time slices from maximum TS to minimum TE
+#'   \item Generates regional co-occurrence matrices using \code{aux_matrix_regional_coex()}
+#'   \item Determines which species occur at which sites in each time slice
+#'   \item Creates site-based co-occurrence matrices using \code{comp_site_cooccurr()}
+#'   \item For each species at each site, counts the number of co-occurring species
+#'   \item Calculates mean and variance of coexistence across species with
+#'       cooccurrence in sites
+#'   \item Optionally filters by group membership
+#' }
+#'
+#' Coexistence calculation details:
+#' \itemize{
+#'   \item \strong{Self-coexistence}: Removed from counts (a species does not
+#'         "co-occur" with itself)
+#'   \item \strong{Singleton species}: Species with 0 co-occurring taxa
+#'         \itemize{
+#'           \item If \code{remove.singletons = TRUE}: Treated as NA (excluded from mean)
+#'           \item If \code{remove.singletons = FALSE}: Contribute 0 to the mean
+#'         }
+#'   \item \strong{Group comparisons}: When using \code{group.focal.compare},
+#'         only counts co-occurrences between/within specified groups
+#' }
+#'
+#' This function calculates site-level (local) coexistence patterns, which differ
+#' from regional-scale richness. For regional richness, see \code{clade_regional_coexistence()}.
 #'
 #' @export
 #'
 #' @examples
+#' \dontrun{
+#' # Create example fossil data
+#' df_temporal <- data.frame(
+#'   species = c("sp1", "sp2", "sp3", "sp4"),
+#'   TS = c(100, 95, 90, 85),
+#'   TE = c(50, 45, 40, 35),
+#'   group = c("A", "A", "B", "B")
+#' )
+#'
+#' df_occurrences <- data.frame(
+#'   species = c("sp1", "sp1", "sp2", "sp3", "sp4", "sp4"),
+#'   Max.age = c(100, 95, 95, 90, 85, 85),
+#'   Min.age = c(90, 85, 85, 80, 75, 75),
+#'   site = c("site1", "site2", "site1", "site1", "site2", "site3")
+#' )
+#'
+#' # Calculate mean site coexistence through time
+#' result <- clade_site_coexistence(
+#'   df.TS.TE = df_temporal,
+#'   df.occ = df_occurrences,
+#'   time.slice = 10
+#' )
+#'
+#' # View results
+#' head(result)
+#'
+#' # Plot mean coexistence through time
+#' plot(result$time.slice,
+#'      result$mean.coexistence,
+#'      type = "l",
+#'      xlab = "Time (Ma)",
+#'      ylab = "Mean Site Richness",
+#'      main = "Mean Species Coexistence at Sites Through Time")
+#'
+#' # Add variance as error bars
+#' arrows(result$time.slice,
+#'        result$mean.coexistence - sqrt(result$var.distance),
+#'        result$time.slice,
+#'        result$mean.coexistence + sqrt(result$var.distance),
+#'        length = 0.05, angle = 90, code = 3)
+#'
+#' # Calculate coexistence including singletons
+#' result_with_singletons <- clade_site_coexistence(
+#'   df.TS.TE = df_temporal,
+#'   df.occ = df_occurrences,
+#'   time.slice = 10,
+#'   remove.singletons = FALSE
+#' )
+#'
+#' # Calculate coexistence between groups
+#' result_between <- clade_site_coexistence(
+#'   df.TS.TE = df_temporal,
+#'   df.occ = df_occurrences,
+#'   time.slice = 10,
+#'   group = "group",
+#'   group.focal.compare = c("A", "B"),
+#'   type.comparison = "between"
+#' )
+#'
+#' # Calculate coexistence within a single group
+#' result_within <- clade_site_coexistence(
+#'   df.TS.TE = df_temporal,
+#'   df.occ = df_occurrences,
+#'   time.slice = 10,
+#'   group = "group",
+#'   group.focal.compare = c("A", "B"),
+#'   type.comparison = "within"
+#' )
+#' }
 clade_site_coexistence <-
   function(df.TS.TE,
            df.occ,

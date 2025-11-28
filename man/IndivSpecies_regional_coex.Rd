@@ -2,7 +2,7 @@
 % Please edit documentation in R/IndivSpecies_regional_coexistence.R
 \name{IndivSpecies_regional_coex}
 \alias{IndivSpecies_regional_coex}
-\title{Calculate individual species coexistence in regional scale}
+\title{Calculate Regional Individual Species Coexistence Across Time Slices}
 \usage{
 IndivSpecies_regional_coex(
   df.TS.TE,
@@ -14,29 +14,43 @@ IndivSpecies_regional_coex(
 )
 }
 \arguments{
-\item{df.TS.TE}{a data frame object containing at least three columns. Species names,
-origination time and extinction time for each species.}
+\item{df.TS.TE}{A data frame containing species temporal data with at least
+three columns: species names, origination times, and extinction times.}
 
-\item{time.slice}{scalar indicating the time interval between consecutive time slices}
+\item{time.slice}{Numeric. The time interval (in the same units as TS and TE)
+between consecutive time slices.}
 
-\item{round.digits}{scalar indicating the number of digits for time of origination and time for
-extinction}
+\item{round.digits}{Integer. The number of decimal places to round time slice
+values. Default is 1. This affects the precision of temporal binning.}
 
-\item{species}{character indicating the name of the column of the data frame
-containing the species name information}
+\item{species}{Character. The name of the column in \code{df.TS.TE} containing
+species identifiers. Default is "species".}
 
-\item{TS}{character indicating the name of the columns of the data frame
-containing the information on origination time}
+\item{TS}{Character. The name of the column in \code{df.TS.TE} containing
+origination (start) times for each species. Default is "TS".}
 
-\item{TE}{character indicating the name of the column of the data frame
-containing the information on extinction time}
+\item{TE}{Character. The name of the column in \code{df.TS.TE} containing
+extinction (end) times for each species. Default is "TE".}
 }
 \value{
-A list with two elements:
-\item{df_IndivSpp_coexist}{A data frame with species name, the number of coexistence for each sepecies in each time slice}
-\item{mean_species_coexistence}{A data frame with three column. The species name, the mean number of coexistence for each species
-and the variance considering all time slices}
+A data frame with three columns:
+\item{time.slice}{Numeric. The time point representing each slice.}
+\item{species}{Character. The name of each species.}
+\item{n.coexistence}{Numeric. The number of species coexisting in each time
+slice for all species.}
 }
 \description{
-Calculate individual species coexistence in regional scale
+This function computes the number of coexisting species at each time slice
+in a regional scale analysis. It divides the temporal range into discrete
+intervals and counts how many species overlap in each interval based on
+their origination (TS) and extinction (TE) times.
+}
+\examples{
+# Example with fossil data
+df <- data.frame(
+  species = c("sp1", "sp2", "sp3"),
+  TS = c(100, 90, 80),
+  TE = c(50, 40, 30)
+)
+IndivSpecies_regional_coex(df, time.slice = 10)
 }
