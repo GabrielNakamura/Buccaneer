@@ -1,0 +1,251 @@
+# Compute Summary Statistics from Fossil Records Across Time Intervals
+
+This function calculates summary statistics for fossil occurrence
+records grouped into discrete time intervals (bins). For each time
+interval, it computes the number of occurrence records and the number of
+unique species (taxonomic richness). The function bins occurrences based
+on their age estimates and provides both record-level and species-level
+summaries.
+
+## Usage
+
+``` r
+get_summary_interval(
+  df.occ.fossil,
+  interval,
+  age.occ = "midpoint",
+  species = "species",
+  Max.age = "Maximum_Age",
+  Min.age = "Minimum_Age",
+  TS = NULL,
+  TE = NULL,
+  lat = NULL,
+  lng = NULL,
+  site = NULL,
+  group = NULL,
+  trait = NULL,
+  ...
+)
+```
+
+## Arguments
+
+- df.occ.fossil:
+
+  A data frame containing fossil occurrence records with columns for
+  species names, age estimates (maximum and minimum ages, or midpoint),
+  and optionally spatial coordinates, site information, group
+  assignments, and trait values.
+
+- interval:
+
+  Numeric vector. A sequence of time bin boundaries in descending order
+  (from oldest to youngest). For example, `c(100, 90, 80, 70)` creates
+  three time bins: 100-90, 90-80, and 80-70. Must have at least two
+  elements.
+
+- age.occ:
+
+  Character. The name of the column in `df.occ.fossil` containing the
+  age estimate used for binning occurrences. Typically "midpoint" for
+  the midpoint between maximum and minimum ages. Default is "midpoint".
+
+- species:
+
+  Character. The name of the column in `df.occ.fossil` containing
+  species identifiers. Default is "species".
+
+- Max.age:
+
+  Character. The name of the column in `df.occ.fossil` containing the
+  maximum (oldest) age estimate for each occurrence record. Default is
+  "Maximum_Age".
+
+- Min.age:
+
+  Character. The name of the column in `df.occ.fossil` containing the
+  minimum (youngest) age estimate for each occurrence record. Default is
+  "Minimum_Age".
+
+- TS:
+
+  Character. The name of the column containing origination (first
+  appearance) times. Default is NULL. This parameter is retained for
+  future functionality but not currently used in calculations.
+
+- TE:
+
+  Character. The name of the column containing extinction (last
+  appearance) times. Default is NULL. This parameter is retained for
+  future functionality but not currently used in calculations.
+
+- lat:
+
+  Character. The name of the column containing latitude coordinates.
+  Default is NULL. If provided, latitude information is retained in
+  output.
+
+- lng:
+
+  Character. The name of the column containing longitude coordinates.
+  Default is NULL. If provided, longitude information is retained in
+  output.
+
+- site:
+
+  Character. The name of the column containing site location
+  identifiers. Default is NULL. If provided, site information is
+  retained in output.
+
+- group:
+
+  Character. The name of the column containing group assignments for
+  species (e.g., clade, family). Default is NULL. If provided, group
+  information is retained in output.
+
+- trait:
+
+  Character. The name of the column containing trait values for species.
+  Default is NULL. If provided, trait information is retained in output.
+
+- ...:
+
+  Additional arguments (currently not used but reserved for future
+  extensions).
+
+## Value
+
+A list containing two data frames:
+
+- df_summary_occurrences:
+
+  A data frame with all occurrence records augmented with two columns:
+
+  - `time.interval`: Character. The time bin identifier (e.g., "100-90")
+
+  - `n.records.bin`: Integer. The total number of occurrence records in
+    that time interval
+
+  This data frame has one row per occurrence record.
+
+- df_summary_richness:
+
+  A data frame with unique species per time interval augmented with two
+  columns:
+
+  - `time.interval`: Character. The time bin identifier
+
+  - `n.species.bin`: Integer. The number of unique species (taxonomic
+    richness) in that time interval
+
+  This data frame has one row per unique species per time interval.
+
+## Details
+
+The function performs the following steps:
+
+1.  Validates that input is a data frame
+
+2.  Extracts specified columns from the occurrence data
+
+3.  For each time interval (consecutive pairs in `interval`):
+
+    - Filters occurrences where `age.occ` falls within the interval
+
+    - Assigns a time interval label (e.g., "100-90")
+
+4.  Calculates summary statistics:
+
+    - **n.records.bin**: Total number of occurrences per interval
+
+    - **n.species.bin**: Number of unique species per interval
+
+Binning logic:
+
+- An occurrence is assigned to an interval if:
+  `interval[i] >= age.occ >= interval[i+1]`
+
+- Intervals are labeled using the format "upper-lower" (e.g., "100-90")
+
+- Occurrences falling outside all intervals are excluded
+
+The two output data frames serve different purposes:
+
+- **df_summary_occurrences**: Retains all individual occurrence records
+  for detailed analyses (e.g., spatial patterns, within-interval
+  variation)
+
+- **df_summary_richness**: Provides species-level summaries for
+  diversity analyses (e.g., richness through time, turnover rates)
+
+## Examples
+
+``` r
+if (FALSE) { # \dontrun{
+# Create example fossil occurrence data
+df_fossils <- data.frame(
+  species = c("sp1", "sp2", "sp3", "sp1", "sp2", "sp4"),
+  midpoint = c(95, 92, 88, 85, 82, 78),
+  Maximum_Age = c(100, 95, 90, 90, 85, 80),
+  Minimum_Age = c(90, 89, 86, 80, 79, 76),
+  lat = c(10, 15, 20, 25, 30, 35),
+  lng = c(-50, -55, -60, -65, -70, -75),
+  site = c("A", "B", "C", "A", "B", "C"),
+  group = c("G1", "G1", "G2", "G1", "G1", "G2"),
+  trait = c(1.2, 2.5, 3.1, 1.2, 2.5, 4.0)
+)
+
+# Define time intervals
+time_bins <- c(100, 90, 80, 70)
+
+# Get summary statistics
+results <- get_summary_interval(
+  df.occ.fossil = df_fossils,
+  interval = time_bins,
+  age.occ = "midpoint"
+)
+
+# View occurrence-level summary
+head(results$df_summary_occurrences)
+
+# View species-level summary (richness)
+head(results$df_summary_richness)
+
+# Plot richness through time
+library(ggplot2)
+richness_summary <- results$df_summary_richness %>%
+  group_by(time.interval) %>%
+  summarise(richness = first(n.species.bin))
+
+ggplot(richness_summary, aes(x = time.interval, y = richness)) +
+  geom_col() +
+  labs(x = "Time Interval", y = "Species Richness") +
+  theme_minimal()
+
+# Calculate sampling intensity (records per species)
+sampling_summary <- results$df_summary_occurrences %>%
+  group_by(time.interval) %>%
+  summarise(
+    total_records = first(n.records.bin),
+    n_species = n_distinct(species),
+    records_per_species = total_records / n_species
+  )
+
+# Use custom column names
+df_custom <- data.frame(
+  taxon = c("sp1", "sp2", "sp3"),
+  age = c(95, 85, 75),
+  oldest = c(100, 90, 80),
+  youngest = c(90, 80, 70)
+)
+
+results_custom <- get_summary_interval(
+  df.occ.fossil = df_custom,
+  interval = c(100, 90, 80, 70),
+  age.occ = "age",
+  species = "taxon",
+  Max.age = "oldest",
+  Min.age = "youngest"
+)
+} # }
+```

@@ -1,0 +1,20 @@
+# Authors and Citation
+
+## Authors
+
+- **First Last**. Author, maintainer.
+  [](https://orcid.org/YOUR-ORCID-ID)
+
+## Citation
+
+Last F (2025). *buccaneer: What the Package Does (One Line, Title
+Case)*. R package version 0.0.0.9000,
+<https://gabrielnakamura.github.io/Buccaneer/>.
+
+    @Manual{,
+      title = {buccaneer: What the Package Does (One Line, Title Case)},
+      author = {First Last},
+      year = {2025},
+      note = {R package version 0.0.0.9000},
+      url = {https://gabrielnakamura.github.io/Buccaneer/},
+    }

@@ -1,0 +1,203 @@
+# Calculate Species Richness Across Time Slices and Grid Cells
+
+This function computes species richness for fossil assemblages across
+spatial grid cells and temporal bins. It divides geographic space into a
+regular grid and temporal ranges into discrete time slices, then
+calculates the number of species present in each grid cell during each
+time slice based on occurrence records and species longevities.
+
+## Usage
+
+``` r
+Assemblage_regional_richness(
+  df.TS.TE,
+  df.occ,
+  time.slice,
+  grid.size,
+  round.digits = 1,
+  species = "species",
+  TS = "TS",
+  TE = "TE",
+  Max.age = "Max.age",
+  Min.age = "Min.age",
+  lat = "lat",
+  lon = "lng",
+  crs = 4326
+)
+```
+
+## Arguments
+
+- df.TS.TE:
+
+  A data frame containing species temporal data with at least three
+  columns: species names, origination times (TS), and extinction times
+  (TE).
+
+- df.occ:
+
+  A data frame containing fossil occurrence records with at least five
+  columns: species names, minimum age, maximum age, latitude, and
+  longitude. Each row represents a single occurrence record at a
+  specific location.
+
+- time.slice:
+
+  Numeric. The time interval (in the same units as TS and TE) between
+  consecutive time slices for temporal binning.
+
+- grid.size:
+
+  Numeric. The size of grid cells in degrees for spatial binning. For
+  example, `grid.size = 5` creates 5° × 5° grid cells.
+
+- round.digits:
+
+  Integer. The number of decimal places to round time slice values.
+  Default is 1. This affects temporal binning precision.
+
+- species:
+
+  Character. The name of the column in `df.TS.TE` and `df.occ`
+  containing species identifiers. Default is "species".
+
+- TS:
+
+  Character. The name of the column in `df.TS.TE` containing origination
+  (start) times for each species. Default is "TS".
+
+- TE:
+
+  Character. The name of the column in `df.TS.TE` containing extinction
+  (end) times for each species. Default is "TE".
+
+- Max.age:
+
+  Character. The name of the column in `df.occ` containing the maximum
+  (oldest) age estimate for each occurrence record. Default is
+  "Max.age".
+
+- Min.age:
+
+  Character. The name of the column in `df.occ` containing the minimum
+  (youngest) age estimate for each occurrence record. Default is
+  "Min.age".
+
+- lat:
+
+  Character. The name of the column in `df.occ` containing latitude
+  coordinates for occurrence records. Default is "lat".
+
+- lon:
+
+  Character. The name of the column in `df.occ` containing longitude
+  coordinates for occurrence records. Default is "lng".
+
+- crs:
+
+  Numeric or character. The coordinate reference system (CRS) code for
+  spatial data. Default is 4326 (WGS84 geographic coordinates).
+
+## Value
+
+A list containing two elements:
+
+- grid_mean_age:
+
+  An sf object with grid cell geometries and temporal summaries.
+  Contains columns:
+
+  - `grid_id`: Unique identifier for each grid cell
+
+  - `mean.age.grid`: Mean age of all occurrences in the grid cell
+
+  - `var.age.grid`: Variance of ages in the grid cell
+
+  - `geometry`: Spatial geometry of the grid cell
+
+- time_series_rich:
+
+  A data frame with richness metric for each grid cell and time slice.
+  Contains columns:
+
+  - `grid_id`: Grid cell identifier
+
+  - `mean.age.grid`: Mean age of occurrences in the grid cell
+
+  - `var.age.grid`: Variance of ages in the grid cell
+
+  - `time.slice`: Time slice identifier
+
+  - `rich.by.grid`: Species richness in the grid cell during the time
+    slice
+
+  - `mean.rich.by.grid.slice`: Mean richness across all grid cells in
+    the time slice
+
+  - `geometry`: Spatial geometry of the grid cell
+
+## Details
+
+The function performs the following steps:
+
+1.  Creates a spatial grid covering the extent of occurrence records
+
+2.  Assigns each occurrence to a grid cell based on coordinates
+
+3.  Calculates temporal statistics (mean and variance of ages) for each
+    grid cell
+
+4.  Divides the temporal range into discrete time slices
+
+5.  For each time slice, identifies species present based on longevities
+
+6.  Counts species richness in each grid cell for each time slice
+
+7.  Computes mean richness across grid cells within each time slice
+
+Missing or invalid coordinates (NA values) are automatically removed
+before spatial analysis. Grid cells without occurrences in a time slice
+will not appear in the results for that time slice.
+
+## Examples
+
+``` r
+if (FALSE) { # \dontrun{
+# Create example data
+df_temporal <- data.frame(
+  species = c("sp1", "sp2", "sp3", "sp4"),
+  TS = c(100, 95, 90, 85),
+  TE = c(50, 45, 40, 35)
+)
+
+df_occurrences <- data.frame(
+  species = c("sp1", "sp1", "sp2", "sp3", "sp4"),
+  Max.age = c(100, 95, 95, 90, 85),
+  Min.age = c(90, 85, 85, 80, 75),
+  lat = c(10.5, 15.2, 20.1, 25.3, 30.0),
+  lng = c(-50.0, -55.5, -60.2, -65.0, -70.5)
+)
+
+# Calculate regional richness with 10 Ma time slices and 5° grid cells
+results <- Assemblage_regional_richness(
+  df.TS.TE = df_temporal,
+  df.occ = df_occurrences,
+  time.slice = 10,
+  grid.size = 5
+)
+
+# Access grid-level summaries
+grid_summary <- results$grid_mean_age
+
+# Access time series of richness
+richness_timeseries <- results$time_series_rich
+
+# Plot richness for a specific time slice
+library(ggplot2)
+slice_data <- subset(results$time_series_rich, time.slice == 90)
+ggplot(slice_data) +
+  geom_sf(aes(fill = rich.by.grid)) +
+  scale_fill_viridis_c() +
+  theme_minimal()
+} # }
+```
