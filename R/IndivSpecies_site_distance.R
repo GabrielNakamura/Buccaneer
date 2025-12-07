@@ -189,7 +189,7 @@ IndivSpec_site_distance <-
     matrix_coex <-
       aux_matrix_regional_coex(df.TS.TE,
                                time.slice,
-                               round.digits = 1,
+                               round.digits = round.digits,
                                species = "species",
                                TS = "TS",
                                TE = "TE")
