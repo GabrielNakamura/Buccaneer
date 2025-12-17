@@ -19,8 +19,6 @@ help(package = "buccaneer")
 
 - [`Assemblage_regional_richness()`](https://gabrielnakamura.github.io/Buccaneer/reference/Assemblage_regional_richness.md)
   : Calculate Species Richness Across Time Slices and Grid Cells
-- [`IndivSpec_reach_richness()`](https://gabrielnakamura.github.io/Buccaneer/reference/IndivSpec_reach_richness.md)
-  : Compute individual species coexistence based on reach criteria
 - [`IndivSpec_regional_distance()`](https://gabrielnakamura.github.io/Buccaneer/reference/IndivSpec_regional_distance.md)
   : Calculate Mean Trait Distance for Individual Species Co-occurring at
   Regional Scale
@@ -29,6 +27,8 @@ help(package = "buccaneer")
 - [`IndivSpec_site_distance()`](https://gabrielnakamura.github.io/Buccaneer/reference/IndivSpec_site_distance.md)
   : Calculate Mean Trait Distance for Individual Species Co-occurring at
   Local Sites
+- [`IndivSpecies_reach_coexistence()`](https://gabrielnakamura.github.io/Buccaneer/reference/IndivSpecies_reach_coexistence.md)
+  : Compute Individual Species Coexistence based on reach criteria
 - [`IndivSpecies_regional_coex()`](https://gabrielnakamura.github.io/Buccaneer/reference/IndivSpecies_regional_coex.md)
   : Calculate Regional Individual Species Coexistence Across Time Slices
 - [`assemblage_site_trait_distance()`](https://gabrielnakamura.github.io/Buccaneer/reference/assemblage_site_trait_distance.md)
@@ -41,6 +41,9 @@ help(package = "buccaneer")
   : Auxiliar function to calculate reach criteria
 - [`check_crossing_boundaries()`](https://gabrielnakamura.github.io/Buccaneer/reference/check_crossing_boundaries.md)
   : Check Occurrence Records Crossing Time Bin Boundaries
+- [`clade_reach_coexistence()`](https://gabrielnakamura.github.io/Buccaneer/reference/clade_reach_coexistence.md)
+  : Compute species coexistence for each time slice based on reach
+  metric
 - [`clade_regional_coexistence()`](https://gabrielnakamura.github.io/Buccaneer/reference/clade_regional_coexistence.md)
   : Calculate Regional Species Richness Across Time Slices
 - [`clade_regional_distance()`](https://gabrielnakamura.github.io/Buccaneer/reference/clade_regional_distance.md)
@@ -56,6 +59,8 @@ help(package = "buccaneer")
   Across Time Slices
 - [`comp_site_occurrence()`](https://gabrielnakamura.github.io/Buccaneer/reference/comp_site_occurrence.md)
   : Calculate Site-Based Species Occurrence Across Time Slices
+- [`comp_slice_occ_cooccurr()`](https://gabrielnakamura.github.io/Buccaneer/reference/comp_slice_occ_cooccurr.md)
+  : Calculate Species Co-occurrence Matrices Based on Time Slice Overlap
 - [`get_summary_interval()`](https://gabrielnakamura.github.io/Buccaneer/reference/get_summary_interval.md)
   : Compute Summary Statistics from Fossil Records Across Time Intervals
 - [`get_summary_slices()`](https://gabrielnakamura.github.io/Buccaneer/reference/get_summary_slices.md)
