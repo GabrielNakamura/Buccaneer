@@ -7,14 +7,31 @@ library(dplyr)
 
 ## Background
 
-Here we will use the same data processed in the article xXXXX.
+In this article we will show how to calculate different metrics of
+interspecific competition (or sometimes coexistence metrics) at
+different taxonomic levels in deep time using {`Buccaneer`} R package.
+
+For all metrics we will use data from [Graciotti et al.
+(2025)](https://academic.oup.com/evolut/article-abstract/79/9/1835/8140865?redirectedFrom=fulltext).
+This comprises fossil record of North American canids, a group that has
+been well caracterized ecologically and regarding fossil record. The
+data is part of the {`Buccaneer`} package and is comprised by:
+
+- Species longevity data: A data frame describing the Origination Time
+  (TS) and Extinction Time (TE) obtained with Bayesian framework called
+  [PyRate](https://gabrielnakamura.github.io/Buccaneer/articles/)
+
+- Occurrence recorda data:
+
+- Species traits:
 
 ## Loading data and packages
 
 ``` r
-data("df_TS_TE_faurby")
-data("df_TS_TE_mass")
-data("df_occ_faurby")
+data("df_longevities_canidae") # longevities for one replicate
+#data("occurrences_canidae") # occurrence data
+data("traits_canidae") # trait data
+data("df_occ_canidae") # occurrence data
 ```
 
 ### Clade level analysis
@@ -22,30 +39,50 @@ data("df_occ_faurby")
 Calculating time series at clade level
 
 ``` r
-regional_richness <- 
-  regional_clade_richness(df.TS.TE = df_TS_TE_faurby,
-                          time.slice = 0.1,
-                          round.digits = 1,
-                          species = "species",
-                          TS = "TS",
-                          TE = "TE")
+res_clade_regional <-
+  clade_regional_coexistence(df.TS.TE = df_longevities_canidae,
+                             time.slice = 0.1,
+                             round.digits = 10,
+                             species = "species",
+                             TS = "TS",
+                             TE = "TE")
 ```
 
 Plotting the results
 
 ``` r
-regional_richness |> 
-  mutate(time.slice = as.numeric(time.slice)) |> 
-  ggplot(aes(x = time.slice, y = richness)) +
-  geom_smooth(se = TRUE, method = "loess", size = 1) +  # Line thickness for better visibility
-  geom_point(aes(x = time.slice, y = richness)) +
-  labs(title = "",
-       x = "Tempo",
-       y = "Riqueza") +
-  scale_x_continuous(breaks = seq(max(as.numeric(regional_richness$time.slice)), 0, by = -10)) +
-  scale_x_reverse() +
-  theme_minimal() +
-  theme(legend.position = "none")# Use a clean theme
+res_clade_regional |>
+  mutate(time.slice = as.numeric(time.slice)) |>
+  ggplot(aes(x = time.slice, y = coexistence)) +
+  geom_smooth(
+    se = TRUE,
+    method = "loess",
+    linewidth = 0.6
+  ) +
+  geom_line(
+    linewidth = 0.4
+  ) +
+  labs(
+    x = "Time (Ma)",
+    y = "Coexistence"
+  ) +
+  scale_x_reverse(
+    breaks = seq(
+      from = 0,
+      to   = max(res_clade_regional$time.slice, na.rm = TRUE),
+      by   = 5
+    )
+  ) +
+  theme_minimal(base_size = 10) +
+  theme(
+    legend.position = "none",
+    axis.line = element_line(color = "black", linewidth = 0.4),
+    axis.title = element_text(size = 9),
+    axis.text  = element_text(size = 7),
+    axis.title.x = element_text(size = 9),
+    axis.title.y = element_text(size = 9),
+    panel.grid.minor = element_blank()
+  )
 ```
 
 #### regional clade trait distances
@@ -65,11 +102,21 @@ Calculating comparing mpd between and within groups using a distance
 matrix and a distance threshold (1 = mnnd)
 
 ``` r
-dist_body_mass <- dist(df_TS_TE_mass$mean.size)
+dist_body_mass <- dist(traits_canidae$LD1)
+
+regional_mnd <- 
+  clade_regional_distance(df.TS.TE = df_longevities_canidae, 
+                          time.slice = 0.1,
+                          dist.trait = dist_body_mass,
+                          nearest.taxon = 1, 
+                          round.digits = 1, 
+                          species = "species", 
+                          TS = "TS", 
+                          TE = "TE")
 
 # distances between groups using as focal group Caniformia
 regional_mnd_between <- 
-  clade_regional_distance(df.TS.TE = df_TS_TE_mass, 
+  clade_regional_distance(df.TS.TE = df_longevities_canidae, 
                           time.slice = 0.1,
                           dist.trait = dist_body_mass,
                           nearest.taxon = 1, 
@@ -100,7 +147,11 @@ Joining all results to plot in one graphic
 
 ``` r
 all_mnd_regional <- rbind(regional_mnd_between, regional_mnd_within)
-all_mnd_regional2 <- data.frame(all_mnd_regional, group_res = rep(c("Between", "Within"), each = nrow(regional_mnd_within)))
+all_mnd_regional2 <- 
+  data.frame(all_mnd_regional, 
+             group_res = rep(c("Between", "Within"), 
+                             each = nrow(regional_mnd_within))
+  )
 ```
 
 Plotting mpd results
@@ -123,30 +174,41 @@ all_mnd_regional2 |>
 #### Clade site richness
 
 ``` r
-site_richness <- 
-  clade_site_richness(df.TS.TE = df_TS_TE_faurby, 
-                      df.occ = df_occ_faurby, 
-                      time.slice = 0.1, 
-                      round.digits = 1,
-                      species = "species",
-                      TS = "TS",
-                      TE = "TE")
+res_clade_site <- 
+  clade_site_coexistence(df.TS.TE = df_longevities_canidae, 
+                         df.occ = df_occ_canidae, 
+                         time.slice = 0.1, 
+                         round.digits = 1,
+                         species = "species",
+                         TS = "TS",
+                         TE = "TE", 
+                         Max.age = "max_T",
+                         Min.age = "min_T",
+                         site = "site.char")
 ```
 
 Plotting the results
 
 ``` r
-site_richness |> 
-  ggplot(aes(x = as.numeric(time.slice), y = mean.richness.site)) +
-  geom_point(aes(x = as.numeric(time.slice), y = mean.richness.site)) +
+res_clade_site |> 
+  ggplot(aes(x = as.numeric(time.slice), y = mean.coexistence)) +
+  geom_line(aes(x = as.numeric(time.slice), y = mean.coexistence)) +
   geom_smooth(se = TRUE, method = "loess", size = 1) +  # Line thickness for better visibility
   labs(title = "",
-       x = "Time",
-       y = "Mean site richness") +
-  scale_x_continuous(breaks = seq(max(as.numeric(site_richness$time.slice)), 0, by = -10)) +
+       x = "Time (Ma)",
+       y = "Mean site coexistence") +
+  scale_x_continuous(breaks = seq(max(as.numeric(res_clade_site$time.slice)), 0, by = -10)) +
   scale_x_reverse() +
-  theme_minimal() +
-  theme(legend.position = "none")# Use a clean theme
+  theme_minimal(base_size = 10) +
+  theme(
+    legend.position = "none",
+    axis.line = element_line(color = "black", linewidth = 0.4),
+    axis.title = element_text(size = 9),
+    axis.text  = element_text(size = 7),
+    axis.title.x = element_text(size = 9),
+    axis.title.y = element_text(size = 9),
+    panel.grid.minor = element_blank()
+  )
 ```
 
 ### Individual species analysis

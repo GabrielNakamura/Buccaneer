@@ -7,14 +7,14 @@
 
 ## Citation
 
-Last F (2025). *buccaneer: What the Package Does (One Line, Title
+Last F (2026). *buccaneer: What the Package Does (One Line, Title
 Case)*. R package version 0.0.0.9000,
 <https://gabrielnakamura.github.io/Buccaneer/>.
 
     @Manual{,
       title = {buccaneer: What the Package Does (One Line, Title Case)},
       author = {First Last},
-      year = {2025},
+      year = {2026},
       note = {R package version 0.0.0.9000},
       url = {https://gabrielnakamura.github.io/Buccaneer/},
     }
