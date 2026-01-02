@@ -195,12 +195,16 @@ clade_site_coexistence <-
     df_occ$site <- as.factor(df_occ$site)
 
     # Generating time intervals used to compute temporal coexistence
-    seq_interval <- seq(from = ceiling(max(df.TS.TE[, "TS"])), to = ceiling(min(df.TS.TE[, "TE"])), by = -time.slice)
+    seq_interval <- seq(from = ceiling(max(df.TS.TE[, "TS"])),
+                        to = ceiling(min(df.TS.TE[, "TE"])),
+                        by = -time.slice)
 
 
     # Time coexistence matrix for all species
     matrix_coex <-
-      aux_matrix_regional_coex(df.TS.TE, time.slice, round.digits = round.digits,
+      aux_matrix_regional_coex(df.TS.TE,
+                               time.slice,
+                               round.digits = round.digits,
                                species = "species",
                                TS = "TS",
                                TE = "TE")

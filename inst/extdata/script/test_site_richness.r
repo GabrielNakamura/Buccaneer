@@ -1,13 +1,12 @@
 
 # Reading data for vignettes
 data("longevities_canidae") # longevities 50 replicates
-data("occurrences_canidae") # occurrence data
+data("df_longevities_canidae") # longevities for one replicate
+#data("occurrences_canidae") # occurrence data
 data("traits_canidae") # trait data
+data("df_occ_canidae") # occurrence data
 
-# Loading Rodolfo's data
-# load(here::here("inst", "extdata", "script", "rodolfo", "df_can_tot.RData"))
-# load(here::here("inst", "extdata", "script", "rodolfo", "longevities.RData"))
-data("longevities_canidae")
+
 # load("./PBDB/df_can.Rdata")
 # Rodolfo's results for comparison
 load(here::here("inst", "extdata", "script", "rodolfo", "df_can.Rdata"))
@@ -210,7 +209,7 @@ res_regional_function <-
 # using high resolution - different than used by rodolfo
 
 res_clade_site_good_high <-
-  clade_site_richness(df.TS.TE = longs2,
+  clade_site_coexistence(df.TS.TE = longs2,
                       df.occ = df_occ_good_low2,
                       time.slice = 0.1,
                       round.digits = 1,

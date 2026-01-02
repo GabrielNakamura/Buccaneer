@@ -140,16 +140,13 @@ comp_site_occurrence <-
           x |>
           distinct(site, species)
 
-        # Step 2: Create a presence/absence matrix (sites x species)
+        # Step 2: Create a sites x species data frame
         site_species_matrix <-
           df_unique  |>
           mutate(present = 1) |>
           tidyr::pivot_wider(names_from = species, values_from = present, values_fill = 0)
 
-        # Step 3: Convert to a matrix and compute cross-product
-        # mat <- as.matrix(site_species_matrix[,-1])  # remove site column
-        # cooccur_matrix_sites <- t(mat) %*% mat  # species-by-species co-occurrence
-        # cooccur_matrix_sites
+        # Step 3: return the site x species data frame
         site_species_matrix
       })
 

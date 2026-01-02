@@ -186,12 +186,15 @@ clade_regional_distance <-
     }
 
     # creating time slices
-    seq_interval <- seq(from = max(df.TS.TE[, "TS"]), to = min(df.TS.TE[, "TE"]), by = -time.slice)
-    seq_interval <- round(seq_interval, digits = round.digits)
+    seq_interval <- seq(from = ceiling(max(df.TS.TE[, "TS"])),
+                        to = ceiling(min(df.TS.TE[, "TE"])),
+                        by = -time.slice)
 
     # co-occurrence matrix
     matrix_coex <-
-      aux_matrix_regional_coex(df.TS.TE, time.slice, round.digits = 1,
+      aux_matrix_regional_coex(df.TS.TE,
+                               time.slice,
+                               round.digits = 1,
                                species = "species",
                                TS = "TS",
                                TE = "TE")
@@ -312,4 +315,3 @@ clade_regional_distance <-
     return(df_res)
 
   }
-
