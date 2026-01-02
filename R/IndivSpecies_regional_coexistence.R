@@ -73,7 +73,7 @@ IndivSpecies_regional_coex <-
     df_long_res <-
       do.call(rbind, lapply(names(list_n_coex_all5), function(nm) {
         data.frame(
-          time.slice = nm,
+          time.slice = as.numeric(nm),
           species = names(list_n_coex_all5[[nm]]),
           n.coexistence = unname(list_n_coex_all5[[nm]])
         )

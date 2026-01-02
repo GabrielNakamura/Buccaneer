@@ -270,7 +270,7 @@ IndivSpec_site_coexistence <-
     df_long_res <-
       do.call(rbind, lapply(names(list_n_coex_all3), function(nm) {
         data.frame(
-          time.slice = nm,
+          time.slice = as.numeric(nm),
           species = names(list_n_coex_all3[[nm]]),
           n.coexistence = unname(list_n_coex_all3[[nm]])
         )

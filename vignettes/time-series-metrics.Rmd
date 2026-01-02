@@ -259,58 +259,74 @@ assemblage, this last being defined as a grid of customized size.
 ### Individual species regional coexistence - taxonomic
 
 ```{r}
-indiv_species_coex <- 
-  IndivSpecies_regional_richness(df.TS.TE = df_TS_TE_faurby, 
-                                 time.slice = 0.1,
-                                 round.digits = 1,
-                                 species = "species",
-                                 TS = "TS",
-                                 TE = "TE")
+res_indiv_species_coex <- 
+  IndivSpecies_regional_coex(df.TS.TE = df_longevities_canidae, 
+                             time.slice = 0.1,
+                             round.digits = 1,
+                             species = "species",
+                             TS = "TS",
+                             TE = "TE")
+
+
+res_indiv_species_coex |> 
+  group_by(species) |> 
+  mutate(media = mean(n.coexistence)) |> View()
 
 ```
 
-This output contain two data frames, one with all individual
-coexistences per species in all time slices, and another containing the
-mean species coexistence considering all time slices
-
-```{r}
-df_mean_individual_species <- indiv_species_coex$mean_species_coexistence
-df_indiv_species_long <- indiv_species_coex$df_IndivSpp_coexist
-```
-
-We can plot the results of all time mean species coexistence for three
-species
-
-```{r, out.width="80%", out.height="80%", dpi=300, fig.retina=2}
-df_indiv_species_long |> 
-  filter(species == "Canis" | species == "Ursus" | species == "Ursavus") |> 
-  ggplot(aes(x = species, y = n.coexistence, fill = species)) +
-  geom_violin(trim = FALSE) +  # Line thickness for better visibility
-  geom_point(aes(x = species, y = n.coexistence, fill = species), shape = 21) +
-  labs(title = "",
-       x = "Espécies",
-       y = "Coexistência média") +
-  theme_minimal() +
-  theme(legend.position = "none", 
-        panel.grid.major = element_line(linetype = "dashed"))# Use a clean theme
-```
 
 We can also plot the time series for each species
 
-```{r, out.width="80%", out.height="80%", dpi=300, fig.retina=2}
-df_indiv_species_long |> 
-  filter(species == "Canis" | species == "Ursavus" | species == "Ursus" | species == "Panthera") |> 
-  ggplot(aes(x = time.slice, y = n.coexistence, color = species, group = species)) +  # Line thickness for better visibility
-  geom_smooth(se = TRUE, method = "loess", size = 1) +
-  geom_point(aes(x = time.slice, y = n.coexistence, color = species), shape = 21) +
-  facet_wrap(~species) +
-  labs(title = "",
-       x = "Time",
-       y = "number of coexistences by species") +
-  theme_minimal()  +
-  scale_x_continuous(breaks = seq(max(df_indiv_species_long$time.slice), 0, by = -10)) +
-  scale_x_reverse() +
-  theme(legend.position = "none")# Use a clean theme
+```{r,fig.retina=2}
+res_indiv_species_coex |>
+  filter(
+    species %in% c(
+      "Cynarctus_marylandica",
+      "Psalidocyon_marianae",
+      "Aelurodon_taxoides",
+      "Leptocyon_douglassi"
+    )
+  ) |>
+  ggplot(
+    aes(
+      x = time.slice,
+      y = n.coexistence,
+      color = species,
+      group = species
+    )
+  ) +
+  geom_smooth(
+    se = TRUE,
+    method = "loess",
+    linewidth = 0.8
+  ) +
+  geom_line(
+    linewidth = 0.5
+  ) +
+  facet_wrap(~ species, nrow = 2) +
+  labs(
+    x = "Time",
+    y = "Number of coexistences by species"
+  ) +
+  scale_x_reverse(
+    breaks = seq(
+      from = 0,
+      to   = max(res_indiv_species_coex$time.slice, na.rm = TRUE),
+      by   = 10
+    )
+  ) +
+  coord_cartesian(clip = "off") +
+  theme_minimal(base_size = 10) +
+    theme(
+    legend.position = "none",
+    axis.line.x.bottom = element_line(color = "black", linewidth = 0.4),
+    axis.ticks.x       = element_line(color = "black", linewidth = 0.4),
+    axis.text.x        = element_text(size = 8),
+    axis.line.y.left   = element_line(color = "black", linewidth = 0.4),
+    panel.grid.minor   = element_blank(),
+    plot.margin = margin(t = 5, r = 5, b = 20, l = 5)
+  )
+
 ```
 
 ### Individual species regional mpd
@@ -327,38 +343,70 @@ body mass.
 
 ```{r}
 
-df_TS_TE_mass2 <- 
-  df_TS_TE_mass |> 
-  filter(across(c(TS, TE), ~ !is.na(.)))
-
-indiv_regional_species_mpd <-
-  IndivSpecies_regional_mpd(df.TS.TE = df_TS_TE_mass, 
+res_indiv_regional_species_mpd <-
+  IndivSpec_regional_distance(df.TS.TE = df_longevities_canidae,
                             time.slice = 0.1, 
-                            trait = "mean.size",
+                            dist.trait = dist_body_mass,
                             round.digits = 1, 
                             species = "species",
                             TS = "TS",
-                            TE = "TE")
+                            TE = "TE", 
+                            nearest.taxon = "all")
 
-df_indiv_species_mpd_long <- indiv_regional_species_mpd
 ```
 
 Plotting the results for individual species mpd
 
-```{r, out.width="80%", out.height="80%", dpi=300, fig.retina=2}
-df_indiv_species_mpd_long |> 
-  filter(species == "Canis" | species == "Ursavus" | species == "Ursus" | species == "Panthera") |> 
-  ggplot(aes(x = time.slice, y = mpd, color = species, group = species)) +  # Line thickness for better visibility
-  geom_point(aes(x = time.slice, y = mpd, color = species), shape = 21) +
-  geom_smooth(se = TRUE, method = "loess", size = 1) +
-  facet_wrap(~species) +
-  labs(title = "",
-       x = "Tempo",
-       y = "Distância média (mpd)") +
-  theme_minimal()  +
-  scale_x_continuous(breaks = seq(max(df_indiv_species_mpd_long$time.slice), 0, by = -10)) +
-  scale_x_reverse() +
-  theme(legend.position = "none")# Use a clean theme
+```{r, fig.retina=2}
+res_indiv_regional_species_mpd |>
+  filter(
+    species %in% c(
+      "Cynarctus_marylandica",
+      "Psalidocyon_marianae",
+      "Aelurodon_taxoides",
+      "Leptocyon_douglassi"
+    )
+  ) |>
+  ggplot(
+    aes(
+      x = time.slice,
+      y = mean_dist_to_cooccur,
+      color = species,
+      group = species
+    )
+  ) +
+  geom_smooth(
+    se = TRUE,
+    method = "loess",
+    linewidth = 0.8
+  ) +
+  geom_line(
+    linewidth = 0.5
+  ) +
+  facet_wrap(~ species, nrow = 2) +
+  labs(
+    x = "Time (Ma)",
+    y = "Mean pairwise distance"
+  ) +
+  scale_x_reverse(
+    breaks = seq(
+      from = 0,
+      to   = max(res_indiv_regional_species_mpd$time.slice, na.rm = TRUE),
+      by   = 10
+    )
+  ) +
+  coord_cartesian(clip = "off") +
+  theme_minimal(base_size = 10) +
+    theme(
+    legend.position = "none",
+    axis.line.x.bottom = element_line(color = "black", linewidth = 0.4),
+    axis.ticks.x       = element_line(color = "black", linewidth = 0.4),
+    axis.text.x        = element_text(size = 8),
+    axis.line.y.left   = element_line(color = "black", linewidth = 0.4),
+    panel.grid.minor   = element_blank(),
+    plot.margin = margin(t = 5, r = 5, b = 20, l = 5)
+  )
+
 ```
 
 #### Individual species regional mpd with varying distances and multiple traits
@@ -373,9 +421,11 @@ calculating the mpd considering all species co-occurring in a time
 slice.
 
 ```{r}
-IndivSpecies_regional_mpd(df.TS.TE = df_TS_TE_mass, 
+res_indiv_regional_species_mnd <- 
+  IndivSpec_regional_distance(df.TS.TE = df_longevities_canidae, 
                             time.slice = 0.1, 
-                            trait = "mean.size",
+                            dist.trait = dist_body_mass, 
+                            nearest.taxon = 1,
                             round.digits = 1, 
                             species = "species",
                             TS = "TS",
@@ -388,40 +438,73 @@ Here we will perform the same calculations but using site criteria for
 individual species coexistence
 
 ```{r}
-indiv_species_site_coex <- 
-  IndivSpec_site_richness(df.TS.TE = df_TS_TE_faurby,
-                          df.occ = df_occ_faurby, 
-                          time.slice = 0.1,
-                          round.digits = 1,
-                          species = "species",
-                          TS = "TS",
-                          TE = "TE",
-                          Max.age = "Max.age",
-                          Min.age = "Min.age",
-                          site = "site")
+res_indiv_species_site_coex <- 
+  IndivSpec_site_coexistence(df.TS.TE = df_longevities_canidae,
+                             df.occ = df_occ_canidae, 
+                             time.slice = 0.1,
+                             round.digits = 5,
+                             species = "species",
+                             TS = "TS",
+                             TE = "TE",
+                             Max.age = "max_T",
+                             Min.age = "min_T",
+                             site = "site.char")
 
-indiv_species_site_coex2 <- 
-  indiv_species_site_coex |> 
-  mutate(time.slice = as.numeric(time.slice))
 
 
 ```
 
 plotting species coexistence considering site coexistence
 
-```{r, out.width="80%", out.height="80%", dpi=300, fig.retina=2}
-indiv_species_site_coex2 |> 
-  filter(species == "Alopecocyon" | species == "Simocyon" | species == "Prepoecilogale" | species == "Vormela" | species == "Hesperocyon") |> 
-  ggplot(aes(x = time.slice, y = mean.per.spp, color = species, group = species)) +  # Line thickness for better visibility
-  geom_smooth(se = TRUE, method = "loess", size = 1) +
-  facet_wrap(~species) +
-  labs(title = "",
-       x = "Time",
-       y = "mean coexistence") +
-  theme_minimal()  +
-  scale_x_continuous(breaks = seq(max(indiv_species_site_coex2$time.slice), 0, by = -10)) +
-  scale_x_reverse() +
-  theme(legend.position = "none")
+```{r,fig.retina=2}
+res_indiv_species_site_coex |>
+  filter(
+    species %in% c(
+      "Cynarctus_marylandica",
+      "Psalidocyon_marianae",
+      "Aelurodon_taxoides",
+      "Leptocyon_douglassi"
+    )
+  ) |>
+  ggplot(
+    aes(
+      x = time.slice,
+      y = n.coexistence,
+      color = species,
+      group = species
+    )
+  ) +
+  geom_smooth(
+    se = TRUE,
+    method = "loess",
+    linewidth = 0.8
+  ) +
+  geom_line(
+    linewidth = 0.5
+  ) +
+  facet_wrap(~ species, nrow = 2) +
+  labs(
+    x = "Time",
+    y = "Number of coexistences by species"
+  ) +
+  scale_x_reverse(
+    breaks = seq(
+      from = 0,
+      to   = max(res_indiv_species_coex$time.slice, na.rm = TRUE),
+      by   = 10
+    )
+  ) +
+  coord_cartesian(clip = "off") +
+  theme_minimal(base_size = 10) +
+    theme(
+    legend.position = "none",
+    axis.line.x.bottom = element_line(color = "black", linewidth = 0.4),
+    axis.ticks.x       = element_line(color = "black", linewidth = 0.4),
+    axis.text.x        = element_text(size = 8),
+    axis.line.y.left   = element_line(color = "black", linewidth = 0.4),
+    panel.grid.minor   = element_blank(),
+    plot.margin = margin(t = 5, r = 5, b = 20, l = 5)
+  )
 ```
 
 ### Individual species site mpd

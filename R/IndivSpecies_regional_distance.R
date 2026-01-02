@@ -261,7 +261,7 @@ IndivSpec_regional_distance <-
         if ((is.matrix(element) || is.data.frame(element)) && nrow(element) > 0) {
           data.frame(
             species = rownames(element),
-            time.slice = age,
+            time.slice = as.numeric(age),
             mean_dist_to_cooccur = element[, 1],
             row.names = NULL
           )
@@ -269,7 +269,7 @@ IndivSpec_regional_distance <-
           # Return NA row if element is not a matrix/data.frame or has 0 rows
           data.frame(
             species = NA,
-            time.slice = age,
+            time.slice = as.numeric(age),
             mean_dist_to_cooccur = NA
           )
         }
