@@ -149,29 +149,34 @@ called <a href="">PyRate</a></p></li>
 allows to set up the group comparison in which the mean will be
 calculate. It can be <code>between</code> to calculate mean distances
 between a focal and a target group or <code>within</code> to calculate
-the mean trait distance only within the focal group</p>
+the mean trait distance only within the focal group. To this end we will
+use the <code>diet_cat</code> column of the <code>trait_canidae</code>
+data frame, that contains a<br>
+classification of canidae species in two categories: hypercarnivores and
+mesocarnivores.</p>
+<p>First we need to join this information to the
+<code>df_longvities_canidae</code> data frame</p>
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">df_longevities_canidae_trait</span> <span class="op">&lt;-</span> </span>
+<span>  <span class="va">df_longevities_canidae</span> <span class="op">|&gt;</span> </span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate-joins.html" class="external-link">left_join</a></span><span class="op">(</span><span class="va">traits_canidae</span>, by <span class="op">=</span> <span class="st">"species"</span><span class="op">)</span></span></code></pre></div>
 <p>This function is also a general solution to calculate the mean trait
 distance using different number of species/genus that are close to each
-other. This is set up in the argument <code>nearest.taxon</code>. 1 is
-equivalent of mnnd.</p>
-<p>Calculating comparing mpd between and within groups using a distance
-matrix and a distance threshold (1 = mnnd)</p>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">dist_body_mass</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/dist.html" class="external-link">dist</a></span><span class="op">(</span><span class="va">traits_canidae</span><span class="op">$</span><span class="va">LD1</span><span class="op">)</span></span>
+other. To set up the number of closest species that will be used in the
+calculation of mean pairwise distances we will change the argument
+<code>nearest.taxon</code>. 1 is equivalent of mean nearest distance and
+<code>all</code> corresponds to the calculation of mean pairwise
+distance (mpd) using all coexisting species.</p>
+<p>The next chunk of code show an example on how we can calculate mean
+distances in the morphospace using different types of comparisons and
+varying the number of closest species in the morphospace considered in
+the calculation</p>
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">dist_body_mass</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/dist.html" class="external-link">dist</a></span><span class="op">(</span><span class="va">traits_canidae</span><span class="op">$</span><span class="va">LD1</span><span class="op">)</span> <span class="co"># computing pairwise distance matrix for body mass</span></span>
 <span></span>
-<span><span class="va">regional_mnd</span> <span class="op">&lt;-</span> </span>
-<span>  <span class="fu"><a href="../reference/clade_regional_distance.html">clade_regional_distance</a></span><span class="op">(</span>df.TS.TE <span class="op">=</span> <span class="va">df_longevities_canidae</span>, </span>
-<span>                          time.slice <span class="op">=</span> <span class="fl">0.1</span>,</span>
-<span>                          dist.trait <span class="op">=</span> <span class="va">dist_body_mass</span>,</span>
-<span>                          nearest.taxon <span class="op">=</span> <span class="fl">1</span>, </span>
-<span>                          round.digits <span class="op">=</span> <span class="fl">1</span>, </span>
-<span>                          species <span class="op">=</span> <span class="st">"species"</span>, </span>
-<span>                          TS <span class="op">=</span> <span class="st">"TS"</span>, </span>
-<span>                          TE <span class="op">=</span> <span class="st">"TE"</span><span class="op">)</span></span>
-<span></span>
-<span><span class="co"># distances between groups using as focal group Caniformia</span></span>
-<span><span class="va">regional_mnd_between</span> <span class="op">&lt;-</span> </span>
-<span>  <span class="fu"><a href="../reference/clade_regional_distance.html">clade_regional_distance</a></span><span class="op">(</span>df.TS.TE <span class="op">=</span> <span class="va">df_longevities_canidae</span>, </span>
+<span><span class="co"># distances between groups using diet category </span></span>
+<span><span class="va">res_regional_mnd_between</span> <span class="op">&lt;-</span> </span>
+<span>  <span class="fu"><a href="../reference/clade_regional_distance.html">clade_regional_distance</a></span><span class="op">(</span>df.TS.TE <span class="op">=</span> <span class="va">df_longevities_canidae_trait</span>, </span>
 <span>                          time.slice <span class="op">=</span> <span class="fl">0.1</span>,</span>
 <span>                          dist.trait <span class="op">=</span> <span class="va">dist_body_mass</span>,</span>
 <span>                          nearest.taxon <span class="op">=</span> <span class="fl">1</span>, </span>
@@ -179,13 +184,14 @@ matrix and a distance threshold (1 = mnnd)</p>
 <span>                          species <span class="op">=</span> <span class="st">"species"</span>, </span>
 <span>                          TS <span class="op">=</span> <span class="st">"TS"</span>, </span>
 <span>                          TE <span class="op">=</span> <span class="st">"TE"</span>, </span>
-<span>                          group <span class="op">=</span> <span class="st">"group"</span>, </span>
-<span>                          group.focal.compare <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Caniformia"</span>, <span class="st">"Feliformia"</span><span class="op">)</span>, </span>
+<span>                          group <span class="op">=</span> <span class="st">"diet_cat"</span>,</span>
+<span>                          group.focal.compare <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"meso"</span>, <span class="st">"hyper"</span><span class="op">)</span>,</span>
 <span>                          type.comparison <span class="op">=</span> <span class="st">"between"</span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># distance within the focal group, in this case is Caniformia</span></span>
-<span><span class="va">regional_mnd_within</span> <span class="op">&lt;-</span> </span>
-<span>  <span class="fu"><a href="../reference/clade_regional_distance.html">clade_regional_distance</a></span><span class="op">(</span>df.TS.TE <span class="op">=</span> <span class="va">df_TS_TE_mass</span>, </span>
+<span></span>
+<span><span class="co"># distance in morphospace computed within the focal group, in this case is mesocarnivores</span></span>
+<span><span class="va">res_regional_mnd_within</span> <span class="op">&lt;-</span> </span>
+<span>  <span class="fu"><a href="../reference/clade_regional_distance.html">clade_regional_distance</a></span><span class="op">(</span>df.TS.TE <span class="op">=</span> <span class="va">df_longevities_canidae_trait</span>, </span>
 <span>                          time.slice <span class="op">=</span> <span class="fl">0.1</span>,</span>
 <span>                          dist.trait <span class="op">=</span> <span class="va">dist_body_mass</span>,</span>
 <span>                          nearest.taxon <span class="op">=</span> <span class="fl">1</span>, </span>
@@ -193,36 +199,44 @@ matrix and a distance threshold (1 = mnnd)</p>
 <span>                          species <span class="op">=</span> <span class="st">"species"</span>, </span>
 <span>                          TS <span class="op">=</span> <span class="st">"TS"</span>, </span>
 <span>                          TE <span class="op">=</span> <span class="st">"TE"</span>, </span>
-<span>                          group <span class="op">=</span> <span class="st">"group"</span>, </span>
-<span>                          group.focal.compare <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Caniformia"</span>, <span class="st">"Feliformia"</span><span class="op">)</span>, </span>
+<span>                          group <span class="op">=</span> <span class="st">"diet_cat"</span>, </span>
+<span>                          group.focal.compare <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"meso"</span>, <span class="st">"meso"</span><span class="op">)</span>, </span>
 <span>                          type.comparison <span class="op">=</span> <span class="st">"within"</span><span class="op">)</span></span></code></pre></div>
-<p>Joining all results to plot in one graphic</p>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">all_mnd_regional</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">rbind</a></span><span class="op">(</span><span class="va">regional_mnd_between</span>, <span class="va">regional_mnd_within</span><span class="op">)</span></span>
+<p>Let’s check out the results of these two competition metrics. First
+we need to join the results to plot in one graphic</p>
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">all_mnd_regional</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">rbind</a></span><span class="op">(</span><span class="va">res_regional_mnd_between</span>, <span class="va">res_regional_mnd_within</span><span class="op">)</span></span>
 <span><span class="va">all_mnd_regional2</span> <span class="op">&lt;-</span> </span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span><span class="va">all_mnd_regional</span>, </span>
 <span>             group_res <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Between"</span>, <span class="st">"Within"</span><span class="op">)</span>, </span>
 <span>                             each <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">regional_mnd_within</span><span class="op">)</span><span class="op">)</span></span>
 <span>  <span class="op">)</span></span></code></pre></div>
 <p>Plotting mpd results</p>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">all_mnd_regional2</span> <span class="op">|&gt;</span> </span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>time.slice.numeric <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/numeric.html" class="external-link">as.numeric</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/unlist.html" class="external-link">unlist</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">lapply</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/strsplit.html" class="external-link">strsplit</a></span><span class="op">(</span><span class="va">time.slice</span>, <span class="st">"_"</span><span class="op">)</span>, <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="va">x</span><span class="op">[</span><span class="fl">2</span><span class="op">]</span><span class="op">)</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
-<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">time.slice.numeric</span>, y <span class="op">=</span> <span class="va">mean.distance</span>, color <span class="op">=</span> <span class="va">group_res</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_point.html" class="external-link">geom_point</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">time.slice.numeric</span>, y <span class="op">=</span> <span class="va">mean.distance</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_smooth.html" class="external-link">geom_smooth</a></span><span class="op">(</span>se <span class="op">=</span> <span class="cn">TRUE</span>, method <span class="op">=</span> <span class="st">"loess"</span>, size <span class="op">=</span> <span class="fl">1</span><span class="op">)</span> <span class="op">+</span>  <span class="co"># Line thickness for better visibility</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/numeric.html" class="external-link">as.numeric</a></span><span class="op">(</span><span class="va">time.slice</span><span class="op">)</span>, y <span class="op">=</span> <span class="va">mean.distance</span>, group <span class="op">=</span> <span class="va">group_res</span>, color <span class="op">=</span> <span class="va">group_res</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_path.html" class="external-link">geom_line</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/numeric.html" class="external-link">as.numeric</a></span><span class="op">(</span><span class="va">time.slice</span><span class="op">)</span>, y <span class="op">=</span> <span class="va">mean.distance</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_smooth.html" class="external-link">geom_smooth</a></span><span class="op">(</span>se <span class="op">=</span> <span class="cn">TRUE</span>, method <span class="op">=</span> <span class="st">"loess"</span>, size <span class="op">=</span> <span class="fl">0.5</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">labs</a></span><span class="op">(</span>title <span class="op">=</span> <span class="st">""</span>,</span>
-<span>       x <span class="op">=</span> <span class="st">"Time"</span>,</span>
-<span>       y <span class="op">=</span> <span class="st">"Mean Distance"</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_continuous.html" class="external-link">scale_x_continuous</a></span><span class="op">(</span>breaks <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">40</span>, <span class="fl">0</span>, by <span class="op">=</span> <span class="op">-</span><span class="fl">10</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/lims.html" class="external-link">xlim</a></span><span class="op">(</span><span class="fl">40</span>, <span class="fl">0</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html" class="external-link">theme_minimal</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html" class="external-link">theme</a></span><span class="op">(</span>legend.position <span class="op">=</span> <span class="st">"bottom"</span><span class="op">)</span><span class="co"># Use a clean theme</span></span></code></pre></div>
+<span>       x <span class="op">=</span> <span class="st">"Time (Ma)"</span>,</span>
+<span>       y <span class="op">=</span> <span class="st">"Mean Nearest Distance"</span>,</span>
+<span>       color <span class="op">=</span> <span class="st">"Groups"</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_continuous.html" class="external-link">scale_x_continuous</a></span><span class="op">(</span>breaks <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">max</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/numeric.html" class="external-link">as.numeric</a></span><span class="op">(</span><span class="va">all_mnd_regional2</span><span class="op">$</span><span class="va">time.slice</span><span class="op">)</span><span class="op">)</span>, <span class="fl">0</span>, by <span class="op">=</span> <span class="op">-</span><span class="fl">10</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_continuous.html" class="external-link">scale_x_reverse</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html" class="external-link">theme_minimal</a></span><span class="op">(</span>base_size <span class="op">=</span> <span class="fl">10</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html" class="external-link">theme</a></span><span class="op">(</span></span>
+<span>    axis.line <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html" class="external-link">element_line</a></span><span class="op">(</span>color <span class="op">=</span> <span class="st">"black"</span>, linewidth <span class="op">=</span> <span class="fl">0.4</span><span class="op">)</span>,</span>
+<span>    axis.title <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html" class="external-link">element_text</a></span><span class="op">(</span>size <span class="op">=</span> <span class="fl">9</span><span class="op">)</span>,</span>
+<span>    axis.text  <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html" class="external-link">element_text</a></span><span class="op">(</span>size <span class="op">=</span> <span class="fl">7</span><span class="op">)</span>,</span>
+<span>    axis.title.x <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html" class="external-link">element_text</a></span><span class="op">(</span>size <span class="op">=</span> <span class="fl">9</span><span class="op">)</span>,</span>
+<span>    axis.title.y <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html" class="external-link">element_text</a></span><span class="op">(</span>size <span class="op">=</span> <span class="fl">9</span><span class="op">)</span>,</span>
+<span>    panel.grid.minor <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html" class="external-link">element_blank</a></span><span class="op">(</span><span class="op">)</span></span>
+<span>  <span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level4">
 <h4 id="clade-site-richness">Clade site richness<a class="anchor" aria-label="anchor" href="#clade-site-richness"></a>
 </h4>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">res_clade_site</span> <span class="op">&lt;-</span> </span>
 <span>  <span class="fu"><a href="../reference/clade_site_coexistence.html">clade_site_coexistence</a></span><span class="op">(</span>df.TS.TE <span class="op">=</span> <span class="va">df_longevities_canidae</span>, </span>
 <span>                         df.occ <span class="op">=</span> <span class="va">df_occ_canidae</span>, </span>
@@ -235,7 +249,7 @@ matrix and a distance threshold (1 = mnnd)</p>
 <span>                         Min.age <span class="op">=</span> <span class="st">"min_T"</span>,</span>
 <span>                         site <span class="op">=</span> <span class="st">"site.char"</span><span class="op">)</span></span></code></pre></div>
 <p>Plotting the results</p>
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">res_clade_site</span> <span class="op">|&gt;</span> </span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/numeric.html" class="external-link">as.numeric</a></span><span class="op">(</span><span class="va">time.slice</span><span class="op">)</span>, y <span class="op">=</span> <span class="va">mean.coexistence</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_path.html" class="external-link">geom_line</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/numeric.html" class="external-link">as.numeric</a></span><span class="op">(</span><span class="va">time.slice</span><span class="op">)</span>, y <span class="op">=</span> <span class="va">mean.coexistence</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
@@ -280,7 +294,7 @@ assemblage, this last being defined as a grid of customized size.</p>
 <div class="section level4">
 <h4 id="individual-species-regional-coexistence---taxonomic">Individual species regional coexistence - taxonomic<a class="anchor" aria-label="anchor" href="#individual-species-regional-coexistence---taxonomic"></a>
 </h4>
-<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">res_indiv_species_coex</span> <span class="op">&lt;-</span> </span>
 <span>  <span class="fu"><a href="../reference/IndivSpecies_regional_coex.html">IndivSpecies_regional_coex</a></span><span class="op">(</span>df.TS.TE <span class="op">=</span> <span class="va">df_longevities_canidae</span>, </span>
 <span>                             time.slice <span class="op">=</span> <span class="fl">0.1</span>,</span>
@@ -294,7 +308,7 @@ assemblage, this last being defined as a grid of customized size.</p>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by</a></span><span class="op">(</span><span class="va">species</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>media <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/mean.html" class="external-link">mean</a></span><span class="op">(</span><span class="va">n.coexistence</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://rdrr.io/r/utils/View.html" class="external-link">View</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <p>We can also plot the time series for each species</p>
-<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">res_indiv_species_coex</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span></span>
 <span>    <span class="va">species</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span>
@@ -355,7 +369,7 @@ require a distance trait matrix (passed to <code>dist</code> argument)
 containing the pairwise distances among species.</p>
 <p>Here we show how to calculate mpd using a single trait, in this case
 body mass.</p>
-<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
 <span><span class="va">res_indiv_regional_species_mpd</span> <span class="op">&lt;-</span></span>
 <span>  <span class="fu"><a href="../reference/IndivSpec_regional_distance.html">IndivSpec_regional_distance</a></span><span class="op">(</span>df.TS.TE <span class="op">=</span> <span class="va">df_longevities_canidae</span>,</span>
@@ -367,7 +381,7 @@ body mass.</p>
 <span>                            TE <span class="op">=</span> <span class="st">"TE"</span>, </span>
 <span>                            nearest.taxon <span class="op">=</span> <span class="st">"all"</span><span class="op">)</span></span></code></pre></div>
 <p>Plotting the results for individual species mpd</p>
-<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">res_indiv_regional_species_mpd</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span></span>
 <span>    <span class="va">species</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span>
@@ -428,7 +442,7 @@ throught the argument <code>nearest.taxon</code> the number of nearest
 species that will be used to calculate the mpd. The default is
 <code>all</code> which is the same as calculating the mpd considering
 all species co-occurring in a time slice.</p>
-<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">res_indiv_regional_species_mnd</span> <span class="op">&lt;-</span> </span>
 <span>  <span class="fu"><a href="../reference/IndivSpec_regional_distance.html">IndivSpec_regional_distance</a></span><span class="op">(</span>df.TS.TE <span class="op">=</span> <span class="va">df_longevities_canidae</span>, </span>
 <span>                            time.slice <span class="op">=</span> <span class="fl">0.1</span>, </span>
@@ -445,7 +459,7 @@ all species co-occurring in a time slice.</p>
 </h4>
 <p>Here we will perform the same calculations but using site criteria
 for individual species coexistence</p>
-<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">res_indiv_species_site_coex</span> <span class="op">&lt;-</span> </span>
 <span>  <span class="fu"><a href="../reference/IndivSpec_site_coexistence.html">IndivSpec_site_coexistence</a></span><span class="op">(</span>df.TS.TE <span class="op">=</span> <span class="va">df_longevities_canidae</span>,</span>
 <span>                             df.occ <span class="op">=</span> <span class="va">df_occ_canidae</span>, </span>
@@ -458,7 +472,7 @@ for individual species coexistence</p>
 <span>                             Min.age <span class="op">=</span> <span class="st">"min_T"</span>,</span>
 <span>                             site <span class="op">=</span> <span class="st">"site.char"</span><span class="op">)</span></span></code></pre></div>
 <p>plotting species coexistence considering site coexistence</p>
-<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">res_indiv_species_site_coex</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span></span>
 <span>    <span class="va">species</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span>
@@ -513,7 +527,7 @@ for individual species coexistence</p>
 </h4>
 <p>We can calculate mean pairwise distances of individual species
 coexistence metrics based on site co-occurrence</p>
-<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
 <span><span class="va">df_TS_TE_mass3</span> <span class="op">&lt;-</span> </span>
 <span>  <span class="va">df_TS_TE_mass2</span> <span class="op">|&gt;</span> </span>
@@ -538,7 +552,7 @@ coexistence metrics based on site co-occurrence</p>
 </h4>
 <p>We will calculate individual mean coexistence using reach
 criteria</p>
-<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
 <span><span class="va">indiv_species_reach_coex</span> <span class="op">&lt;-</span> </span>
 <span>  <span class="fu">IndivSpec_reach_richness</span><span class="op">(</span>df.TS.TE <span class="op">=</span> <span class="va">df_TS_TE_faurby</span>,</span>
@@ -553,7 +567,7 @@ criteria</p>
 <span>                           lat <span class="op">=</span> <span class="st">"lat"</span>,</span>
 <span>                           lon <span class="op">=</span> <span class="st">"lng"</span><span class="op">)</span></span></code></pre></div>
 <p>plotting individual species coexistence with reach criteria</p>
-<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
 <span><span class="va">indiv_species_reach_coex2</span> <span class="op">&lt;-</span> </span>
 <span>  <span class="va">indiv_species_reach_coex</span> <span class="op">|&gt;</span> </span>

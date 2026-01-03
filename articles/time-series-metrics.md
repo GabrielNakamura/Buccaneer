@@ -91,32 +91,39 @@ Here we calculate the mean distances using a general function that
 allows to set up the group comparison in which the mean will be
 calculate. It can be `between` to calculate mean distances between a
 focal and a target group or `within` to calculate the mean trait
-distance only within the focal group
+distance only within the focal group. To this end we will use the
+`diet_cat` column of the `trait_canidae` data frame, that contains a  
+classification of canidae species in two categories: hypercarnivores and
+mesocarnivores.
+
+First we need to join this information to the `df_longvities_canidae`
+data frame
+
+``` r
+df_longevities_canidae_trait <- 
+  df_longevities_canidae |> 
+  left_join(traits_canidae, by = "species")
+```
 
 This function is also a general solution to calculate the mean trait
 distance using different number of species/genus that are close to each
-other. This is set up in the argument `nearest.taxon`. 1 is equivalent
-of mnnd.
+other. To set up the number of closest species that will be used in the
+calculation of mean pairwise distances we will change the argument
+`nearest.taxon`. 1 is equivalent of mean nearest distance and `all`
+corresponds to the calculation of mean pairwise distance (mpd) using all
+coexisting species.
 
-Calculating comparing mpd between and within groups using a distance
-matrix and a distance threshold (1 = mnnd)
+The next chunk of code show an example on how we can calculate mean
+distances in the morphospace using different types of comparisons and
+varying the number of closest species in the morphospace considered in
+the calculation
 
 ``` r
-dist_body_mass <- dist(traits_canidae$LD1)
+dist_body_mass <- dist(traits_canidae$LD1) # computing pairwise distance matrix for body mass
 
-regional_mnd <- 
-  clade_regional_distance(df.TS.TE = df_longevities_canidae, 
-                          time.slice = 0.1,
-                          dist.trait = dist_body_mass,
-                          nearest.taxon = 1, 
-                          round.digits = 1, 
-                          species = "species", 
-                          TS = "TS", 
-                          TE = "TE")
-
-# distances between groups using as focal group Caniformia
-regional_mnd_between <- 
-  clade_regional_distance(df.TS.TE = df_longevities_canidae, 
+# distances between groups using diet category 
+res_regional_mnd_between <- 
+  clade_regional_distance(df.TS.TE = df_longevities_canidae_trait, 
                           time.slice = 0.1,
                           dist.trait = dist_body_mass,
                           nearest.taxon = 1, 
@@ -124,13 +131,14 @@ regional_mnd_between <-
                           species = "species", 
                           TS = "TS", 
                           TE = "TE", 
-                          group = "group", 
-                          group.focal.compare = c("Caniformia", "Feliformia"), 
+                          group = "diet_cat",
+                          group.focal.compare = c("meso", "hyper"),
                           type.comparison = "between")
 
-# distance within the focal group, in this case is Caniformia
-regional_mnd_within <- 
-  clade_regional_distance(df.TS.TE = df_TS_TE_mass, 
+
+# distance in morphospace computed within the focal group, in this case is mesocarnivores
+res_regional_mnd_within <- 
+  clade_regional_distance(df.TS.TE = df_longevities_canidae_trait, 
                           time.slice = 0.1,
                           dist.trait = dist_body_mass,
                           nearest.taxon = 1, 
@@ -138,15 +146,16 @@ regional_mnd_within <-
                           species = "species", 
                           TS = "TS", 
                           TE = "TE", 
-                          group = "group", 
-                          group.focal.compare = c("Caniformia", "Feliformia"), 
+                          group = "diet_cat", 
+                          group.focal.compare = c("meso", "meso"), 
                           type.comparison = "within")
 ```
 
-Joining all results to plot in one graphic
+Let’s check out the results of these two competition metrics. First we
+need to join the results to plot in one graphic
 
 ``` r
-all_mnd_regional <- rbind(regional_mnd_between, regional_mnd_within)
+all_mnd_regional <- rbind(res_regional_mnd_between, res_regional_mnd_within)
 all_mnd_regional2 <- 
   data.frame(all_mnd_regional, 
              group_res = rep(c("Between", "Within"), 
@@ -158,17 +167,24 @@ Plotting mpd results
 
 ``` r
 all_mnd_regional2 |> 
-  mutate(time.slice.numeric = as.numeric(unlist(lapply(strsplit(time.slice, "_"), function(x) x[2])))) |> 
-  ggplot(aes(x = time.slice.numeric, y = mean.distance, color = group_res)) +
-  geom_point(aes(x = time.slice.numeric, y = mean.distance)) +
-  geom_smooth(se = TRUE, method = "loess", size = 1) +  # Line thickness for better visibility
+  ggplot(aes(x = as.numeric(time.slice), y = mean.distance, group = group_res, color = group_res)) +
+  geom_line(aes(x = as.numeric(time.slice), y = mean.distance)) +
+  geom_smooth(se = TRUE, method = "loess", size = 0.5) +
   labs(title = "",
-       x = "Time",
-       y = "Mean Distance") +
-  scale_x_continuous(breaks = seq(40, 0, by = -10)) +
-  xlim(40, 0) +
-  theme_minimal() +
-  theme(legend.position = "bottom")# Use a clean theme
+       x = "Time (Ma)",
+       y = "Mean Nearest Distance",
+       color = "Groups") +
+  scale_x_continuous(breaks = seq(max(as.numeric(all_mnd_regional2$time.slice)), 0, by = -10)) +
+  scale_x_reverse() +
+  theme_minimal(base_size = 10) +
+  theme(
+    axis.line = element_line(color = "black", linewidth = 0.4),
+    axis.title = element_text(size = 9),
+    axis.text  = element_text(size = 7),
+    axis.title.x = element_text(size = 9),
+    axis.title.y = element_text(size = 9),
+    panel.grid.minor = element_blank()
+  )
 ```
 
 #### Clade site richness
