@@ -222,8 +222,8 @@ clade_regional_distance <-
     if(!is.null(group.focal.compare) == TRUE){
       focal <- group.focal.compare[1]
       compare <- group.focal.compare[2]
-      spp_focal <- df.TS.TE[which(df.TS.TE$group == focal), "species"]$species
-      spp_compare <- df.TS.TE[which(df.TS.TE$group == compare), "species"]$species
+      spp_focal <- df.TS.TE[which(df.TS.TE$group == focal), "species"]
+      spp_compare <- df.TS.TE[which(df.TS.TE$group == compare), "species"]
 
       if(type.comparison == "between"){# comparison between species of two groups
         matrix_dist_trait_comp <- matrix_dist_trait[spp_focal, spp_compare] # focal speices in lines and comparison in columns
