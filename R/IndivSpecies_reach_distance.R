@@ -67,18 +67,19 @@ IndivSpec_reach_distance <-
            time.slice,
            dist.trait,
            nearest.taxon,
-           round.digits,
-           species,
-           TS,
-           TE,
-           lat,
-           lon,
-           Max.age = "Max.age",
-           Min.age = "Min.age",
-           crs = 4326,
            group = NULL,
            group.focal.compare = NULL,
-           type.comparison = NULL){
+           type.comparison = NULL,
+           trait = NULL,
+           round.digits = 1,
+           species = "species",
+           TS = "TS",
+           TE = "TE",
+           Max.age = "Max.age",
+           Min.age = "Min.age",
+           lat = "lat",
+           lon = "lon",
+           crs = 4326){
     # subseting columns
     if(!is.null(group) == TRUE){
       df.TS.TE <- df.TS.TE[, c(species, trait, TS, TE, group)]

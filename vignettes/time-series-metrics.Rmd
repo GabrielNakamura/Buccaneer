@@ -21,6 +21,7 @@ knitr::opts_chunk$set(
 ```{r setup}
 library(ggplot2)
 library(dplyr)
+devtools::load_all(".")
 ```
 
 # Background
@@ -48,11 +49,12 @@ data is part of the {`Buccaneer`} package and is comprised by:
 # Loading data and packages
 
 ```{r}
+
 data("df_longevities_canidae") # longevities for one replicate
 #data("occurrences_canidae") # occurrence data
 data("traits_canidae") # trait data
 data("df_occ_canidae") # occurrence data
-library("buccaneer")
+
 
 ```
 
@@ -73,7 +75,6 @@ res_clade_regional <-
                              TE = "TE")
 
 ```
-
 
 
 Here we calculate the mean distances using a general function that
@@ -148,7 +149,7 @@ all_mnd_regional <- rbind(res_regional_mnd_between, res_regional_mnd_within)
 all_mnd_regional2 <- 
   data.frame(all_mnd_regional, 
              group_res = rep(c("Between", "Within"), 
-                             each = nrow(regional_mnd_within))
+                             each = nrow(res_regional_mnd_within))
   )
 
 ```

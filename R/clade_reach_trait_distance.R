@@ -65,12 +65,12 @@ clade_reach_distance <-
            time.slice,
            dist.trait,
            nearest.taxon,
-           round.digits,
-           species,
-           TS,
-           TE,
-           lat,
-           lon,
+           round.digits = 1,
+           species = "species",
+           TS = "TS",
+           TE = "TE",
+           lat = "lat",
+           lon = "lon",
            Max.age = "Max.age",
            Min.age = "Min.age",
            crs = 4326,
@@ -194,7 +194,7 @@ clade_reach_distance <-
     matrix_all_dist2 <- list_matrix_dist_occ
 
     # filtering the combinations and filling the co-occurrence matrix with zeroes and 1s accordingly with reach criteria
-    list_res <- vector(mode = "list", length = length(matrix_coex2))
+    list_res <- vector(mode = "list", length = length(matrix_coex))
     for(i in 1:length(matrix_all_dist2)){
       # i = 66
       res <- matrix_coex[[i]] # regional cooccurrence matrix
@@ -202,16 +202,12 @@ clade_reach_distance <-
         res <- NA
       } else{
         for(j in 1:ncol(combination[[i]])){
-
-          if(combination[[i]][1, j] %in% rownames(res) |  combination[[i]][1, j] %in% colnames(res) &&
-             combination[[i]][2, j] %in% spp_focal | combination[[i]][2, j] %in% spp_compare)
-
-            min_between <-
-              matrix_all_dist2[[i]][which(combination[[i]][1, j] ==
-                                            rownames(matrix_all_dist2[[i]])),
-                                    which(combination[[i]][2, j] ==
-                                            colnames(matrix_all_dist2[[i]])),
-                                    drop = FALSE]
+          min_between <-
+            matrix_all_dist2[[i]][which(combination[[i]][1, j] ==
+                                          rownames(matrix_all_dist2[[i]])),
+                                  which(combination[[i]][2, j] ==
+                                          colnames(matrix_all_dist2[[i]])),
+                                  drop = FALSE]
           max_1 <-
             matrix_all_dist2[[i]][which(combination[[i]][1, j] ==
                                           rownames(matrix_all_dist2[[i]])),

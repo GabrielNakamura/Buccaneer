@@ -10,18 +10,19 @@ IndivSpec_reach_distance(
   time.slice,
   dist.trait,
   nearest.taxon,
-  round.digits,
-  species,
-  TS,
-  TE,
-  lat,
-  lon,
-  Max.age = "Max.age",
-  Min.age = "Min.age",
-  crs = 4326,
   group = NULL,
   group.focal.compare = NULL,
-  type.comparison = NULL
+  type.comparison = NULL,
+  trait = NULL,
+  round.digits = 1,
+  species = "species",
+  TS = "TS",
+  TE = "TE",
+  Max.age = "Max.age",
+  Min.age = "Min.age",
+  lat = "lat",
+  lon = "lon",
+  crs = 4326
 )
 }
 \arguments{
@@ -36,33 +37,6 @@ Each row represents a single occurrence record at a specific site.}
 
 \item{time.slice}{Numeric. The time interval (in the same units as TS and TE)
 between consecutive time slices for temporal binning.}
-
-\item{round.digits}{Integer. The number of decimal places to round time slice
-values. Default is 1. This affects temporal binning precision.}
-
-\item{species}{Character. The name of the column in \code{df.TS.TE} and
-\code{df.occ} containing species identifiers. Default is "species".}
-
-\item{TS}{Character. The name of the column in \code{df.TS.TE} containing
-origination (first appearance) times for each species. Default is "TS".}
-
-\item{TE}{Character. The name of the column in \code{df.TS.TE} containing
-extinction (last appearance) times for each species. Default is "TE".}
-
-\item{lat}{Numeric. The latitude coordinate of the occurrence record in
-\code{df.occ}.}
-
-\item{lon}{Numeric. The longitude coordinate of the occurrence records in
-\code{df.occ}.}
-
-\item{Max.age}{Character. The name of the column in \code{df.occ} containing
-the maximum (oldest) age estimate for each occurrence record. Default is "Max.age".}
-
-\item{Min.age}{Character. The name of the column in \code{df.occ} containing
-the minimum (youngest) age estimate for each occurrence record. Default is "Min.age".}
-
-\item{crs}{Numeric. The code indicating the coordinate reference system
-to be used for latitude and longitude of occurrence records in \code{df.occ}}
 
 \item{group}{Character. The name of the column in \code{df.TS.TE} containing
 group assignments for species (e.g., clade, family). Required if using
@@ -81,6 +55,33 @@ the focal and comparison groups.
 the focal group.
 \item NULL (default): Count all co-occurrences regardless of group.
 }}
+
+\item{round.digits}{Integer. The number of decimal places to round time slice
+values. Default is 1. This affects temporal binning precision.}
+
+\item{species}{Character. The name of the column in \code{df.TS.TE} and
+\code{df.occ} containing species identifiers. Default is "species".}
+
+\item{TS}{Character. The name of the column in \code{df.TS.TE} containing
+origination (first appearance) times for each species. Default is "TS".}
+
+\item{TE}{Character. The name of the column in \code{df.TS.TE} containing
+extinction (last appearance) times for each species. Default is "TE".}
+
+\item{Max.age}{Character. The name of the column in \code{df.occ} containing
+the maximum (oldest) age estimate for each occurrence record. Default is "Max.age".}
+
+\item{Min.age}{Character. The name of the column in \code{df.occ} containing
+the minimum (youngest) age estimate for each occurrence record. Default is "Min.age".}
+
+\item{lat}{Numeric. The latitude coordinate of the occurrence record in
+\code{df.occ}.}
+
+\item{lon}{Numeric. The longitude coordinate of the occurrence records in
+\code{df.occ}.}
+
+\item{crs}{Numeric. The code indicating the coordinate reference system
+to be used for latitude and longitude of occurrence records in \code{df.occ}}
 
 \item{remove.singletons}{Logical. Should singleton species (species occurring
 alone at a site with no co-occurring species) be excluded from mean and
