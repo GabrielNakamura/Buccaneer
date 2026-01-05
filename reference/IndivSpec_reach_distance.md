@@ -1,14 +1,17 @@
-# Compute species coexistence for each time slice based on reach metric
+# Calculate Mean Individual Species Trait Distances Across Time Slices With Reach Criteria
 
-Compute species coexistence for each time slice based on reach metric
+Calculate Mean Individual Species Trait Distances Across Time Slices
+With Reach Criteria
 
 ## Usage
 
 ``` r
-clade_reach_coexistence(
+IndivSpec_reach_distance(
   df.TS.TE,
   df.occ,
   time.slice,
+  dist.trait,
+  nearest.taxon,
   round.digits,
   species,
   TS,
@@ -18,7 +21,6 @@ clade_reach_coexistence(
   Max.age = "Max.age",
   Min.age = "Min.age",
   crs = 4326,
-  remove.singletons = TRUE,
   group = NULL,
   group.focal.compare = NULL,
   type.comparison = NULL
@@ -35,9 +37,10 @@ clade_reach_coexistence(
 
 - df.occ:
 
-  A data frame containing fossil occurrence records with at least four
-  columns: species names, minimum age, maximum age, and site location
-  ID. Each row represents a single occurrence record at a specific site.
+  data frame containing fossil occurrence records with at least five
+  columns: species names, minimum age, maximum age, and latitude and
+  longitude. Each row represents a single occurrence record at a
+  specific site.
 
 - time.slice:
 
@@ -90,13 +93,6 @@ clade_reach_coexistence(
   Numeric. The code indicating the coordinate reference system to be
   used for latitude and longitude of occurrence records in `df.occ`
 
-- remove.singletons:
-
-  Logical. Should singleton species (species occurring alone at a site
-  with no co-occurring species) be excluded from mean and variance
-  calculations? Default is TRUE. When TRUE, singletons are treated as
-  NA; when FALSE, they contribute 0 to the mean.
-
 - group:
 
   Character. The name of the column in `df.TS.TE` containing group
@@ -122,20 +118,29 @@ clade_reach_coexistence(
 
   - NULL (default): Count all co-occurrences regardless of group.
 
+- remove.singletons:
+
+  Logical. Should singleton species (species occurring alone at a site
+  with no co-occurring species) be excluded from mean and variance
+  calculations? Default is TRUE. When TRUE, singletons are treated as
+  NA; when FALSE, they contribute 0 to the mean.
+
 ## Value
 
 A data frame with three columns:
 
-- mean.coexistence:
+- mean.distance:
 
-  Numeric. The mean number of co-occurring species in each time slice.
-  This represents average local coexistence (excluding or including
+  Numeric. The mean distance for each individual species in each time
+  slice for all other cooccurring species according with reach criteria.
+  This represents average distance of each species in the morphospace
+  relative to all other cooccurring species (excluding or including
   singletons based on `remove.singletons`).
 
-- var.coexistence:
+- var.distance:
 
-  Numeric. The variance in the number of co-occurring species in each
-  time slice.
+  Numeric. The variance in the mean distance for each individual species
+  in each time slice.
 
 - time.slice:
 

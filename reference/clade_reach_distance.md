@@ -1,14 +1,17 @@
-# Compute species coexistence for each time slice based on reach metric
+# Calculate Mean Clade-Level Trait Distances Across Time Slices With Reach Criteria
 
-Compute species coexistence for each time slice based on reach metric
+Calculate Mean Clade-Level Trait Distances Across Time Slices With Reach
+Criteria
 
 ## Usage
 
 ``` r
-clade_reach_coexistence(
+clade_reach_distance(
   df.TS.TE,
   df.occ,
   time.slice,
+  dist.trait,
+  nearest.taxon,
   round.digits,
   species,
   TS,
@@ -35,9 +38,10 @@ clade_reach_coexistence(
 
 - df.occ:
 
-  A data frame containing fossil occurrence records with at least four
-  columns: species names, minimum age, maximum age, and site location
-  ID. Each row represents a single occurrence record at a specific site.
+  data frame containing fossil occurrence records with at least five
+  columns: species names, minimum age, maximum age, and latitude and
+  longitude. Each row represents a single occurrence record at a
+  specific site.
 
 - time.slice:
 
@@ -126,16 +130,16 @@ clade_reach_coexistence(
 
 A data frame with three columns:
 
-- mean.coexistence:
+- mean.distance:
 
-  Numeric. The mean number of co-occurring species in each time slice.
-  This represents average local coexistence (excluding or including
-  singletons based on `remove.singletons`).
+  Numeric. The mean distance among of co-occurring species in each time
+  slice. This represents average mean distance in morphospace (excluding
+  or including singletons based on `remove.singletons`).
 
-- var.coexistence:
+- var.distance:
 
-  Numeric. The variance in the number of co-occurring species in each
-  time slice.
+  Numeric. The variance in the mean distance in mophospace among species
+  in each time slice.
 
 - time.slice:
 

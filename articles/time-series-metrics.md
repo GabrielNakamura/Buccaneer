@@ -313,12 +313,79 @@ res_clade_reach_coexistence <-
                           crs = 4326)
 ```
 
-#### Interspecific competition at regional scale and clade level
-
-Now we can plot both graphics
+Reach criteria for mean trait distance metrics
 
 ``` r
-all_mnd_regional2 |> 
+res_clade_reach_distance <- 
+  clade_reach_distance(df.TS.TE = df_longevities_canidae,
+                       df.occ = df_occ_canidae, 
+                       time.slice = 0.1, 
+                       dist.trait = dist_body_mass, 
+                       nearest.taxon = 1,
+                       round.digits = 5, 
+                       species = "species", 
+                       TS = "TS",
+                       TE = "TE",
+                       lat = "lat",
+                       lon = "lng",
+                       Max.age = "max_T",
+                       Min.age = "min_T",
+                       crs = 4326)
+
+res_clade_reach_distance_between <- 
+  clade_reach_distance(df.TS.TE = df_longevities_canidae_trait,
+                       df.occ = df_occ_canidae, 
+                       time.slice = 0.1, 
+                       group = "diet_cat",
+                       group.focal.compare = c("meso", "hyper"),
+                       type.comparison = "between", 
+                       dist.trait = dist_body_mass, 
+                       nearest.taxon = 1,
+                       round.digits = 5, 
+                       species = "species", 
+                       TS = "TS",
+                       TE = "TE",
+                       lat = "lat",
+                       lon = "lng",
+                       Max.age = "max_T",
+                       Min.age = "min_T",
+                       crs = 4326)
+
+res_clade_reach_distance_within <- 
+  clade_reach_distance(df.TS.TE = df_longevities_canidae_trait,
+                       df.occ = df_occ_canidae, 
+                       time.slice = 0.1, 
+                       group = "diet_cat",
+                       group.focal.compare = c("meso", "hyper"),
+                       type.comparison = "within", 
+                       dist.trait = dist_body_mass, 
+                       nearest.taxon = 1,
+                       round.digits = 5, 
+                       species = "species", 
+                       TS = "TS",
+                       TE = "TE",
+                       lat = "lat",
+                       lon = "lng",
+                       Max.age = "max_T",
+                       Min.age = "min_T",
+                       crs = 4326)
+```
+
+Joining the results and plotting
+
+``` r
+all_mnd_clade_reach <- rbind(res_clade_reach_distance, res_clade_reach_distance_between, res_clade_reach_distance_within)
+all_mnd_clade_reach2 <- 
+  data.frame(all_mnd_clade_reach, 
+             group_res = rep(c("All", "Between", "Within"), 
+                             each = nrow(res_clade_reach_distance))
+  )
+```
+
+Plotting
+
+``` r
+all_mnd_clade_reach2 |> 
   ggplot(aes(x = as.numeric(time.slice), y = mean.distance, group = group_res, color = group_res)) +
   geom_line(aes(x = as.numeric(time.slice), y = mean.distance)) +
   geom_smooth(se = TRUE, method = "loess", size = 0.5) +
@@ -326,7 +393,7 @@ all_mnd_regional2 |>
        x = "Time (Ma)",
        y = "Mean Nearest Distance",
        color = "Groups") +
-  scale_x_continuous(breaks = seq(max(as.numeric(all_mnd_regional2$time.slice)), 0, by = -10)) +
+  scale_x_continuous(breaks = seq(max(as.numeric(all_mnd_clade_reach2$time.slice)), 0, by = -10)) +
   scale_x_reverse() +
   theme_minimal(base_size = 10) +
   theme(
@@ -339,7 +406,7 @@ all_mnd_regional2 |>
   )
 ```
 
-### Individual species analysis
+## Individual species analysis
 
 In individual species analyses the focus is on the “perception” of each
 individual species with other co-occurring species. There are two main
@@ -360,7 +427,7 @@ potentially co-occurr. Finally, the assemblage level, that considers as
 species co-occurring only those with an occurrence record in the same
 assemblage, this last being defined as a grid of customized size.
 
-#### Individual species regional coexistence - taxonomic
+### Regional scale
 
 ``` r
 res_indiv_species_coex <- 
@@ -370,23 +437,18 @@ res_indiv_species_coex <-
                              species = "species",
                              TS = "TS",
                              TE = "TE")
-
-
-res_indiv_species_coex |> 
-  group_by(species) |> 
-  mutate(media = mean(n.coexistence)) |> View()
 ```
 
-We can also plot the time series for each species
+We can plot the time series for each species
 
 ``` r
 res_indiv_species_coex |>
   filter(
     species %in% c(
-      "Cynarctus_marylandica",
+      "Aelurodon_ferox",
       "Psalidocyon_marianae",
       "Aelurodon_taxoides",
-      "Leptocyon_douglassi"
+      "Phlaocyon_marslandensis"
     )
   ) |>
   ggplot(
@@ -430,8 +492,6 @@ res_indiv_species_coex |>
   )
 ```
 
-#### Individual species regional mpd
-
 We can also plot individual species mpd for all species coexisting in
 regional context. For this we will also use data on body mass for all
 species. There are different ways in which mpd can be calculated. We can
@@ -446,13 +506,13 @@ body mass.
 
 res_indiv_regional_species_mpd <-
   IndivSpec_regional_distance(df.TS.TE = df_longevities_canidae,
-                            time.slice = 0.1, 
-                            dist.trait = dist_body_mass,
-                            round.digits = 1, 
-                            species = "species",
-                            TS = "TS",
-                            TE = "TE", 
-                            nearest.taxon = "all")
+                              time.slice = 0.1, 
+                              dist.trait = dist_body_mass,
+                              round.digits = 1, 
+                              species = "species",
+                              TS = "TS",
+                              TE = "TE", 
+                              nearest.taxon = "all")
 ```
 
 Plotting the results for individual species mpd
@@ -461,10 +521,10 @@ Plotting the results for individual species mpd
 res_indiv_regional_species_mpd |>
   filter(
     species %in% c(
-      "Cynarctus_marylandica",
+      "Aelurodon_ferox",
       "Psalidocyon_marianae",
       "Aelurodon_taxoides",
-      "Leptocyon_douglassi"
+      "Phlaocyon_marslandensis"
     )
   ) |>
   ggplot(
@@ -508,8 +568,6 @@ res_indiv_regional_species_mpd |>
   )
 ```
 
-##### Individual species regional mpd with varying distances and multiple traits
-
 In order to calculate the mpd for multiple traits the user must inform
 an object of class dist containing all pairwise distances among species.
 The function can handle distances in different ways. It can use all
@@ -531,7 +589,7 @@ res_indiv_regional_species_mnd <-
                             TE = "TE")
 ```
 
-#### Individual species site coexistence
+### Site scale
 
 Here we will perform the same calculations but using site criteria for
 individual species coexistence
@@ -556,10 +614,10 @@ plotting species coexistence considering site coexistence
 res_indiv_species_site_coex |>
   filter(
     species %in% c(
-      "Cynarctus_marylandica",
+      "Aelurodon_ferox",
       "Psalidocyon_marianae",
       "Aelurodon_taxoides",
-      "Leptocyon_douglassi"
+      "Phlaocyon_marslandensis"
     )
   ) |>
   ggplot(
@@ -603,72 +661,169 @@ res_indiv_species_site_coex |>
   )
 ```
 
-#### Individual species site mpd
-
 We can calculate mean pairwise distances of individual species
 coexistence metrics based on site co-occurrence
 
 ``` r
 
-df_TS_TE_mass3 <- 
-  df_TS_TE_mass2 |> 
-  rename(species = "Genus")
-
-
 indiv_species_site_mpd <- 
-  IndivSpec_site_mpd(df.TS.TE = df_TS_TE_mass3, 
-                     df.occ = df_occ_faurby, 
+  IndivSpec_site_distance(df.TS.TE = df_longevities_canidae, 
+                     df.occ = df_occ_canidae, 
                      time.slice = 0.1, 
-                     trait = "mean.size",
+                     dist.trait = dist_body_mass, 
+                     nearest.taxon = "all",
                      round.digits = 1,
                      species = "species",
                      TS = "TS",
                      TE = "TE",
-                     Max.age = "Max.age",
-                     Min.age = "Min.age",
-                     site = "site")
+                     Max.age = "max_T",
+                     Min.age = "min_T",
+                     site = "site.char")
 ```
 
-#### Individual reach coexistence
+### Reach criteria
 
 We will calculate individual mean coexistence using reach criteria
 
 ``` r
 
-indiv_species_reach_coex <- 
-  IndivSpec_reach_richness(df.TS.TE = df_TS_TE_faurby,
-                           df.occ = df_occ_faurby,
-                           time.slice = 0.1, 
-                           round.digits = 1,
-                           species = "species",
-                           TS = "TS",
-                           TE = "TE",
-                           Max.age = "Max.age",
-                           Min.age = "Min.age",
-                           lat = "lat",
-                           lon = "lng")
+res_indiv_species_reach_coex <- 
+  IndivSpecies_reach_coexistence(df.TS.TE = df_longevities_canidae,
+                                 df.occ = df_occ_canidae,
+                                 time.slice = 0.1, 
+                                 round.digits = 1,
+                                 species = "species",
+                                 TS = "TS",
+                                 TE = "TE",
+                                 Max.age = "max_T",
+                                 Min.age = "min_T",
+                                 lat = "lat",
+                                 lon = "lng")
 ```
 
 plotting individual species coexistence with reach criteria
 
 ``` r
 
-indiv_species_reach_coex2 <- 
-  indiv_species_reach_coex |> 
-  mutate(time.slice = as.numeric(time.slice))
-
-indiv_species_reach_coex2 |> 
-  filter(species == "Ursus" | species == "Simocyon" | species == "Plionarctos" | species == "Vormela" | species == "Hesperocyon") |> 
-  ggplot(aes(x = time.slice, y = n.coexistence, color = species, group = species)) +  # Line thickness for better visibility
-  geom_smooth(se = TRUE, method = "loess", size = 1) +
-  facet_wrap(~species) +
-  labs(title = "",
-       x = "Time",
-       y = "mean coexistence") +
-  theme_minimal()  +
-  scale_x_continuous(breaks = seq(max(indiv_species_site_coex2$time.slice), 0, by = -10)) +
-  scale_x_reverse() +
-  theme(legend.position = "none")
+res_indiv_species_reach_coex |>
+  filter(
+    species %in% c(
+      "Aelurodon_ferox",
+      "Psalidocyon_marianae",
+      "Aelurodon_taxoides",
+      "Phlaocyon_marslandensis"
+    )
+  ) |>
+  ggplot(
+    aes(
+      x = time.slice,
+      y = n.coexistence,
+      color = species,
+      group = species
+    )
+  ) +
+  geom_smooth(
+    se = TRUE,
+    method = "loess",
+    linewidth = 0.8
+  ) +
+  geom_line(
+    linewidth = 0.5
+  ) +
+  facet_wrap(~ species, nrow = 2) +
+  labs(
+    x = "Time",
+    y = "Number of coexistences by species"
+  ) +
+  scale_x_reverse(
+    breaks = seq(
+      from = 0,
+      to   = max(res_indiv_species_reach_coex$time.slice, na.rm = TRUE),
+      by   = 3
+    )
+  ) +
+  coord_cartesian(clip = "off") +
+  theme_minimal(base_size = 10) +
+    theme(
+    legend.position = "none",
+    axis.line.x.bottom = element_line(color = "black", linewidth = 0.4),
+    axis.ticks.x       = element_line(color = "black", linewidth = 0.4),
+    axis.text.x        = element_text(size = 8),
+    axis.line.y.left   = element_line(color = "black", linewidth = 0.4),
+    panel.grid.minor   = element_blank(),
+    plot.margin = margin(t = 5, r = 5, b = 20, l = 5)
+  )
 ```
 
-#### Individual reach coexistence mpd
+Individual reach coexistence mpd and mnd
+
+``` r
+res_indiv_species_reach_distance <- 
+  IndivSpec_reach_distance(df.TS.TE = df_longevities_canidae, 
+                           dist.trait = dist_body_mass, 
+                           nearest.taxon = "all",
+                           crs = 4326, 
+                           df.occ = df_occ_canidae,
+                           time.slice = 0.1, 
+                           round.digits = 1,
+                           species = "species",
+                           TS = "TS",
+                           TE = "TE",
+                           Max.age = "max_T",
+                           Min.age = "min_T",
+                           lat = "lat",
+                           lon = "lng")
+```
+
+Plotting the result
+
+``` r
+res_indiv_species_reach_distance |>
+  filter(
+    species %in% c(
+      "Aelurodon_ferox",
+      "Psalidocyon_marianae",
+      "Aelurodon_taxoides",
+      "Phlaocyon_marslandensis"
+    )
+  ) |>
+  ggplot(
+    aes(
+      x = time.slice,
+      y = mean_dist_to_cooccur,
+      color = species,
+      group = species
+    )
+  ) +
+  geom_smooth(
+    se = TRUE,
+    method = "loess",
+    linewidth = 0.8
+  ) +
+  geom_line(
+    linewidth = 0.5
+  ) +
+  facet_wrap(~ species, nrow = 2) +
+  labs(
+    x = "Time (Ma)",
+    y = "Mean individual distance in morphospace"
+  ) +
+  scale_x_reverse(
+    breaks = seq(
+      from = 0,
+      to   = max(res_indiv_species_reach_distance$time.slice, na.rm = TRUE),
+      by   = 10
+    )
+  ) +
+  coord_cartesian(clip = "off") +
+  theme_minimal(base_size = 10) +
+    theme(
+    legend.position = "none",
+    axis.line.x.bottom = element_line(color = "black", linewidth = 0.4),
+    axis.ticks.x       = element_line(color = "black", linewidth = 0.4),
+    axis.text.x        = element_text(size = 8),
+    axis.line.y.left   = element_line(color = "black", linewidth = 0.4),
+    panel.grid.minor   = element_blank(),
+    plot.margin = margin(t = 5, r = 5, b = 20, l = 5)
+  )
+```

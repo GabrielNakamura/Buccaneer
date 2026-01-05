@@ -19,6 +19,9 @@ help(package = "buccaneer")
 
 - [`Assemblage_regional_richness()`](https://gabrielnakamura.github.io/Buccaneer/reference/Assemblage_regional_richness.md)
   : Calculate Species Richness Across Time Slices and Grid Cells
+- [`IndivSpec_reach_distance()`](https://gabrielnakamura.github.io/Buccaneer/reference/IndivSpec_reach_distance.md)
+  : Calculate Mean Individual Species Trait Distances Across Time Slices
+  With Reach Criteria
 - [`IndivSpec_regional_distance()`](https://gabrielnakamura.github.io/Buccaneer/reference/IndivSpec_regional_distance.md)
   : Calculate Mean Trait Distance for Individual Species Co-occurring at
   Regional Scale
@@ -31,6 +34,8 @@ help(package = "buccaneer")
   : Compute Individual Species Coexistence based on reach criteria
 - [`IndivSpecies_regional_coex()`](https://gabrielnakamura.github.io/Buccaneer/reference/IndivSpecies_regional_coex.md)
   : Calculate Regional Individual Species Coexistence Across Time Slices
+- [`assemblage_nspecies()`](https://gabrielnakamura.github.io/Buccaneer/reference/assemblage_nspecies.md)
+  : Calculate the number of species in each grid/assemblage/site
 - [`assemblage_site_trait_distance()`](https://gabrielnakamura.github.io/Buccaneer/reference/assemblage_site_trait_distance.md)
   : Compute mean distance for species co occurring in sites
 - [`aux_matrix_regional_coex()`](https://gabrielnakamura.github.io/Buccaneer/reference/aux_matrix_regional_coex.md)
@@ -44,6 +49,9 @@ help(package = "buccaneer")
 - [`clade_reach_coexistence()`](https://gabrielnakamura.github.io/Buccaneer/reference/clade_reach_coexistence.md)
   : Compute species coexistence for each time slice based on reach
   metric
+- [`clade_reach_distance()`](https://gabrielnakamura.github.io/Buccaneer/reference/clade_reach_distance.md)
+  : Calculate Mean Clade-Level Trait Distances Across Time Slices With
+  Reach Criteria
 - [`clade_regional_coexistence()`](https://gabrielnakamura.github.io/Buccaneer/reference/clade_regional_coexistence.md)
   : Calculate Regional Species Richness Across Time Slices
 - [`clade_regional_distance()`](https://gabrielnakamura.github.io/Buccaneer/reference/clade_regional_distance.md)
