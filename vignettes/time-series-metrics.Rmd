@@ -52,6 +52,7 @@ data("df_longevities_canidae") # longevities for one replicate
 #data("occurrences_canidae") # occurrence data
 data("traits_canidae") # trait data
 data("df_occ_canidae") # occurrence data
+library("buccaneer")
 
 ```
 
@@ -445,7 +446,7 @@ all_mnd_clade_reach2 |>
 ```
 
 
-# Individual species analysis
+# Interspecific Competition at Individual Species Level
 
 In individual species analyses the focus is on the "perception" of each
 individual species with other co-occurring species. There are two main
@@ -879,5 +880,8 @@ res_indiv_species_reach_distance |>
     plot.margin = margin(t = 5, r = 5, b = 20, l = 5)
   )
 ```
+
+# Interspecific Competition at Assemblage Level
+
 
 
