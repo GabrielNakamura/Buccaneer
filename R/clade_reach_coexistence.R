@@ -50,7 +50,7 @@
 #'   \item{mean.coexistence}{Numeric. The mean number of co-occurring species in
 #'       each time slice. This represents average local coexistence
 #'       (excluding or including singletons based on \code{remove.singletons}).}
-#'   \item{var.distance}{Numeric. The variance in the number of co-occurring
+#'   \item{var.coexistence}{Numeric. The variance in the number of co-occurring
 #'       species in each time slice.}
 #'   \item{time.slice}{Numeric. The time point representing each slice, typically
 #'       the upper (older) boundary of the time bin.}

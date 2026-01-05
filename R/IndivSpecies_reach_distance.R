@@ -1,4 +1,4 @@
-#' Calculate Mean Clade-Level Trait Distances Across Time Slices With Reach Criteria
+#' Calculate Mean Individual Species Trait Distances Across Time Slices With Reach Criteria
 #'
 #' @param df.TS.TE A data frame containing species temporal data with at least
 #'     three columns: species names, origination times (TS), and extinction
@@ -48,18 +48,20 @@
 #'     }
 #'
 #' @returns A data frame with three columns:
-#'   \item{mean.distance}{Numeric. The mean distance among of co-occurring species in
-#'       each time slice. This represents average mean distance in morphospace
+#'   \item{mean.distance}{Numeric. The mean distance for each individual species in
+#'       each time slice for all other cooccurring species according with
+#'       reach criteria. This represents average distance of each species in the
+#'       morphospace relative to all other cooccurring species
 #'       (excluding or including singletons based on \code{remove.singletons}).}
-#'   \item{var.distance}{Numeric. The variance in the mean distance in mophospace
-#'       among species in each time slice.}
+#'   \item{var.distance}{Numeric. The variance in the mean distance for each
+#'       individual species in each time slice.}
 #'   \item{time.slice}{Numeric. The time point representing each slice, typically
 #'       the upper (older) boundary of the time bin.}
 #'
 #' @export
 #'
 #' @examples
-clade_reach_distance <-
+IndivSpec_reach_distance <-
   function(df.TS.TE,
            df.occ,
            time.slice,
@@ -74,21 +76,26 @@ clade_reach_distance <-
            Max.age = "Max.age",
            Min.age = "Min.age",
            crs = 4326,
-           remove.singletons = TRUE,
            group = NULL,
            group.focal.compare = NULL,
            type.comparison = NULL){
-
-    # renaming longevity data frame
+    # subseting columns
     if(!is.null(group) == TRUE){
-      df.TS.TE <- df.TS.TE[, c(species, TS, TE, group)]
-      colnames(df.TS.TE) <- c("species", "TS", "TE", "group")
+      df.TS.TE <- df.TS.TE[, c(species, trait, TS, TE, group)]
+      if(is.null(trait) == TRUE){
+        colnames(df.TS.TE) <- c("species", "TS", "TE", "group")
+      } else{
+        colnames(df.TS.TE) <- c("species", "trait", "TS", "TE", "group")
+      }
     } else{
-      df.TS.TE <- df.TS.TE[, c(species, TS, TE)]
-      colnames(df.TS.TE) <- c("species", "TS", "TE")
+      df.TS.TE <- df.TS.TE[, c(species, trait, TS, TE)]
+      if(is.null(trait) == TRUE){
+        colnames(df.TS.TE) <- c("species", "TS", "TE")
+      } else{
+        colnames(df.TS.TE) <- c("species", "trait", "TS", "TE")
+      }
     }
 
-    # renaming occurrence data frame
     df_occ <-
       df.occ[, c(species, lat, lon, Max.age, Min.age)]
     vars <- list(species, lat, lon, Max.age, Min.age)
@@ -97,52 +104,45 @@ clade_reach_distance <-
     column.names <- names(unlist(vars))
     colnames(df_occ) <- column.names
 
-    # time slices
-    names_slice <- seq(from = ceiling(max(df.TS.TE[, "TS"])),
-                       to = ceiling(min(df.TS.TE[, "TE"])),
-                       by = -time.slice)
+    # Generating time intervals used to compute temporal coexistence
+    seq_interval <- seq(from = ceiling(max(df.TS.TE[, "TS"])),
+                        to = ceiling(min(df.TS.TE[, "TE"])),
+                        by = -time.slice)
 
-    # Removing non numeric values in lat long in occurrence data frame
-    df_long_slice_coord_spp2 <-
-      df_occ |>
-      filter(if_any(c(lat, lon), ~ !is.na(as.numeric(.)))) |>
-      mutate(lat = as.numeric(lat), lon = as.numeric(lon))
-
-    # transforming to a coordinate system  in occurrence data frame
-    df_long_slice_coord_spp3 <-
-      sf::st_as_sf(x = df_long_slice_coord_spp2,
-                   coords = c("lon", "lat"),
-                   crs = crs)
-
-
-    # Time coexistence matrix for all species
+    # regional coexistence matrix based on longevities
     matrix_coex <-
       aux_matrix_regional_coex(df.TS.TE,
-                               time.slice = time.slice,
+                               time.slice,
                                round.digits = round.digits,
                                species = "species",
                                TS = "TS",
                                TE = "TE")
 
-    # species composition at each time slice
+    # species composition at each timeslice
     spp_slice <-
       lapply(matrix_coex, function(x){
         names(which(rowSums(x) >= 1))
       })
 
-    # naming list with time slices
-    names(spp_slice) <- format(names_slice, trim = TRUE, scientific = FALSE)
-
+    names(spp_slice) <- format(seq_interval, trim = TRUE, scientific = FALSE)
 
     # calculating trait distances for all clades
+
+    # trait distance
+    # if trait is not informed in longevities data frame use trait distance
     if(!is.null(dist.trait) == TRUE){
       matrix_dist_trait <- as.matrix(dist.trait)
-    } else{
+    } else{ # otherwise use the trait provided to create the distance matrix
       matrix_dist_trait <-
         as.matrix(dist(x = df.TS.TE[, "trait"], method = "euclidean", upper = T, diag = T))
     }
+    # matching name orders in longevities and trait matrix
     rownames(matrix_dist_trait) <- df.TS.TE$species
     colnames(matrix_dist_trait) <- df.TS.TE$species
+    matrix_dist_trait <-
+      matrix_dist_trait[match(rownames(matrix_dist_trait), df.TS.TE$species),
+                        match(colnames(matrix_dist_trait), df.TS.TE$species)]
+
 
 
     # modified trait matrix containing group comparison
@@ -162,7 +162,19 @@ clade_reach_distance <-
       matrix_dist_trait_comp <- matrix_dist_trait
     }
 
-    # obtaining occurrence records for each time slice based on species composition in time slices
+    # calculating matrix of species cooccurrence using reach criteria
+    # Removing non numeric values in lat long in occurrence data frame
+    df_long_slice_coord_spp2 <-
+      df_occ |>
+      filter(if_any(c(lat, lon), ~ !is.na(as.numeric(.)))) |>
+      mutate(lat = as.numeric(lat), lon = as.numeric(lon))
+
+    # transforming to a coordinate system  in occurrence data frame
+    df_long_slice_coord_spp3 <-
+      sf::st_as_sf(x = df_long_slice_coord_spp2,
+                   coords = c("lon", "lat"),
+                   crs = crs)
+
     df_occ_occurr <-
       comp_slice_occ_cooccurr(spp_slice = spp_slice,
                               df.occ = df_long_slice_coord_spp3,
@@ -191,44 +203,29 @@ clade_reach_distance <-
         return(df)
       })
 
-    matrix_all_dist2 <- list_matrix_dist_occ
-
-    # filtering the combinations and filling the co-occurrence matrix with zeroes and 1s accordingly with reach criteria
+    # removing NAs - no co-occurrence, only one species occurrence in the timeslice
+    combination2 <- combination[-which(is.na(combination) == TRUE)]
+    matrix_all_dist2 <- list_matrix_dist_occ[-which(is.na(combination) == TRUE)]
+    matrix_coex2 <- matrix_coex[-which(is.na(combination) == TRUE)]
+    # filtering the combinations and filling the co-occurrence matrix with zeroes and 1 accordingly with reach criteria
     list_res <- vector(mode = "list", length = length(matrix_coex2))
     for(i in 1:length(matrix_all_dist2)){
-      # i = 66
-      res <- matrix_coex[[i]] # regional cooccurrence matrix
-      if(is.data.frame(combination[[i]]) != TRUE){
-        res <- NA
-      } else{
-        for(j in 1:ncol(combination[[i]])){
 
-          if(combination[[i]][1, j] %in% rownames(res) |  combination[[i]][1, j] %in% colnames(res) &&
-             combination[[i]][2, j] %in% spp_focal | combination[[i]][2, j] %in% spp_compare)
+      res <- matrix_coex2[[i]] # regional cooccurrence matrix
+      for(j in 1:ncol(combination2[[i]])){
+        # j = 5
 
-            min_between <-
-              matrix_all_dist2[[i]][which(combination[[i]][1, j] ==
-                                            rownames(matrix_all_dist2[[i]])),
-                                    which(combination[[i]][2, j] ==
-                                            colnames(matrix_all_dist2[[i]])),
-                                    drop = FALSE]
-          max_1 <-
-            matrix_all_dist2[[i]][which(combination[[i]][1, j] ==
-                                          rownames(matrix_all_dist2[[i]])),
-                                  which(combination[[i]][1, j] ==
-                                          colnames(matrix_all_dist2[[i]])),
-                                  drop = FALSE]
-          max_2 <-
-            matrix_all_dist2[[i]][which(combination[[i]][2, j] ==
-                                          rownames(matrix_all_dist2[[i]])),
-                                  which(combination[[i]][2, j] ==
-                                          colnames(matrix_all_dist2[[i]])),
-                                  drop = FALSE]
-          res[combination[[i]][1, j], combination[[i]][2, j]] <-
-            ifelse(min(min_between) <=
-                     sum(max(max_1),
-                         max(max_2)), 1, 0)
-        }
+        min_between <- matrix_all_dist2[[i]][which(combination2[[i]][1, j] == rownames(matrix_all_dist2[[i]])),
+                                             which(combination2[[i]][2, j] == colnames(matrix_all_dist2[[i]])),
+                                             drop = FALSE]
+        max_1 <- matrix_all_dist2[[i]][which(combination2[[i]][1, j] == rownames(matrix_all_dist2[[i]])),
+                                       which(combination2[[i]][1, j] == colnames(matrix_all_dist2[[i]])),
+                                       drop = FALSE]
+        max_2 <- matrix_all_dist2[[i]][which(combination2[[i]][2, j] == rownames(matrix_all_dist2[[i]])),
+                                       which(combination2[[i]][2, j] == colnames(matrix_all_dist2[[i]])),
+                                       drop = FALSE]
+        res[combination2[[i]][1, j], combination2[[i]][2, j]] <- ifelse(min(min_between) <= sum(max(max_1), max(max_2)), 1, 0)
+
       }
       list_res[[i]] <- res
     }
@@ -265,9 +262,9 @@ clade_reach_distance <-
     }
 
     # naming coexistence matrices
-    names(matrix_coex2) <- format(names_slice, trim = TRUE, scientific = FALSE)
+    names(matrix_coex2) <- format(seq_interval, trim = TRUE, scientific = FALSE)
 
-    # Ensure same species and same order in both cooccurrence matrix and distance matrix
+    # Ensuring same species and same order in both cooccurrence matrix and distance matrix
     list_dist_spp <-
       lapply(matrix_coex2, function(x){
         if(is.matrix(x) != TRUE){
@@ -320,17 +317,46 @@ clade_reach_distance <-
         return(mean_distances)
       })
 
-    # calculating mean distances and variance
-    mean_dist_timeslice <- lapply(list_dist_spp, function(x) mean(x, na.rm = TRUE))
-    var_dist_timeslice <- lapply(list_dist_spp, function(x) var(x, na.rm = TRUE))
+    # naming list elements with time slice
+    names(list_dist_spp) <- format(seq_interval, trim = TRUE, scientific = FALSE)
 
-    # wraping the results in a matrix
-    df_res <-
-      data.frame(mean.distance = unlist(mean_dist_timeslice),
-                 var.distance = unlist(var_dist_timeslice),
-                 time.slice = names_slice)
+    df_dist_spp <-
+      do.call(rbind, lapply(names(list_dist_spp), function(age) {
+        element <- list_dist_spp[[age]]
 
-    return(df_res)
+        if ((is.matrix(element) || is.data.frame(element)) && nrow(element) > 0) {
+          data.frame(
+            species = rownames(element),
+            time.slice = as.numeric(age),
+            mean_dist_to_cooccur = element[, 1],
+            row.names = NULL
+          )
+        } else {
+          # Return NA row if element is not a matrix/data.frame or has 0 rows
+          data.frame(
+            species = NA,
+            time.slice = as.numeric(age),
+            mean_dist_to_cooccur = NA
+          )
+        }
+      }))
+
+    # Ensure the column is character first
+    df_dist_spp$mean_dist_to_cooccur <- as.character(df_dist_spp$mean_dist_to_cooccur)
+
+    # Create flag column for singleton entries
+    df_dist_spp$is_singleton <- df_dist_spp$mean_dist_to_cooccur == "NA_singleton"
+
+    # Replace "NA_singleton" with "0"
+    df_dist_spp$mean_dist_to_cooccur[df_dist_spp$mean_dist_to_cooccur == "NA_singleton"] <- "0"
+
+    # Replace "<NA>" strings with real NA
+    df_dist_spp$mean_dist_to_cooccur[df_dist_spp$mean_dist_to_cooccur == "<NA>"] <- NA
+
+    # Convert mean_dist_to_cooccur to numeric
+    df_dist_spp$mean_dist_to_cooccur <- as.numeric(df_dist_spp$mean_dist_to_cooccur)
+
+
+    return(df_dist_spp)
 
   }
-

@@ -224,7 +224,7 @@ IndivSpecies_reach_coexistence <-
     df_long_res <-
       do.call(rbind, lapply(names(res_coex_slice), function(nm) {
         data.frame(
-          time.slice = nm,
+          time.slice = as.numeric(nm),
           species = names(res_coex_slice[[nm]]),
           n.coexistence = unname(res_coex_slice[[nm]])
         )
