@@ -38,6 +38,15 @@ Each row represents a single occurrence record at a specific site.}
 \item{time.slice}{Numeric. The time interval (in the same units as TS and TE)
 between consecutive time slices for temporal binning.}
 
+\item{dist.trait}{A distance matrix object (class \code{dist} or \code{matrix})
+containing pairwise trait distances between species. Row and column names
+must match species names in \code{df.TS.TE}. If NULL, distances will be
+computed from the trait column using Euclidean distance.}
+
+\item{nearest.taxon}{Numeric or character. The number of nearest neighbors to
+consider when calculating mean distances. Use \code{1} for mean nearest
+neighbor distance (MNND), or \code{"all"} for mean pairwise distance (MPD).}
+
 \item{round.digits}{Integer. The number of decimal places to round time slice
 values. Default is 1. This affects temporal binning precision.}
 
@@ -87,6 +96,8 @@ the focal and comparison groups.
 the focal group.
 \item NULL (default): Count all co-occurrences regardless of group.
 }}
+
+\item{trait}{Character. The name of the column in \code{df.TS.TE} containing}
 }
 \value{
 A data frame with three columns:

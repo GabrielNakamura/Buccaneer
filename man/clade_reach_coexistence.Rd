@@ -98,3 +98,51 @@ the upper (older) boundary of the time bin.}
 \description{
 Compute species coexistence for each time slice based on reach metric
 }
+\examples{
+\dontrun{
+# Create example fossil data
+df_temporal <- data.frame(
+  species = c("sp1", "sp2", "sp3", "sp4"),
+  TS = c(100, 95, 90, 85),
+  TE = c(50, 45, 40, 35),
+  group = c("A", "A", "B", "B")
+)
+
+df_occurrences <- data.frame(
+  species = c("sp1", "sp1", "sp2", "sp3", "sp4", "sp4"),
+  Max.age = c(100, 95, 95, 90, 85, 85),
+  Min.age = c(90, 85, 85, 80, 75, 75),
+  site = c("site1", "site2", "site1", "site1", "site2", "site3")
+)
+
+# Calculate mean site reach through time
+result <- clade_reach_coexistence(
+  df.TS.TE = df_temporal,
+  df.occ = df_occurrences,
+  time.slice = 10
+)
+
+# View results
+head(result)
+
+# Calculate reach between groups
+result_between <- clade_reach_coexistence(
+  df.TS.TE = df_temporal,
+  df.occ = df_occurrences,
+  time.slice = 10,
+  group = "group",
+  group.focal.compare = c("A", "B"),
+  type.comparison = "between"
+)
+
+# Calculate reach within a single group
+result_within <- clade_reach_coexistence(
+  df.TS.TE = df_temporal,
+  df.occ = df_occurrences,
+  time.slice = 10,
+  group = "group",
+  group.focal.compare = c("A", "B"),
+  type.comparison = "within"
+)
+}
+}

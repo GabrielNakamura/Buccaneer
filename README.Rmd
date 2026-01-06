@@ -25,7 +25,7 @@ devtools::install_github("GabrielNakamura/Buccaneer", ref = "main")
 
 # Help page
 
-```{r}
-help(package = "buccaneer")
+```{r,eval=FALSE}
+help(package = "Buccaneer")
 ```
 

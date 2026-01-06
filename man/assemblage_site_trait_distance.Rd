@@ -71,6 +71,20 @@ containing the information on extinction time.}
 
 \item{site}{Character indicating the name of the column containing the information on site location.}
 }
+\value{
+A data frame with one row per site (assemblage) per time slice, containing:
+\itemize{
+\item \code{site}: Site/assemblage identifier.
+\item \code{time.slice}: Time-slice label
+\item \code{mean.distance}: Mean trait distance among co-occurring species
+in that site and time slice (MPD if \code{nearest.taxon = "all"},
+MNND if \code{nearest.taxon = 1}, or based on the specified neighbor count).
+\item \code{var.distance}: Variance of those distances (NA if fewer than two species).
+\item \code{n.species} (if returned): Number of species in the site for that time slice.
+\item \code{n.pairs} (if returned): Number of pairwise comparisons used in
+the distance calculation.
+}
+}
 \description{
 Compute mean distance for species co occurring in sites
 }

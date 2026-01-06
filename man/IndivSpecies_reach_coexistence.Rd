@@ -97,3 +97,42 @@ time slice per species.}
 \description{
 Compute Individual Species Coexistence based on reach criteria
 }
+\examples{
+\dontrun{
+# Dummy temporal data
+df_temporal <- data.frame(
+  species = c("sp1", "sp2", "sp3", "sp4"),
+  TS       = c(100, 95, 90, 88),
+  TE       = c(70, 65, 60, 55),
+  group    = c("A", "A", "B", "B")
+)
+
+# Dummy occurrence data
+df_occ <- data.frame(
+  species = c("sp1","sp1","sp2","sp3","sp4","sp4"),
+  Max.age = c(100, 96, 95, 90, 88, 86),
+  Min.age = c(92, 90, 88, 82, 80, 78),
+  site    = c("s1","s2","s1","s1","s2","s3")
+)
+
+# Compute species-level coexistence reach
+res <- IndivSpecies_reach_coexistence(
+  df.TS.TE = df_temporal,
+  df.occ   = df_occ,
+  time.slice = 5,
+  round.digits = 1,
+  species = "species",
+  TS = "TS",
+  TE = "TE",
+  Max.age = "Max.age",
+  Min.age = "Min.age",
+  site = "site",
+  remove.singletons = TRUE,
+  group = "group",
+  group.focal.compare = c("A","B"),
+  type.comparison = "between"
+)
+
+head(res)
+}
+}

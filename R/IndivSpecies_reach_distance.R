@@ -9,6 +9,13 @@
 #'     Each row represents a single occurrence record at a specific site.
 #' @param time.slice Numeric. The time interval (in the same units as TS and TE)
 #'     between consecutive time slices for temporal binning.
+#' @param dist.trait A distance matrix object (class \code{dist} or \code{matrix})
+#'     containing pairwise trait distances between species. Row and column names
+#'     must match species names in \code{df.TS.TE}. If NULL, distances will be
+#'     computed from the trait column using Euclidean distance.
+#' @param nearest.taxon Numeric or character. The number of nearest neighbors to
+#'     consider when calculating mean distances. Use \code{1} for mean nearest
+#'     neighbor distance (MNND), or \code{"all"} for mean pairwise distance (MPD).
 #' @param round.digits Integer. The number of decimal places to round time slice
 #'     values. Default is 1. This affects temporal binning precision.
 #' @param species Character. The name of the column in \code{df.TS.TE} and
@@ -27,10 +34,6 @@
 #'     the minimum (youngest) age estimate for each occurrence record. Default is "Min.age".
 #' @param crs Numeric. The code indicating the coordinate reference system
 #'     to be used for latitude and longitude of occurrence records in \code{df.occ}
-#' @param remove.singletons Logical. Should singleton species (species occurring
-#'     alone at a site with no co-occurring species) be excluded from mean and
-#'     variance calculations? Default is TRUE. When TRUE, singletons are treated
-#'     as NA; when FALSE, they contribute 0 to the mean.
 #' @param group Character. The name of the column in \code{df.TS.TE} containing
 #'     group assignments for species (e.g., clade, family). Required if using
 #'     \code{group.focal.compare}. Default is NULL.
@@ -61,6 +64,48 @@
 #' @export
 #'
 #' @examples
+#' \dontrun{
+#' # Example temporal data with traits
+#' df_longevities <- data.frame(
+#'   species = c("sp1", "sp2", "sp3", "sp4"),
+#'   TS      = c(100, 96, 92, 88),
+#'   TE      = c(70, 65, 60, 55),
+#'   trait   = c(1.2, 2.5, 3.1, 4.0),
+#'   group   = c("A", "A", "B", "B")
+#' )
+#'
+#' # Occurrence data
+#' df_occ <- data.frame(
+#'   species = c("sp1","sp1","sp2","sp3","sp4","sp4"),
+#'   Max.age = c(100, 96, 95, 92, 88, 86),
+#'   Min.age = c(92, 90, 88, 82, 80, 78),
+#'   site    = c("s1","s2","s1","s1","s2","s3")
+#' )
+#'
+#' # Compute species-level reach distances (MPD)
+#' res_mpd <- IndivSpec_reach_distance(
+#'   df.TS.TE = df_longevities,
+#'   df.occ   = df_occ,
+#'   time.slice = 5,
+#'   trait      = "trait",
+#'   dist.trait = NULL,
+#'   nearest.taxon = "all"
+#' )
+#'
+#' # Compute species-level reach distances (MNND) between groups
+#' res_between <- IndivSpec_reach_distance(
+#'   df.TS.TE = df_longevities,
+#'   df.occ   = df_occ,
+#'   time.slice = 5,
+#'   trait      = "trait",
+#'   nearest.taxon = 1,
+#'   group = "group",
+#'   group.focal.compare = c("A", "B"),
+#'   type.comparison = "between"
+#' )
+#'
+#' head(res_mpd)
+#' }
 IndivSpec_reach_distance <-
   function(df.TS.TE,
            df.occ,

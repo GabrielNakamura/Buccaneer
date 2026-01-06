@@ -2,7 +2,7 @@
 title: "Time series metrics"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{time-series-metrics}
+  %\VignetteIndexEntry{Time series metrics}
   %\VignetteEncoding{UTF-8}
   %\VignetteEngine{knitr::rmarkdown}
 editor_options: 
@@ -21,7 +21,7 @@ knitr::opts_chunk$set(
 ```{r setup}
 library(ggplot2)
 library(dplyr)
-devtools::load_all(".")
+library(Buccaneer)
 ```
 
 # Background
@@ -54,8 +54,6 @@ data("df_longevities_canidae") # longevities for one replicate
 #data("occurrences_canidae") # occurrence data
 data("traits_canidae") # trait data
 data("df_occ_canidae") # occurrence data
-
-
 ```
 
 # Interspecific competition at clade level
@@ -197,7 +195,7 @@ res_clade_regional |>
 
 ## Site scale
 
-```{r}
+```{r, eval=FALSE}
 res_clade_site <- 
   clade_site_coexistence(df.TS.TE = df_longevities_canidae, 
                          df.occ = df_occ_canidae, 
@@ -209,11 +207,13 @@ res_clade_site <-
                          Max.age = "max_T",
                          Min.age = "min_T",
                          site = "site.char")
+
+
 ```
 
 Plotting the results
 
-```{r, fig.retina=2}
+```{r, fig.retina=2, eval=FALSE}
 res_clade_site |> 
   ggplot(aes(x = as.numeric(time.slice), y = mean.coexistence)) +
   geom_line(aes(x = as.numeric(time.slice), y = mean.coexistence)) +
