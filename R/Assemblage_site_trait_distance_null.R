@@ -77,12 +77,12 @@ assemblage_site_trait_distance_null <-
 
     # matrix coexistence at each timeslice
     matrix_coex <-
-      aux_matrix_regional_coex(df.TS.TE = df_longevities_canidae,
-                               time.slice = 0.1,
-                               round.digits = 1,
-                               species = "species",
-                               TS = "TS",
-                               TE = "TE")
+      aux_matrix_regional_coex(df.TS.TE = df.TS.TE,
+                               time.slice = time.slice,
+                               round.digits = round.digits,
+                               species = species,
+                               TS = TS,
+                               TE = TE)
 
     # species composition at each timeslice
     spp_slice <-
@@ -90,9 +90,9 @@ assemblage_site_trait_distance_null <-
         names(which(rowSums(x) >= 1))
       })
 
-    seq_interval <- seq(from = ceiling(max(df_longevities_canidae[, "TS"])),
-                        to = ceiling(min(df_longevities_canidae[, "TE"])),
-                        by = -0.1)
+    seq_interval <- seq(from = ceiling(max(df.TS.TE[, "TS"])),
+                        to = ceiling(min(df.TS.TE[, "TE"])),
+                        by = -time.slice)
 
     # naming time slices
     names(spp_slice) <- format(seq_interval, trim = TRUE, scientific = FALSE)
@@ -106,14 +106,86 @@ assemblage_site_trait_distance_null <-
                            Min.age = "min_T",
                            site = "site.char")
 
+    # naming list elements with species occurrence with timeslices
+    names(list_occurrence) <- format(seq_interval, trim = TRUE, scientific = FALSE)
+
+    # removing site column
+    list_mat_comp_site <-
+      lapply(list_occurrence, function(x){
+        mat_comp <- x[, -1]
+        mat_comp_matrix <- as.matrix(mat_comp)
+        rownames(mat_comp_matrix) <- x$site
+        return(mat_comp_matrix)
+      })
+
+    # trait distance matrix
     dist_matrix_trait <- as.matrix(dist_matrix_trait)
     rownames(dist_matrix_trait) <- df.TS.TE$species
     colnames(dist_matrix_trait) <- df.TS.TE$species
 
+    # calculating observed local distance in assemblages
+    list_mpd_site <-
+      if(nearest.taxon == "mpd"){
+        lapply(list_mat_comp_site, function(x){
+          if(dim(x)[1] <= 1){
+            NA
+          } else{
+            res_mpd_vector <-
+              picante::mpd(samp = x,
+                           dis = dist_matrix_trait,
+                           abundance.weighted = F)
+            names(res_mpd_vector) <- rownames(x)
+            return(res_mpd_vector)
+          }
+        })
+      } else{
+        list_mpd_site <-
+          lapply(list_mat_comp_site, function(x){
+            if(dim(x)[1] <= 1){
+              NA
+            } else{
+              res_mpd_vector <-
+                picante::mntd(samp = x,
+                              dis = dist_matrix_trait,
+                              abundance.weighted = F)
+              names(res_mpd_vector) <- rownames(x)
+              return(res_mpd_vector)
+            }
+          })
+      }
+
+    # naming list with time slices
+    names(list_mpd_site) <- format(seq_interval, trim = TRUE, scientific = FALSE)
+
+    # organizing observed result in a data frame
+    res_obs_assemblage_trait_site <-
+      do.call(rbind, lapply(names(list_mpd_site), function(age) {
+        element <- list_mpd_site[[age]]
+
+        if (is.vector(element) && length(element) > 1) {
+          data.frame(
+            sites = names(element),
+            time.slice = as.numeric(age),
+            mean_dist_to_cooccur = element,
+            row.names = NULL
+          )
+        } else {
+          # Return NA row if element is not a vector or has length 0
+          data.frame(
+            sites = NA,
+            time.slice = as.numeric(age),
+            mean_dist_to_cooccur = NA
+          )
+        }
+      }))
 
     # data frame to receive the results
     list_res_timeslice <-
       vector(mode = "list", length = length(list_occurrence))
+
+    # progress bar
+    n <- nperm
+    pb <- txtProgressBar(min = 0, max = n, style = 3)
 
     # beginning the computation of null model and ses metrics
     for(i in 1:length(list_occurrence)){
@@ -141,8 +213,8 @@ assemblage_site_trait_distance_null <-
           list_matrix_coocccur_null_site <-
             lapply(null_occ_site$perm, function(x){
               picante::mntd(samp = x,
-                           dis = dist_body_mass,
-                           abundance.weighted = FALSE)
+                            dis = dist_matrix_trait,
+                            abundance.weighted = FALSE)
             })
         }
 
@@ -184,17 +256,19 @@ assemblage_site_trait_distance_null <-
           data.frame(dist.obs = dist_obs_slice,
                      dist.obs.z = z_score_slice,
                      p.value = p_two,
-                     time.slice = names(list_occurrence[i]))
+                     time.slice = names(list_occurrence[i])
+          )
 
         # list to receive all results
 
         list_res_timeslice[[i]] <- df_res
 
       } # end of conditional
-      print(i)
+      setTxtProgressBar(pb, i)
     }# end loop for each timeslice
 
     return(list_res_timeslice)
+
+    res_all_mpd_timeslices <- do.call(rbind, list_res_timeslice)
+    return(res_all_mpd_timeslices)
   }
-
-
