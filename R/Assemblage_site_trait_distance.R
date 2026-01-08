@@ -1,4 +1,4 @@
-#' Compute mean distance for species co occurring in sites
+#' Compute mean distance for species co occurring in sites/grids
 #'
 #' @param df.TS.TE Data frame object containing at least four columns. Species names,
 #'     origination time, extinction time and a trait value for each species.
@@ -52,7 +52,7 @@ assemblage_site_trait_distance <-
            df.occ,
            time.slice,
            dist.trait,
-           nearest.taxon,
+           nearest.taxon = TRUE,
            group = NULL,
            group.focal.compare = NULL,
            type.comparison = NULL,
@@ -91,8 +91,9 @@ assemblage_site_trait_distance <-
     df_occ$site <- as.factor(df_occ$site)
 
     # Generating time intervals used to compute temporal coexistence
-    seq_interval <- seq(from = max(df.TS.TE[, "TS"]), to = min(df.TS.TE[, "TE"]), by = -time.slice)
-    seq_interval <- c(round(seq_interval, digits = round.digits))
+    seq_interval <- seq(from = ceiling(max(df.TS.TE[, "TS"])),
+                        to = ceiling(min(df.TS.TE[, "TE"])),
+                        by = -time.slice)
 
     # coexistence matrix
     matrix_coex <-
@@ -121,81 +122,76 @@ assemblage_site_trait_distance <-
     rownames(matrix_dist_trait) <- df.TS.TE$species
     colnames(matrix_dist_trait) <- df.TS.TE$species
 
+    # calculating occurrence data frame
+    list_matrix_occur_site <-
+      comp_site_occurrence(spp_slice = spp_slice, df.occ = df_occ)
 
-    # modified trait matrix containing group comparison
-    if(!is.null(group.focal.compare) == TRUE){
-      focal <- group.focal.compare[1]
-      compare <- group.focal.compare[2]
-      spp_focal <- df.TS.TE[which(df.TS.TE$group == focal), "species"]$species
-      spp_compare <- df.TS.TE[which(df.TS.TE$group == compare), "species"]$species
-
-      if(type.comparison == "between"){# comparison between species of two groups
-        matrix_dist_trait_comp <- matrix_dist_trait[spp_focal, spp_compare] # focal speices in lines and comparison in columns
-      }
-      if(type.comparison == "within"){ # comparison only within the focal group
-        matrix_dist_trait_comp <- matrix_dist_trait[spp_focal, spp_focal]
-      }
-    } else{
-      matrix_dist_trait_comp <- matrix_dist_trait
-    }
-
-
-    # calculating matrix of species cooccurrence for site
-
-    list_matrix_cooccur_site <-
-      comp_site_cooccurr(spp_slice = spp_slice, df.occ = df_occ)
-
-
-    # Ensure same species and same order in both cooccurrence matrix and distance matrix
-    list_dist_spp <-
-      lapply(list_matrix_cooccur_site, function(x){
-        species_row <- intersect(rownames(x), rownames(matrix_dist_trait_comp))
-        species_col <- intersect(colnames(x), colnames(matrix_dist_trait_comp))
-        cooccur_matrix <- x[species_row, species_col]
-        dist_matrix <- matrix_dist_trait_comp[species_row, species_col]
-
-        # Create matrix to store the results of mean pairwise distances
-        mean_distances <- matrix(NA, nrow = length(species_row), ncol = 1,
-                                 dimnames = list(species_row, paste("mean.dist.to.cooccur", nearest.taxon, sep = ".")))
-
-        # calculating distances for all species
-        for (sp in species_row) {
-
-          #checking if there are no species in the slice or
-          if(length(species_row) == 0 | length(species_col) == 0){
-            mean_distances[sp, 1] <- NA
-            if(length(species_row) != 0){
-              mean_distances[sp, 1] <- "NA_singleton"
-            }
-          } else{
-            if(length(species_row) == 1 & length(species_col) == 1){
-              mean_distances[sp, 1] <- dist_matrix
-            } else{
-              cooccur_species <- names(which(cooccur_matrix[sp, ] > 0 & names(cooccur_matrix[sp, ]) != sp))
-
-              # If there are co-occurring species, compute mean distance
-              if (length(cooccur_species) > 0) {
-                distance_sorted <- sort(dist_matrix[sp, cooccur_species], decreasing = FALSE)
-                if(nearest.taxon == "all"){ # calculating for all taxon
-                  mean_distances[sp, 1] <- mean(as.numeric(dist_matrix[sp, cooccur_species]), na.rm = TRUE)
-                } else{ # using the threshold distance set by the user
-                  mean_distances[sp, 1] <- mean(distance_sorted[1:nearest.taxon], na.rm = TRUE)
-                }
-              }
-            }
-          }
-        }
-        return(mean_distances)
+    # transforming in a matrix and removing the site column
+    list_mat_comp_site <-
+      lapply(list_matrix_occur_site, function(x){
+        mat_comp <- x[, -1]
+        mat_comp_matrix <- as.matrix(mat_comp)
+        rownames(mat_comp_matrix) <- x$site
+        return(mat_comp_matrix)
       })
 
-    mean_dist_timeslice <- lapply(list_dist_spp, function(x) mean(x, na.rm = TRUE))
-    var_dist_timeslice <- lapply(list_dist_spp, function(x) var(x, na.rm = TRUE))
+    # calculating trait distance metrics
+    if(nearest.taxon == TRUE){
+      list_mpd_site <-
+        lapply(list_mat_comp_site, function(x){
+          if(length(x) == 0){
+            NA
+          } else{
+            res_mpd_vector <-
+              picante::ses.mntd(samp = x,
+                                dis = matrix_dist_trait,
+                                abundance.weighted = F)
+            names(res_mpd_vector) <- rownames(x)
+            return(res_mpd_vector)
+          }
+        })
+      names(list_mpd_site) <- format(seq_interval, trim = TRUE, scientific = FALSE)
+    } else{
+      list_mpd_site <-
+        lapply(list_mat_comp_site, function(x){
+          if(length(x) == 0){
+            NA
+          } else{
+            res_mpd_vector <-
+              picante::ses.mpd(samp = x,
+                               dis = matrix_dist_trait,
+                               abundance.weighted = F)
+            names(res_mpd_vector) <- rownames(x)
+            return(res_mpd_vector)
+          }
+        })
+      names(list_mpd_site) <- format(seq_interval, trim = TRUE, scientific = FALSE)
+    }
 
-    df_res <-
-      data.frame(mean.distance = unlist(mean_dist_timeslice),
-                 var.distance = unlist(var_dist_timeslice),
-                 time.slice = seq_interval)
+    # organizing the long df with mpd results
+    df_dist_site <-
+      do.call(rbind, lapply(names(list_mpd_site), function(age) {
+        element <- list_mpd_site[[age]]
 
-    return(df_res)
+        if (is.vector(element) && length(element) > 1) {
+          data.frame(
+            sites = names(element),
+            time.slice = as.numeric(age),
+            mean_dist_to_cooccur = element,
+            row.names = NULL
+          )
+        } else {
+          # Return NA row if element is not a vector or has length 0
+          data.frame(
+            sites = NA,
+            time.slice = as.numeric(age),
+            mean_dist_to_cooccur = NA
+          )
+        }
+      }))
+
+    return(df_dist_site)
 
   }
+
+

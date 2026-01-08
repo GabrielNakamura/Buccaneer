@@ -147,11 +147,11 @@ plot_occ_bins <-
       df_occ_fossil <-
         df_occ_fossil |>
         dplyr::group_by(species) |>
-        dplyr::arrange(desc(max.age)) |>                     # Step 1: Arrange within groups
+        dplyr::arrange(dplyr::desc(max.age)) |>                     # Step 1: Arrange within groups
         dplyr::mutate(max_value = max(max.age)) |>           # Step 2: Calculate max within groups
         dplyr::ungroup() |>
-        dplyr::arrange(desc(max_value), species, desc(max.age)) |>
-        dplyr::mutate(sequence = row_number()) |>
+        dplyr::arrange(dplyr::desc(max_value), species, dplyr::desc(max.age)) |>
+        dplyr::mutate(sequence = dplyr::row_number()) |>
         dplyr::add_count(species, name = "n.occurrences")
     }
 
@@ -159,11 +159,11 @@ plot_occ_bins <-
       df_occ_fossil <-
         df_occ_fossil |>
         dplyr::group_by(species) |>
-        dplyr::arrange(desc(max.age)) |>                     # Step 1: Arrange within groups
+        dplyr::arrange(dplyr::desc(max.age)) |>                     # Step 1: Arrange within groups
         dplyr::mutate(max_value = max(max.age)) |>           # Step 2: Calculate max within groups
         dplyr::ungroup()  |>
-        dplyr::arrange(desc(max_value), species, desc(max.age)) |>
-        dplyr::mutate(sequence = row_number()) |>
+        dplyr::arrange(dplyr::desc(max_value), species, dplyr::desc(max.age)) |>
+        dplyr::mutate(sequence = dplyr::row_number()) |>
         dplyr::add_count(species, name = "n.occurrences") |>
         dplyr::mutate(n.occurrences = log(n.occurrences))
     }
@@ -173,37 +173,37 @@ plot_occ_bins <-
       ggplot2::ggplot(df_occ_fossil) +
       ggplot2::scale_x_reverse() +
       ggplot2::scale_y_discrete(limits = unique(df_occ_fossil$species)) +
-      ggplot2::geom_segment(aes(x = max.age, xend = min.age, y = species, colour = n.occurrences), position = position_dodge(width = 0.05)) +
+      ggplot2::geom_segment(ggplot2::aes(x = max.age, xend = min.age, y = species, colour = n.occurrences), position = ggplot2::position_dodge(width = 0.05)) +
       ggplot2::scale_color_viridis_c(option = name.scale.occ, name = "n.occ")
 
 
     if(show.species.name == TRUE){
       basic_plot2 <-
         basic_plot +
-        labs(title = " age ranges",
-             x = "range",
-             y = "species") +
-        theme(axis.text.y = element_blank(),
-              panel.grid.major = element_blank(),
-              panel.grid.minor = element_blank()
+        ggplot2::labs(title = " age ranges",
+                      x = "range",
+                      y = "species") +
+        ggplot2::theme(axis.text.y = ggplot2::element_blank(),
+                       panel.grid.major = ggplot2::element_blank(),
+                       panel.grid.minor = ggplot2::element_blank()
         )   # Adjust the size of y-axis title
 
     } else{
       basic_plot2 <-
         basic_plot +
-        labs(title = "",
-             x = "age",
-             y = "occurrences") +
-        theme(axis.text.y = element_blank(),
-              panel.grid.major = element_blank(),
-              panel.grid.minor = element_blank()
+        ggplot2::labs(title = "",
+                      x = "age",
+                      y = "occurrences") +
+        ggplot2::theme(axis.text.y = ggplot2::element_blank(),
+                       panel.grid.major = ggplot2::element_blank(),
+                       panel.grid.minor = ggplot2::element_blank()
         )
     }
 
     if(age.scheme == TRUE){
       dog_NALMAs_age <- c(37.2,33.9,33.3,30.8,20.43,15.97,13.6,10.3,4.9,1.8,0.3,0.0117,0)
       basic_plot2 +
-        geom_vline(xintercept = dog_NALMAs_age, linetype = "dashed", color = "black", size = 0.6)
+        ggplot2::geom_vline(xintercept = dog_NALMAs_age, linetype = "dashed", color = "black", size = 0.6)
     } else{
       basic_plot2
     }

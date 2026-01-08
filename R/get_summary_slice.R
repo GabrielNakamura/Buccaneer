@@ -230,18 +230,19 @@ get_summary_slices <-
 
 
     # Generating time intervals used to compute temporal coexistence
-    seq_slice <- seq(from = max(df.TS.TE4[, "TS"]), to = min(df.TS.TE4[, "TE"]), by = -timeframe)
-    seq_slice <- round(seq_interval, digits = round.digits)
+    seq_interval <- seq(from = ceiling(max(df.TS.TE[, "TS"])),
+                        to = ceiling(min(df.TS.TE[, "TE"])),
+                        by = -time.slice)
 
     # defining species per slice and subsetting longevities data frame
-    df_sub_slice <- vector(mode = "list", length = length(seq_slice))
-    for (i in 1:length(seq_slice)){
+    df_sub_slice <- vector(mode = "list", length = length(seq_interval))
+    for (i in 1:length(seq_interval)){
       # i = 450
-      df_sub_slice[[i]] <- df.TS.TE4[which(df.TS.TE4$TS >= seq_slice[i] & df.TS.TE4$TE <= seq_slice[i]), ]
+      df_sub_slice[[i]] <- df.TS.TE4[which(df.TS.TE4$TS >= seq_interval[i] & df.TS.TE4$TE <= seq_interval[i]), ]
     }
 
     # naming slices
-    names(df_sub_slice) <- paste("slice", seq_slice, sep = "_")
+    names(df_sub_slice) <- paste("slice", seq_interval, sep = "_")
 
     # adding occurrence counts for each bin
     df_sub_slice2 <-

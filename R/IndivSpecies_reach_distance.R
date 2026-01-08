@@ -180,7 +180,7 @@ IndivSpec_reach_distance <-
       matrix_dist_trait <- as.matrix(dist.trait)
     } else{ # otherwise use the trait provided to create the distance matrix
       matrix_dist_trait <-
-        as.matrix(dist(x = df.TS.TE[, "trait"], method = "euclidean", upper = T, diag = T))
+        as.matrix(stats::dist(x = df.TS.TE[, "trait"], method = "euclidean", upper = T, diag = T))
     }
     # matching name orders in longevities and trait matrix
     rownames(matrix_dist_trait) <- df.TS.TE$species
@@ -212,8 +212,8 @@ IndivSpec_reach_distance <-
     # Removing non numeric values in lat long in occurrence data frame
     df_long_slice_coord_spp2 <-
       df_occ |>
-      filter(if_any(c(lat, lon), ~ !is.na(as.numeric(.)))) |>
-      mutate(lat = as.numeric(lat), lon = as.numeric(lon))
+      dplyr::filter(dplyr::if_any(c(lat, lon), ~ !is.na(as.numeric(.)))) |>
+      dplyr::mutate(lat = as.numeric(lat), lon = as.numeric(lon))
 
     # transforming to a coordinate system  in occurrence data frame
     df_long_slice_coord_spp3 <-
@@ -244,7 +244,7 @@ IndivSpec_reach_distance <-
         if(length(spp_names) == 1 | length(spp_names) == 0){
           df <- NA
         } else{
-          df <- data.frame(combn(spp_names, m = 2, simplify = TRUE))
+          df <- data.frame(utils::combn(spp_names, m = 2, simplify = TRUE))
         }
         return(df)
       })

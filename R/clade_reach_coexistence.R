@@ -108,11 +108,11 @@ clade_reach_coexistence <-
            df.occ,
            time.slice,
            round.digits,
-           species,
-           TS,
-           TE,
-           lat,
-           lon,
+           species = "species",
+           TS = "TS",
+           TE = "TE",
+           lat = "lat",
+           lon = "lon",
            Max.age = "Max.age",
            Min.age = "Min.age",
            crs = 4326,
@@ -121,8 +121,7 @@ clade_reach_coexistence <-
            group.focal.compare = NULL,
            type.comparison = NULL){
 
-    # renaming longevity data frame
-    if(!is.null(group) == TRUE){
+    if(!is.null(group)){
       df.TS.TE <- df.TS.TE[, c(species, TS, TE, group)]
       colnames(df.TS.TE) <- c("species", "TS", "TE", "group")
     } else{
@@ -130,69 +129,48 @@ clade_reach_coexistence <-
       colnames(df.TS.TE) <- c("species", "TS", "TE")
     }
 
-    # renaming occurrence data frame
-    df_occ <-
-      df.occ[, c(species, lat, lon, Max.age, Min.age)]
+    df_occ <- df.occ[, c(species, lat, lon, Max.age, Min.age)]
     vars <- list(species, lat, lon, Max.age, Min.age)
     name_vars <- c("species", "lat", "lon", "Max.age", "Min.age")
     names(vars) <- name_vars
     column.names <- names(unlist(vars))
     colnames(df_occ) <- column.names
 
-    # time slices
     names_slice <- seq(from = ceiling(max(df.TS.TE[, "TS"])),
-                       to = ceiling(min(df.TS.TE[, "TE"])),
-                       by = -time.slice)
+                       to   = ceiling(min(df.TS.TE[, "TE"])),
+                       by   = -time.slice)
 
-    # Removing non numeric values in lat long in occurrence data frame
     df_long_slice_coord_spp2 <-
       df_occ |>
-      filter(if_any(c(lat, lon), ~ !is.na(as.numeric(.)))) |>
-      mutate(lat = as.numeric(lat), lon = as.numeric(lon))
+      dplyr::filter(dplyr::if_any(c(lat, lon), ~ !is.na(as.numeric(.)))) |>
+      dplyr::mutate(lat = as.numeric(lat), lon = as.numeric(lon))
 
-    # transforming to a coordinate system  in occurrence data frame
     df_long_slice_coord_spp3 <-
       sf::st_as_sf(x = df_long_slice_coord_spp2,
                    coords = c("lon", "lat"),
                    crs = crs)
 
-
-    # Time coexistence matrix for all species
     matrix_coex <-
       aux_matrix_regional_coex(df.TS.TE, time.slice, round.digits = round.digits,
-                               species = "species",
-                               TS = "TS",
-                               TE = "TE")
+                               species = "species", TS = "TS", TE = "TE")
 
-    # modified coexistence matrix containing group comparison, in rows are focal species, in colums comparison
-    # the "within" argument place focal species in both columns and rows
-    if(!is.null(group.focal.compare) == TRUE){
-      focal <- group.focal.compare[1]
-      compare <- group.focal.compare[2]
-      spp_focal <- df.TS.TE[which(df.TS.TE$group == focal), "species"]
-      spp_compare <- df.TS.TE[which(df.TS.TE$group == compare), "species"]
+    if(!is.null(group.focal.compare)){
+      focal    <- group.focal.compare[1]
+      compare  <- group.focal.compare[2]
+      spp_focal    <- df.TS.TE[which(df.TS.TE$group == focal), "species"]
+      spp_compare  <- df.TS.TE[which(df.TS.TE$group == compare), "species"]
 
-      if(type.comparison == "between"){# comparison between species of two groups
-        matrix_coex <- lapply(matrix_coex, function(x) x[spp_focal, spp_compare]) # focal species in lines and comparison in columns
+      if(type.comparison == "between"){
+        matrix_coex <- lapply(matrix_coex, function(x) x[spp_focal, spp_compare])
       }
-      if(type.comparison == "within"){ # comparison only within the focal group
+      if(type.comparison == "within"){
         matrix_coex <- lapply(matrix_coex, function(x) x[spp_focal, spp_focal])
       }
-    } else{
-      matrix_coex <- matrix_coex
     }
 
-    # species composition at each time slice
-    spp_slice <-
-      lapply(matrix_coex, function(x){
-        names(which(rowSums(x) >= 1))
-      })
-
-    # naming list with time slices
+    spp_slice <- lapply(matrix_coex, function(x) names(which(rowSums(x) >= 1)))
     names(spp_slice) <- format(names_slice, trim = TRUE, scientific = FALSE)
 
-
-    # obtaining occurrence records for each time slice based on species composition in time slices
     df_occ_occurr <-
       comp_slice_occ_cooccurr(spp_slice = spp_slice,
                               df.occ = df_long_slice_coord_spp3,
@@ -200,80 +178,60 @@ clade_reach_coexistence <-
                               Max.age = "Max.age",
                               Min.age = "Min.age")
 
-    # list with matrices containing geographical distances for all occurrence records in all time slices
     list_matrix_dist_occ <-
       lapply(df_occ_occurr, function(x){
         dist_occ <- sf::st_distance(x = x)
         colnames(dist_occ) <- x$species
         rownames(dist_occ) <- x$species
-        return(dist_occ)
+        dist_occ
       })
 
-    # getting pairwise combination between all species cooccurring in all time slices
     combination <-
       lapply(df_occ_occurr, function(x){
         spp_names <- unique(x$species)
-        if(length(spp_names) == 1 | length(spp_names) == 0){
-          df <- NA
+        if(length(spp_names) <= 1){
+          NA
         } else{
-          df <- data.frame(combn(spp_names, m = 2, simplify = TRUE))
+          data.frame(utils::combn(spp_names, m = 2, simplify = TRUE))
         }
-        return(df)
       })
 
-    # removing NAs - no co-occurrence, only one species occurrence in the timeslice
-    combination2 <- combination[-which(is.na(combination) == TRUE)]
-    matrix_all_dist2 <- list_matrix_dist_occ[-which(is.na(combination) == TRUE)]
-    matrix_coex2 <- matrix_coex[-which(is.na(combination) == TRUE)]
-    # filtering the combinations and filling the co-occurrence matrix with zeroes and 1 accordingly with reach criteria
+    combination2     <- combination[!is.na(combination)]
+    matrix_all_dist2 <- list_matrix_dist_occ[!is.na(combination)]
+    matrix_coex2     <- matrix_coex[!is.na(combination)]
+
     list_res <- vector(mode = "list", length = length(matrix_coex2))
-    for(i in 1:length(matrix_all_dist2)){
-      # i = 100
-      #res <-
-      #  matrix(0, nrow = length(unique(rownames(matrix_all_dist2[[i]]))),
-      #         ncol = length(unique(colnames(matrix_all_dist2[[i]]))),
-      #         dimnames = list(unique(rownames(matrix_all_dist2[[i]])),
-      #                         unique(colnames(matrix_all_dist2[[i]]))))
-      res <- matrix_coex2[[i]] # regional cooccurrence matrix
+    for(i in seq_along(matrix_all_dist2)){
+      res <- matrix_coex2[[i]]
       for(j in 1:ncol(combination2[[i]])){
-        # j = 5
-
-        min_between <- matrix_all_dist2[[i]][which(combination2[[i]][1, j] == rownames(matrix_all_dist2[[i]])),
-                                             which(combination2[[i]][2, j] == colnames(matrix_all_dist2[[i]])),
-                                             drop = FALSE]
-        max_1 <- matrix_all_dist2[[i]][which(combination2[[i]][1, j] == rownames(matrix_all_dist2[[i]])),
-                                       which(combination2[[i]][1, j] == colnames(matrix_all_dist2[[i]])),
-                                       drop = FALSE]
-        max_2 <- matrix_all_dist2[[i]][which(combination2[[i]][2, j] == rownames(matrix_all_dist2[[i]])),
-                                       which(combination2[[i]][2, j] == colnames(matrix_all_dist2[[i]])),
-                                       drop = FALSE]
-        res[combination2[[i]][1, j], combination2[[i]][2, j]] <- ifelse(min(min_between) <= sum(max(max_1), max(max_2)), 1, 0)
-
+        min_between <- matrix_all_dist2[[i]][combination2[[i]][1, j],
+                                             combination2[[i]][2, j], drop = FALSE]
+        max_1 <- matrix_all_dist2[[i]][combination2[[i]][1, j],
+                                       combination2[[i]][1, j], drop = FALSE]
+        max_2 <- matrix_all_dist2[[i]][combination2[[i]][2, j],
+                                       combination2[[i]][2, j], drop = FALSE]
+        res[combination2[[i]][1, j], combination2[[i]][2, j]] <-
+          ifelse(min(min_between) <= sum(max(max_1), max(max_2)), 1, 0)
       }
       list_res[[i]] <- res
     }
 
-    # naming coexistence matrices
-    names_slice2 <- names_slice[-which(is.na(combination) == TRUE)]
+    names_slice2 <- names_slice[!is.na(combination)]
     names(list_res) <- format(names_slice2, trim = TRUE, scientific = FALSE)
 
-    # calculating coexistence
     res_coex_slice <-
       lapply(list_res, function(x){
         coex_slice <- rowSums(x) - 1
-        coex_slice2 <- coex_slice[which(coex_slice > 0)]
-        return(coex_slice2)
+        coex_slice[coex_slice > 0]
       })
 
-    res_mean_coex_slice <- lapply(res_coex_slice, function(x) mean(x))
-    res_var_coex_slice <- lapply(res_coex_slice, function(x) var(x))
+    res_mean_coex_slice <- lapply(res_coex_slice, mean)
+    res_var_coex_slice  <- lapply(res_coex_slice, var)
 
     df_res <-
       data.frame(mean.coexistence = unlist(res_mean_coex_slice),
-                 var.distance = unlist(res_var_coex_slice),
-                 time.slice = names_slice2)
+                 var.distance     = unlist(res_var_coex_slice),
+                 time.slice       = names_slice2)
 
     return(df_res)
-
   }
-

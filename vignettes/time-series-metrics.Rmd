@@ -53,7 +53,7 @@ data is part of the {`Buccaneer`} package and is comprised by:
 data("df_longevities_canidae") # longevities for one replicate
 #data("occurrences_canidae") # occurrence data
 data("traits_canidae") # trait data
-data("df_occ_canidae") # occurrence data
+data("df_occurrence_canidae") # occurrence data
 ```
 
 # Interspecific competition at clade level
@@ -198,7 +198,7 @@ res_clade_regional |>
 ```{r, eval=FALSE}
 res_clade_site <- 
   clade_site_coexistence(df.TS.TE = df_longevities_canidae, 
-                         df.occ = df_occ_canidae, 
+                         df.occ = df_occurrence_canidae, 
                          time.slice = 0.1, 
                          round.digits = 1,
                          species = "species",
@@ -240,7 +240,7 @@ We can also calculate the distance in morphospace using site criteria
 ```{r}
 res_clade_site_distance <- 
   clade_site_distance(df.TS.TE = df_longevities_canidae, 
-                      df.occ = df_occ_canidae, 
+                      df.occ = df_occurrence_canidae, 
                       time.slice = 0.1, 
                       round.digits = 1,
                       dist.trait = dist_body_mass, 
@@ -255,7 +255,7 @@ res_clade_site_distance <-
 # calculating between mesocarnivores and hypercarnivores species
 res_clade_site_distance_between <- 
   clade_site_distance(df.TS.TE = df_longevities_canidae_trait, 
-                      df.occ = df_occ_canidae, 
+                      df.occ = df_occurrence_canidae, 
                       time.slice = 0.1, 
                       round.digits = 1,
                       dist.trait = dist_body_mass, 
@@ -273,7 +273,7 @@ res_clade_site_distance_between <-
 # calculating within mesocarnivore species
 res_clade_site_distance_within <- 
   clade_site_distance(df.TS.TE = df_longevities_canidae_trait, 
-                      df.occ = df_occ_canidae, 
+                      df.occ = df_occurrence_canidae, 
                       time.slice = 0.1, 
                       round.digits = 1,
                       dist.trait = dist_body_mass, 
@@ -335,7 +335,7 @@ Reach criteria for coexistence
 ```{r}
 res_clade_reach_coexistence <- 
   clade_reach_coexistence(df.TS.TE = df_longevities_canidae,
-                          df.occ = df_occ_canidae, 
+                          df.occ = df_occurrence_canidae, 
                           time.slice = 0.1, 
                           round.digits = 5,
                           species = "species",
@@ -356,7 +356,7 @@ Reach criteria for mean trait distance metrics
 ```{r}
 res_clade_reach_distance <- 
   clade_reach_distance(df.TS.TE = df_longevities_canidae,
-                       df.occ = df_occ_canidae, 
+                       df.occ = df_occurrence_canidae, 
                        time.slice = 0.1, 
                        dist.trait = dist_body_mass, 
                        nearest.taxon = 1,
@@ -372,7 +372,7 @@ res_clade_reach_distance <-
 
 res_clade_reach_distance_between <- 
   clade_reach_distance(df.TS.TE = df_longevities_canidae_trait,
-                       df.occ = df_occ_canidae, 
+                       df.occ = df_occurrence_canidae, 
                        time.slice = 0.1, 
                        group = "diet_cat",
                        group.focal.compare = c("meso", "hyper"),
@@ -391,7 +391,7 @@ res_clade_reach_distance_between <-
 
 res_clade_reach_distance_within <- 
   clade_reach_distance(df.TS.TE = df_longevities_canidae_trait,
-                       df.occ = df_occ_canidae, 
+                       df.occ = df_occurrence_canidae, 
                        time.slice = 0.1, 
                        group = "diet_cat",
                        group.focal.compare = c("meso", "hyper"),
@@ -644,7 +644,7 @@ individual species coexistence
 ```{r}
 res_indiv_species_site_coex <- 
   IndivSpec_site_coexistence(df.TS.TE = df_longevities_canidae,
-                             df.occ = df_occ_canidae, 
+                             df.occ = df_occurrence_canidae, 
                              time.slice = 0.1,
                              round.digits = 5,
                              species = "species",
@@ -719,7 +719,7 @@ coexistence metrics based on site co-occurrence
 
 indiv_species_site_mpd <- 
   IndivSpec_site_distance(df.TS.TE = df_longevities_canidae, 
-                     df.occ = df_occ_canidae, 
+                     df.occ = df_occurrence_canidae, 
                      time.slice = 0.1, 
                      dist.trait = dist_body_mass, 
                      nearest.taxon = "all",
@@ -742,7 +742,7 @@ We will calculate individual mean coexistence using reach criteria
 
 res_indiv_species_reach_coex <- 
   IndivSpecies_reach_coexistence(df.TS.TE = df_longevities_canidae,
-                                 df.occ = df_occ_canidae,
+                                 df.occ = df_occurrence_canidae,
                                  time.slice = 0.1, 
                                  round.digits = 1,
                                  species = "species",
@@ -817,7 +817,7 @@ res_indiv_species_reach_distance <-
                            dist.trait = dist_body_mass, 
                            nearest.taxon = "all",
                            crs = 4326, 
-                           df.occ = df_occ_canidae,
+                           df.occ = df_occurrence_canidae,
                            time.slice = 0.1, 
                            round.digits = 1,
                            species = "species",
@@ -883,6 +883,13 @@ res_indiv_species_reach_distance |>
 ```
 
 # Interspecific Competition at Assemblage Level
+
+Calculating distance metrics at site and grid scale
+
+```{r}
+
+```
+
 
 
 

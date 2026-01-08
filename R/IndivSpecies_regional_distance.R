@@ -131,7 +131,6 @@ IndivSpec_regional_distance <-
            species = "species",
            TS = "TS",
            TE = "TE"){
-    # subseting columns
     if(!is.null(group) == TRUE){
       df.TS.TE <- df.TS.TE[, c(species, trait, TS, TE, group)]
       if(is.null(trait) == TRUE){
@@ -148,12 +147,10 @@ IndivSpec_regional_distance <-
       }
     }
 
-    # Generating time intervals used to compute temporal coexistence
     seq_interval <- seq(from = ceiling(max(df.TS.TE[, "TS"])),
                         to = ceiling(min(df.TS.TE[, "TE"])),
                         by = -time.slice)
 
-    # regional coexistence matrix based on longevities
     matrix_coex <-
       aux_matrix_regional_coex(df.TS.TE,
                                time.slice,
@@ -162,7 +159,6 @@ IndivSpec_regional_distance <-
                                TS = "TS",
                                TE = "TE")
 
-    # species composition at each timeslice
     spp_slice <-
       lapply(matrix_coex, function(x){
         names(which(rowSums(x) >= 1))
@@ -170,43 +166,34 @@ IndivSpec_regional_distance <-
 
     names(spp_slice) <- format(seq_interval, trim = TRUE, scientific = FALSE)
 
-    # calculating trait distances for all clades
-
-    # trait distance
-    # if trait is not informed in longevities data frame use trait distance
     if(!is.null(dist.trait) == TRUE){
       matrix_dist_trait <- as.matrix(dist.trait)
-    } else{ # otherwise use the trait provided to create the distance matrix
+    } else{
       matrix_dist_trait <-
-        as.matrix(dist(x = df.TS.TE[, "trait"], method = "euclidean", upper = T, diag = T))
+        as.matrix(stats::dist(x = df.TS.TE[, "trait"], method = "euclidean", upper = TRUE, diag = TRUE))
     }
-    # matching name orders in longevities and trait matrix
     rownames(matrix_dist_trait) <- df.TS.TE$species
     colnames(matrix_dist_trait) <- df.TS.TE$species
     matrix_dist_trait <-
       matrix_dist_trait[match(rownames(matrix_dist_trait), df.TS.TE$species),
                         match(colnames(matrix_dist_trait), df.TS.TE$species)]
 
-
-
-    # modified trait matrix containing group comparison
     if(!is.null(group.focal.compare) == TRUE){
       focal <- group.focal.compare[1]
       compare <- group.focal.compare[2]
       spp_focal <- df.TS.TE[which(df.TS.TE$group == focal), "species"]
       spp_compare <- df.TS.TE[which(df.TS.TE$group == compare), "species"]
 
-      if(type.comparison == "between"){# comparison between species of two groups
-        matrix_dist_trait_comp <- matrix_dist_trait[spp_focal, spp_compare] # focal speices in lines and comparison in columns
+      if(type.comparison == "between"){
+        matrix_dist_trait_comp <- matrix_dist_trait[spp_focal, spp_compare]
       }
-      if(type.comparison == "within"){ # comparison only within the focal group
+      if(type.comparison == "within"){
         matrix_dist_trait_comp <- matrix_dist_trait[spp_focal, spp_focal]
       }
     } else{
       matrix_dist_trait_comp <- matrix_dist_trait
     }
 
-    # Ensure same species and same order in both cooccurrence matrix and distance matrix
     list_dist_spp <-
       lapply(matrix_coex, function(x){
         species_row <- intersect(rownames(x), rownames(matrix_dist_trait_comp))
@@ -214,7 +201,6 @@ IndivSpec_regional_distance <-
         cooccur_matrix <- x[species_row, species_col, drop = FALSE]
         dist_matrix <- matrix_dist_trait_comp[species_row, species_col, drop = FALSE]
 
-        # Create matrix to store the results of mean pairwise distances
         mean_distances <-
           matrix(NA, nrow = length(species_row), ncol = 1,
                  dimnames = list(species_row,
@@ -223,11 +209,9 @@ IndivSpec_regional_distance <-
                  )
           )
 
-        # calculating distances for all species
         for (sp in species_row) {
-          #checking if there are no species in the slice or
           if(length(species_row) == 0 | length(species_col) == 0){
-            mean_distances[sp, 1] <- NA # no cooccurrence in sites
+            mean_distances[sp, 1] <- NA
             if(length(species_row) != 0){
               mean_distances[sp, 1] <- "NA_singleton"
             }
@@ -237,12 +221,11 @@ IndivSpec_regional_distance <-
             } else{
               cooccur_species <- names(which(cooccur_matrix[sp, ] > 0 & names(cooccur_matrix[sp, ]) != sp))
 
-              # If there are co-occurring species, compute mean distance
               if (length(cooccur_species) > 0) {
                 distance_sorted <- sort(dist_matrix[sp, cooccur_species], decreasing = FALSE)
-                if(nearest.taxon == "all"){ # calculating for all taxon
+                if(nearest.taxon == "all"){
                   mean_distances[sp, 1] <- mean(as.numeric(dist_matrix[sp, cooccur_species]), na.rm = TRUE)
-                } else{ # using the threshold distance set by the user
+                } else{
                   mean_distances[sp, 1] <- mean(distance_sorted[1:nearest.taxon], na.rm = TRUE)
                 }
               }
@@ -266,7 +249,6 @@ IndivSpec_regional_distance <-
             row.names = NULL
           )
         } else {
-          # Return NA row if element is not a matrix/data.frame or has 0 rows
           data.frame(
             species = NA,
             time.slice = as.numeric(age),
@@ -275,22 +257,11 @@ IndivSpec_regional_distance <-
         }
       }))
 
-    # Ensure the column is character first
     df_dist_spp$mean_dist_to_cooccur <- as.character(df_dist_spp$mean_dist_to_cooccur)
-
-    # Create flag column for singleton entries
     df_dist_spp$is_singleton <- df_dist_spp$mean_dist_to_cooccur == "NA_singleton"
-
-    # Replace "NA_singleton" with "0"
     df_dist_spp$mean_dist_to_cooccur[df_dist_spp$mean_dist_to_cooccur == "NA_singleton"] <- "0"
-
-    # Replace "<NA>" strings with real NA
     df_dist_spp$mean_dist_to_cooccur[df_dist_spp$mean_dist_to_cooccur == "<NA>"] <- NA
-
-    # Convert mean_dist_to_cooccur to numeric
     df_dist_spp$mean_dist_to_cooccur <- as.numeric(df_dist_spp$mean_dist_to_cooccur)
 
-
     return(df_dist_spp)
-
   }
