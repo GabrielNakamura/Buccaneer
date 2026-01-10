@@ -2,14 +2,14 @@
 % Please edit documentation in R/Assemblage_site_trait_distance.R
 \name{assemblage_site_trait_distance}
 \alias{assemblage_site_trait_distance}
-\title{Compute mean distance for species co occurring in sites}
+\title{Compute mean distance for species co occurring in sites/grids}
 \usage{
 assemblage_site_trait_distance(
   df.TS.TE,
   df.occ,
   time.slice,
   dist.trait,
-  nearest.taxon,
+  nearest.taxon = TRUE,
   group = NULL,
   group.focal.compare = NULL,
   type.comparison = NULL,
@@ -27,7 +27,7 @@ assemblage_site_trait_distance(
 \item{df.TS.TE}{Data frame object containing at least four columns. Species names,
 origination time, extinction time and a trait value for each species.}
 
-\item{df.occ}{a data frame object containing the occurrence records for each species.
+\item{df.occ}{Data frame object containing the occurrence records for each species.
 This must have at least a column indicating the name of species, its minimum and maximum age estimate,
 and its site location ID.}
 
@@ -86,5 +86,5 @@ the distance calculation.
 }
 }
 \description{
-Compute mean distance for species co occurring in sites
+Compute mean distance for species co occurring in sites/grids
 }

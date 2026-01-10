@@ -26,4 +26,5 @@ Imports:
     stringr (>= 1.4.0),
     stats,
     sf,
-    class
+    class, 
+    tidyr

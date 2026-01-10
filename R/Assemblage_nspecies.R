@@ -1,15 +1,24 @@
 #' Calculate the number of species in each grid/assemblage/site
 #'
-#' @param df.TS.TE
-#' @param df.occ
-#' @param time.slice
-#' @param round.digits
-#' @param species
-#' @param TS
-#' @param TE
-#' @param Max.age
-#' @param Min.age
-#' @param site
+#' @param df.TS.TE Data frame object containing at least four columns. Species names,
+#'     origination time, extinction time and a trait value for each species.
+#' @param df.occ Data frame object containing the occurrence records for each species.
+#'     This must have at least a column indicating the name of species, its minimum and maximum age estimate,
+#'     and its site location ID.
+#' @param time.slice Scalar indicating the time interval between consecutive time slices.
+#' @param round.digits Scalar indicating the precision of time slices.
+#' @param species Character indicating the name of the column of the data frame
+#'     containing the species name information.
+#' @param TS Character indicating the name of the columns of the data frame
+#'     containing the information on origination time.
+#' @param TE Character indicating the name of the column of the data frame
+#'     containing the information on extinction time.
+#' @param Max.age Character indicating the name of the column containing the upper
+#'     age limit for occurrence record.
+#' @param Min.age Character indicating the name of the column containing the
+#'     lower age limit for occurrence record.
+#' @param site Character indicating the name of the column containing the
+#'     information on assemblage location.
 #'
 #' @returns
 #' @export
@@ -27,21 +36,9 @@ assemblage_nspecies <-
            Min.age = "Min.age",
            site = "site"){
     # subseting columns
-    if(!is.null(group) == TRUE){
-      df.TS.TE <- df.TS.TE[, c(species, trait, TS, TE, group)]
-      if(is.null(trait) == TRUE){
-        colnames(df.TS.TE) <- c("species", "TS", "TE", "group")
-      } else{
-        colnames(df.TS.TE) <- c("species", "trait", "TS", "TE", "group")
-      }
-    } else{
-      df.TS.TE <- df.TS.TE[, c(species, trait, TS, TE)]
-      if(is.null(trait) == TRUE){
-        colnames(df.TS.TE) <- c("species", "TS", "TE")
-      } else{
-        colnames(df.TS.TE) <- c("species", "trait", "TS", "TE")
-      }
-    }
+    df.TS.TE <- df.TS.TE[, c(species, TS, TE)]
+    colnames(df.TS.TE) <- c("species", "TS", "TE")
+
 
     df_occ <-
       df.occ[, c(species, Max.age, Min.age, site)]

@@ -120,8 +120,8 @@ calc_null_model <-
       print(i)
     }# end loop for each timeslice
 
-
-    return(list_res_timeslice)
+    res_all_mpd_timeslices <- do.call(rbind, list_res_timeslice)
+    return(res_all_mpd_timeslices)
   }
 
 
@@ -394,6 +394,9 @@ assemblage_site_trait_distance_null <-
     }# end loop for each timeslice
 
     return(list_res_timeslice)
+
+    res_all_mpd_timeslices <- do.call(rbind, list_res_timeslice)
+    return(res_all_mpd_timeslices)
   }
 
 

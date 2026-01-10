@@ -16,13 +16,15 @@
 #'     origination (first appearance) times for each species. Default is "TS".
 #' @param TE Character. The name of the column in \code{df.TS.TE} containing
 #'     extinction (last appearance) times for each species. Default is "TE".
-#' @param nearest.taxon Numeric or character. The number of nearest neighbors to
-#'     consider when calculating mean distances. Use \code{1} for mean nearest
-#'     neighbor distance (MNND), or \code{"all"} for mean pairwise distance (MPD).
+#' @param nearest.taxon Character, indicating the mean distance to be used. If
+#'     \code{"mpd"} mean pairwise distance will be calculated, if \code{mnnd}
+#'     mean nearest neighbour distance will be computed, considering only the
+#'     distant to the closest species in the morphospace.
 #' @param nperm A scalar, indicating the number of permutations to be used in the
 #'     null model
-#' @param fixedmar Character, stating which row/column sums should be preserved.
-#'     Options are "none", "rows", "columns" or "both"
+#' @param fixedmar Character, stating which row/column sums should be preserved
+#'     in the assemblage composition matrix (sites in the rows and species in the
+#'     columns). Options are "none", "rows", "columns" or "both".
 #' @param mtype Character, indicanting the type of null model to be performed.
 #'     \code{"prab"} is the option for presence-absence (detection/non-detection)
 #'     matrix and \code{"count"} for matrix with count data.
@@ -58,10 +60,7 @@ assemblage_site_trait_distance_null <-
            mtype = "prab"){
 
     # subsetting TS TE matrix and checking procedures
-
     df.TS.TE <- df.TS.TE[, c(species, TS, TE)]
-
-
     colnames(df.TS.TE) <- c("species", "TS", "TE")
 
     # subsetting occurrence matrix
@@ -80,9 +79,9 @@ assemblage_site_trait_distance_null <-
       aux_matrix_regional_coex(df.TS.TE = df.TS.TE,
                                time.slice = time.slice,
                                round.digits = round.digits,
-                               species = species,
-                               TS = TS,
-                               TE = TE)
+                               species = "species",
+                               TS = "TS",
+                               TE = "TE")
 
     # species composition at each timeslice
     spp_slice <-
@@ -100,11 +99,11 @@ assemblage_site_trait_distance_null <-
     # calculating occurrence in local assemblages
     list_occurrence <-
       comp_site_occurrence(spp_slice = spp_slice,
-                           df.occ = df.occ,
+                           df.occ = df_occ,
                            species = "species",
-                           Max.age = "max_T",
-                           Min.age = "min_T",
-                           site = "site.char")
+                           Max.age = "Max.age",
+                           Min.age = "Min.age",
+                           site = "site")
 
     # naming list elements with species occurrence with timeslices
     names(list_occurrence) <- format(seq_interval, trim = TRUE, scientific = FALSE)
@@ -184,7 +183,7 @@ assemblage_site_trait_distance_null <-
       vector(mode = "list", length = length(list_occurrence))
 
     # progress bar
-    n <- nperm
+    n <- length(list_occurrence)
     pb <- txtProgressBar(min = 0, max = n, style = 3)
 
     # beginning the computation of null model and ses metrics
@@ -266,8 +265,6 @@ assemblage_site_trait_distance_null <-
       } # end of conditional
       setTxtProgressBar(pb, i)
     }# end loop for each timeslice
-
-    return(list_res_timeslice)
 
     res_all_mpd_timeslices <- do.call(rbind, list_res_timeslice)
     return(res_all_mpd_timeslices)

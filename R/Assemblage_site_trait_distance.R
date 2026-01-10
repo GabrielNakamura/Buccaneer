@@ -2,7 +2,7 @@
 #'
 #' @param df.TS.TE Data frame object containing at least four columns. Species names,
 #'     origination time, extinction time and a trait value for each species.
-#' @param df.occ a data frame object containing the occurrence records for each species.
+#' @param df.occ Data frame object containing the occurrence records for each species.
 #'     This must have at least a column indicating the name of species, its minimum and maximum age estimate,
 #'     and its site location ID.
 #' @param time.slice Scalar indicating the time interval between consecutive time slices.
@@ -108,7 +108,7 @@ assemblage_site_trait_distance <-
         names(which(rowSums(x) >= 1))
       })
 
-    names(spp_slice) <- seq_interval
+    names(spp_slice) <- format(seq_interval, trim = TRUE, scientific = FALSE)
 
     # calculating trait distances for all clades
 
@@ -143,9 +143,9 @@ assemblage_site_trait_distance <-
             NA
           } else{
             res_mpd_vector <-
-              picante::ses.mntd(samp = x,
-                                dis = matrix_dist_trait,
-                                abundance.weighted = F)
+              picante::mntd(samp = x,
+                            dis = matrix_dist_trait,
+                            abundance.weighted = F)
             names(res_mpd_vector) <- rownames(x)
             return(res_mpd_vector)
           }
@@ -158,9 +158,9 @@ assemblage_site_trait_distance <-
             NA
           } else{
             res_mpd_vector <-
-              picante::ses.mpd(samp = x,
-                               dis = matrix_dist_trait,
-                               abundance.weighted = F)
+              picante::mpd(samp = x,
+                           dis = matrix_dist_trait,
+                           abundance.weighted = F)
             names(res_mpd_vector) <- rownames(x)
             return(res_mpd_vector)
           }
