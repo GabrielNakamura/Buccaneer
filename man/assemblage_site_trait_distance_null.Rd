@@ -59,15 +59,17 @@ the minimum (youngest) age estimate for each occurrence record. Default is "Min.
 \item{site}{Character. The name of the column in \code{df.occ} containing
 site location identifiers. Default is "site".}
 
-\item{nearest.taxon}{Numeric or character. The number of nearest neighbors to
-consider when calculating mean distances. Use \code{1} for mean nearest
-neighbor distance (MNND), or \code{"all"} for mean pairwise distance (MPD).}
+\item{nearest.taxon}{Character, indicating the mean distance to be used. If
+\code{"mpd"} mean pairwise distance will be calculated, if \code{mnnd}
+mean nearest neighbour distance will be computed, considering only the
+distant to the closest species in the morphospace.}
 
 \item{nperm}{A scalar, indicating the number of permutations to be used in the
 null model}
 
-\item{fixedmar}{Character, stating which row/column sums should be preserved.
-Options are "none", "rows", "columns" or "both"}
+\item{fixedmar}{Character, stating which row/column sums should be preserved
+in the assemblage composition matrix (sites in the rows and species in the
+columns). Options are "none", "rows", "columns" or "both".}
 
 \item{mtype}{Character, indicanting the type of null model to be performed.
 \code{"prab"} is the option for presence-absence (detection/non-detection)

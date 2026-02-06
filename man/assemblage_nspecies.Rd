@@ -18,7 +18,34 @@ assemblage_nspecies(
 )
 }
 \arguments{
-\item{site}{}
+\item{df.TS.TE}{Data frame object containing at least four columns. Species names,
+origination time, extinction time and a trait value for each species.}
+
+\item{df.occ}{Data frame object containing the occurrence records for each species.
+This must have at least a column indicating the name of species, its minimum and maximum age estimate,
+and its site location ID.}
+
+\item{time.slice}{Scalar indicating the time interval between consecutive time slices.}
+
+\item{round.digits}{Scalar indicating the precision of time slices.}
+
+\item{species}{Character indicating the name of the column of the data frame
+containing the species name information.}
+
+\item{TS}{Character indicating the name of the columns of the data frame
+containing the information on origination time.}
+
+\item{TE}{Character indicating the name of the column of the data frame
+containing the information on extinction time.}
+
+\item{Max.age}{Character indicating the name of the column containing the upper
+age limit for occurrence record.}
+
+\item{Min.age}{Character indicating the name of the column containing the
+lower age limit for occurrence record.}
+
+\item{site}{Character indicating the name of the column containing the
+information on assemblage location.}
 }
 \description{
 Calculate the number of species in each grid/assemblage/site
