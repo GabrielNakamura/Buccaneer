@@ -1,5 +1,7 @@
 <urlset xmlns = 'http://www.sitemaps.org/schemas/sitemap/0.9'>
 <url><loc>https://gabrielnakamura.github.io/Buccaneer/404.html</loc></url>
+<url><loc>https://gabrielnakamura.github.io/Buccaneer/LICENSE-text.html</loc></url>
+<url><loc>https://gabrielnakamura.github.io/Buccaneer/LICENSE.html</loc></url>
 <url><loc>https://gabrielnakamura.github.io/Buccaneer/articles/assemblage-time-series.html</loc></url>
 <url><loc>https://gabrielnakamura.github.io/Buccaneer/articles/index.html</loc></url>
 <url><loc>https://gabrielnakamura.github.io/Buccaneer/articles/pre-processing-data.html</loc></url>
@@ -15,9 +17,9 @@
 <url><loc>https://gabrielnakamura.github.io/Buccaneer/reference/IndivSpecies_regional_coex.html</loc></url>
 <url><loc>https://gabrielnakamura.github.io/Buccaneer/reference/assemblage_nspecies.html</loc></url>
 <url><loc>https://gabrielnakamura.github.io/Buccaneer/reference/assemblage_site_trait_distance.html</loc></url>
+<url><loc>https://gabrielnakamura.github.io/Buccaneer/reference/assemblage_site_trait_distance_null.html</loc></url>
 <url><loc>https://gabrielnakamura.github.io/Buccaneer/reference/aux_matrix_regional_coex.html</loc></url>
 <url><loc>https://gabrielnakamura.github.io/Buccaneer/reference/calc_null_model.html</loc></url>
-<url><loc>https://gabrielnakamura.github.io/Buccaneer/reference/calc_reach.html</loc></url>
 <url><loc>https://gabrielnakamura.github.io/Buccaneer/reference/check_crossing_boundaries.html</loc></url>
 <url><loc>https://gabrielnakamura.github.io/Buccaneer/reference/clade_reach_coexistence.html</loc></url>
 <url><loc>https://gabrielnakamura.github.io/Buccaneer/reference/clade_reach_distance.html</loc></url>

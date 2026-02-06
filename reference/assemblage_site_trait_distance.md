@@ -1,6 +1,6 @@
-# Compute mean distance for species co occurring in sites
+# Compute mean distance for species co occurring in sites/grids
 
-Compute mean distance for species co occurring in sites
+Compute mean distance for species co occurring in sites/grids
 
 ## Usage
 
@@ -10,7 +10,7 @@ assemblage_site_trait_distance(
   df.occ,
   time.slice,
   dist.trait,
-  nearest.taxon,
+  nearest.taxon = TRUE,
   group = NULL,
   group.focal.compare = NULL,
   type.comparison = NULL,
@@ -34,10 +34,9 @@ assemblage_site_trait_distance(
 
 - df.occ:
 
-  a data frame object containing the occurrence records for each
-  species. This must have at least a column indicating the name of
-  species, its minimum and maximum age estimate, and its site location
-  ID.
+  Data frame object containing the occurrence records for each species.
+  This must have at least a column indicating the name of species, its
+  minimum and maximum age estimate, and its site location ID.
 
 - time.slice:
 
@@ -111,3 +110,25 @@ assemblage_site_trait_distance(
 
   Character indicating the name of the column containing the information
   on site location.
+
+## Value
+
+A data frame with one row per site (assemblage) per time slice,
+containing:
+
+- `site`: Site/assemblage identifier.
+
+- `time.slice`: Time-slice label
+
+- `mean.distance`: Mean trait distance among co-occurring species in
+  that site and time slice (MPD if `nearest.taxon = "all"`, MNND if
+  `nearest.taxon = 1`, or based on the specified neighbor count).
+
+- `var.distance`: Variance of those distances (NA if fewer than two
+  species).
+
+- `n.species` (if returned): Number of species in the site for that time
+  slice.
+
+- `n.pairs` (if returned): Number of pairwise comparisons used in the
+  distance calculation.

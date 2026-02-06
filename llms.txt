@@ -10,7 +10,7 @@ devtools::install_github("GabrielNakamura/Buccaneer", ref = "main")
 # Help page
 
 ``` r
-help(package = "buccaneer")
+help(package = "Buccaneer")
 ```
 
 # Package index
@@ -37,13 +37,14 @@ help(package = "buccaneer")
 - [`assemblage_nspecies()`](https://gabrielnakamura.github.io/Buccaneer/reference/assemblage_nspecies.md)
   : Calculate the number of species in each grid/assemblage/site
 - [`assemblage_site_trait_distance()`](https://gabrielnakamura.github.io/Buccaneer/reference/assemblage_site_trait_distance.md)
-  : Compute mean distance for species co occurring in sites
+  : Compute mean distance for species co occurring in sites/grids
+- [`assemblage_site_trait_distance_null()`](https://gabrielnakamura.github.io/Buccaneer/reference/assemblage_site_trait_distance_null.md)
+  : Compute Mean Pairwise Distances Between Species Cooccurring in Local
+  Assemblages
 - [`aux_matrix_regional_coex()`](https://gabrielnakamura.github.io/Buccaneer/reference/aux_matrix_regional_coex.md)
   : Generate Regional Species Co-occurrence Matrices Across Time Slices
 - [`calc_null_model()`](https://gabrielnakamura.github.io/Buccaneer/reference/calc_null_model.md)
   : Calculate Null Model for Trait Distances with Fixed Site Richness
-- [`calc_reach()`](https://gabrielnakamura.github.io/Buccaneer/reference/calc_reach.md)
-  : Auxiliar function to calculate reach criteria
 - [`check_crossing_boundaries()`](https://gabrielnakamura.github.io/Buccaneer/reference/check_crossing_boundaries.md)
   : Check Occurrence Records Crossing Time Bin Boundaries
 - [`clade_reach_coexistence()`](https://gabrielnakamura.github.io/Buccaneer/reference/clade_reach_coexistence.md)

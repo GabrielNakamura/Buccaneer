@@ -12,12 +12,12 @@ clade_reach_distance(
   time.slice,
   dist.trait,
   nearest.taxon,
-  round.digits,
-  species,
-  TS,
-  TE,
-  lat,
-  lon,
+  round.digits = 1,
+  species = "species",
+  TS = "TS",
+  TE = "TE",
+  lat = "lat",
+  lon = "lon",
   Max.age = "Max.age",
   Min.age = "Min.age",
   crs = 4326,
@@ -47,6 +47,19 @@ clade_reach_distance(
 
   Numeric. The time interval (in the same units as TS and TE) between
   consecutive time slices for temporal binning.
+
+- dist.trait:
+
+  A distance matrix object (class `dist` or `matrix`) containing
+  pairwise trait distances between species. Row and column names must
+  match species names in `df.TS.TE`. If NULL, distances will be computed
+  from the trait column using Euclidean distance.
+
+- nearest.taxon:
+
+  Numeric or character. The number of nearest neighbors to consider when
+  calculating mean distances. Use `1` for mean nearest neighbor distance
+  (MNND), or `"all"` for mean pairwise distance (MPD).
 
 - round.digits:
 
@@ -125,6 +138,10 @@ clade_reach_distance(
     group.
 
   - NULL (default): Count all co-occurrences regardless of group.
+
+- trait:
+
+  Character. The name of the column in `df.TS.TE` containing
 
 ## Value
 

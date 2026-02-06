@@ -3,35 +3,45 @@
 ``` r
 library(ggplot2)
 library(dplyr)
+#> 
+#> Attaching package: 'dplyr'
+#> The following objects are masked from 'package:stats':
+#> 
+#>     filter, lag
+#> The following objects are masked from 'package:base':
+#> 
+#>     intersect, setdiff, setequal, union
+library(Buccaneer)
 ```
 
 ## Background
 
 In this article we will show how to calculate different metrics of
 interspecific competition (or sometimes coexistence metrics) at
-different taxonomic levels in deep time using {`Buccaneer`} R package.
+different taxonomic levels and spatial scales in deep time using
+{`Buccaneer`} R package.
 
-For all metrics we will use data from [Graciotti et al.
-(2025)](https://academic.oup.com/evolut/article-abstract/79/9/1835/8140865?redirectedFrom=fulltext).
-This comprises fossil record of North American canids, a group that has
-been well caracterized ecologically and regarding fossil record. The
-data is part of the {`Buccaneer`} package and is comprised by:
+For all metrics we will use data from Graciotti et al. (2025). The data
+comprises fossil record of North American canids, a group that has been
+well caracterized ecologically and regarding fossil record. This data is
+also part of the {`Buccaneer`} package and is comprised by:
 
-- Species longevity data: A data frame describing the Origination Time
-  (TS) and Extinction Time (TE) obtained with Bayesian framework called
-  [PyRate](https://gabrielnakamura.github.io/Buccaneer/articles/)
+- Species longevity: A data frame describing the Origination Time (TS)
+  and Extinction Time (TE) obtained with Bayesian framework called
+  [PyRate](https://besjournals.onlinelibrary.wiley.com/doi/full/10.1111/2041-210X.12263)
 
-- Occurrence recorda data:
+- Occurrence record data:
 
 - Species traits:
 
 ## Loading data and packages
 
 ``` r
+
 data("df_longevities_canidae") # longevities for one replicate
 #data("occurrences_canidae") # occurrence data
 data("traits_canidae") # trait data
-data("df_occ_canidae") # occurrence data
+data("df_occurrence_canidae") # occurrence data
 ```
 
 ## Interspecific competition at clade level
@@ -82,7 +92,9 @@ varying the number of closest species in the morphospace considered in
 the calculation
 
 ``` r
-dist_body_mass <- dist(traits_canidae$LD1) # computing pairwise distance matrix for body mass
+ld1 <- traits_canidae$LD1
+names(ld1) <- traits_canidae$species
+dist_body_mass <- dist(ld1) # computing pairwise distance matrix for body mass
 
 # distances between groups using diet category 
 res_regional_mnd_between <- 
@@ -122,7 +134,7 @@ all_mnd_regional <- rbind(res_regional_mnd_between, res_regional_mnd_within)
 all_mnd_regional2 <- 
   data.frame(all_mnd_regional, 
              group_res = rep(c("Between", "Within"), 
-                             each = nrow(regional_mnd_within))
+                             each = nrow(res_regional_mnd_within))
   )
 ```
 
@@ -161,14 +173,17 @@ res_clade_regional |>
     axis.title.y = element_text(size = 9),
     panel.grid.minor = element_blank()
   )
+#> `geom_smooth()` using formula = 'y ~ x'
 ```
+
+![](time-series-metrics_files/figure-html/unnamed-chunk-7-1.png)
 
 ### Site scale
 
 ``` r
 res_clade_site <- 
   clade_site_coexistence(df.TS.TE = df_longevities_canidae, 
-                         df.occ = df_occ_canidae, 
+                         df.occ = df_occurrence_canidae, 
                          time.slice = 0.1, 
                          round.digits = 1,
                          species = "species",
@@ -208,7 +223,7 @@ We can also calculate the distance in morphospace using site criteria
 ``` r
 res_clade_site_distance <- 
   clade_site_distance(df.TS.TE = df_longevities_canidae, 
-                      df.occ = df_occ_canidae, 
+                      df.occ = df_occurrence_canidae, 
                       time.slice = 0.1, 
                       round.digits = 1,
                       dist.trait = dist_body_mass, 
@@ -223,7 +238,7 @@ res_clade_site_distance <-
 # calculating between mesocarnivores and hypercarnivores species
 res_clade_site_distance_between <- 
   clade_site_distance(df.TS.TE = df_longevities_canidae_trait, 
-                      df.occ = df_occ_canidae, 
+                      df.occ = df_occurrence_canidae, 
                       time.slice = 0.1, 
                       round.digits = 1,
                       dist.trait = dist_body_mass, 
@@ -237,11 +252,176 @@ res_clade_site_distance_between <-
                       Max.age = "max_T",
                       Min.age = "min_T",
                       site = "site.char")
+#> Warning in mean.default(x, na.rm = TRUE): argument is not numeric or logical:
+#> returning NA
+#> Warning in mean.default(x, na.rm = TRUE): argument is not numeric or logical:
+#> returning NA
+#> Warning in mean.default(x, na.rm = TRUE): argument is not numeric or logical:
+#> returning NA
+#> Warning in mean.default(x, na.rm = TRUE): argument is not numeric or logical:
+#> returning NA
+#> Warning in mean.default(x, na.rm = TRUE): argument is not numeric or logical:
+#> returning NA
+#> Warning in mean.default(x, na.rm = TRUE): argument is not numeric or logical:
+#> returning NA
+#> Warning in mean.default(x, na.rm = TRUE): argument is not numeric or logical:
+#> returning NA
+#> Warning in mean.default(x, na.rm = TRUE): argument is not numeric or logical:
+#> returning NA
+#> Warning in mean.default(x, na.rm = TRUE): argument is not numeric or logical:
+#> returning NA
+#> Warning in mean.default(x, na.rm = TRUE): argument is not numeric or logical:
+#> returning NA
+#> Warning in mean.default(x, na.rm = TRUE): argument is not numeric or logical:
+#> returning NA
+#> Warning in mean.default(x, na.rm = TRUE): argument is not numeric or logical:
+#> returning NA
+#> Warning in mean.default(x, na.rm = TRUE): argument is not numeric or logical:
+#> returning NA
+#> Warning in mean.default(x, na.rm = TRUE): argument is not numeric or logical:
+#> returning NA
+#> Warning in mean.default(x, na.rm = TRUE): argument is not numeric or logical:
+#> returning NA
+#> Warning in mean.default(x, na.rm = TRUE): argument is not numeric or logical:
+#> returning NA
+#> Warning in mean.default(x, na.rm = TRUE): argument is not numeric or logical:
+#> returning NA
+#> Warning in mean.default(x, na.rm = TRUE): argument is not numeric or logical:
+#> returning NA
+#> Warning in mean.default(x, na.rm = TRUE): argument is not numeric or logical:
+#> returning NA
+#> Warning in mean.default(x, na.rm = TRUE): argument is not numeric or logical:
+#> returning NA
+#> Warning in mean.default(x, na.rm = TRUE): argument is not numeric or logical:
+#> returning NA
+#> Warning in mean.default(x, na.rm = TRUE): argument is not numeric or logical:
+#> returning NA
+#> Warning in mean.default(x, na.rm = TRUE): argument is not numeric or logical:
+#> returning NA
+#> Warning in mean.default(x, na.rm = TRUE): argument is not numeric or logical:
+#> returning NA
+#> Warning in mean.default(x, na.rm = TRUE): argument is not numeric or logical:
+#> returning NA
+#> Warning in mean.default(x, na.rm = TRUE): argument is not numeric or logical:
+#> returning NA
+#> Warning in mean.default(x, na.rm = TRUE): argument is not numeric or logical:
+#> returning NA
+#> Warning in mean.default(x, na.rm = TRUE): argument is not numeric or logical:
+#> returning NA
+#> Warning in mean.default(x, na.rm = TRUE): argument is not numeric or logical:
+#> returning NA
+#> Warning in mean.default(x, na.rm = TRUE): argument is not numeric or logical:
+#> returning NA
+#> Warning in mean.default(x, na.rm = TRUE): argument is not numeric or logical:
+#> returning NA
+#> Warning in mean.default(x, na.rm = TRUE): argument is not numeric or logical:
+#> returning NA
+#> Warning in mean.default(x, na.rm = TRUE): argument is not numeric or logical:
+#> returning NA
+#> Warning in mean.default(x, na.rm = TRUE): argument is not numeric or logical:
+#> returning NA
+#> Warning in mean.default(x, na.rm = TRUE): argument is not numeric or logical:
+#> returning NA
+#> Warning in mean.default(x, na.rm = TRUE): argument is not numeric or logical:
+#> returning NA
+#> Warning in mean.default(x, na.rm = TRUE): argument is not numeric or logical:
+#> returning NA
+#> Warning in mean.default(x, na.rm = TRUE): argument is not numeric or logical:
+#> returning NA
+#> Warning in mean.default(x, na.rm = TRUE): argument is not numeric or logical:
+#> returning NA
+#> Warning in mean.default(x, na.rm = TRUE): argument is not numeric or logical:
+#> returning NA
+#> Warning in mean.default(x, na.rm = TRUE): argument is not numeric or logical:
+#> returning NA
+#> Warning in mean.default(x, na.rm = TRUE): argument is not numeric or logical:
+#> returning NA
+#> Warning in mean.default(x, na.rm = TRUE): argument is not numeric or logical:
+#> returning NA
+#> Warning in mean.default(x, na.rm = TRUE): argument is not numeric or logical:
+#> returning NA
+#> Warning in mean.default(x, na.rm = TRUE): argument is not numeric or logical:
+#> returning NA
+#> Warning in mean.default(x, na.rm = TRUE): argument is not numeric or logical:
+#> returning NA
+#> Warning in mean.default(x, na.rm = TRUE): argument is not numeric or logical:
+#> returning NA
+#> Warning in mean.default(x, na.rm = TRUE): argument is not numeric or logical:
+#> returning NA
+#> Warning in mean.default(x, na.rm = TRUE): argument is not numeric or logical:
+#> returning NA
+#> Warning in mean.default(x, na.rm = TRUE): argument is not numeric or logical:
+#> returning NA
+#> Warning in mean.default(x, na.rm = TRUE): argument is not numeric or logical:
+#> returning NA
+#> Warning in mean.default(x, na.rm = TRUE): argument is not numeric or logical:
+#> returning NA
+#> Warning in mean.default(x, na.rm = TRUE): argument is not numeric or logical:
+#> returning NA
+#> Warning in mean.default(x, na.rm = TRUE): argument is not numeric or logical:
+#> returning NA
+#> Warning in mean.default(x, na.rm = TRUE): argument is not numeric or logical:
+#> returning NA
+#> Warning in var(x, na.rm = TRUE): NAs introduced by coercion
+#> Warning in var(x, na.rm = TRUE): NAs introduced by coercion
+#> Warning in var(x, na.rm = TRUE): NAs introduced by coercion
+#> Warning in var(x, na.rm = TRUE): NAs introduced by coercion
+#> Warning in var(x, na.rm = TRUE): NAs introduced by coercion
+#> Warning in var(x, na.rm = TRUE): NAs introduced by coercion
+#> Warning in var(x, na.rm = TRUE): NAs introduced by coercion
+#> Warning in var(x, na.rm = TRUE): NAs introduced by coercion
+#> Warning in var(x, na.rm = TRUE): NAs introduced by coercion
+#> Warning in var(x, na.rm = TRUE): NAs introduced by coercion
+#> Warning in var(x, na.rm = TRUE): NAs introduced by coercion
+#> Warning in var(x, na.rm = TRUE): NAs introduced by coercion
+#> Warning in var(x, na.rm = TRUE): NAs introduced by coercion
+#> Warning in var(x, na.rm = TRUE): NAs introduced by coercion
+#> Warning in var(x, na.rm = TRUE): NAs introduced by coercion
+#> Warning in var(x, na.rm = TRUE): NAs introduced by coercion
+#> Warning in var(x, na.rm = TRUE): NAs introduced by coercion
+#> Warning in var(x, na.rm = TRUE): NAs introduced by coercion
+#> Warning in var(x, na.rm = TRUE): NAs introduced by coercion
+#> Warning in var(x, na.rm = TRUE): NAs introduced by coercion
+#> Warning in var(x, na.rm = TRUE): NAs introduced by coercion
+#> Warning in var(x, na.rm = TRUE): NAs introduced by coercion
+#> Warning in var(x, na.rm = TRUE): NAs introduced by coercion
+#> Warning in var(x, na.rm = TRUE): NAs introduced by coercion
+#> Warning in var(x, na.rm = TRUE): NAs introduced by coercion
+#> Warning in var(x, na.rm = TRUE): NAs introduced by coercion
+#> Warning in var(x, na.rm = TRUE): NAs introduced by coercion
+#> Warning in var(x, na.rm = TRUE): NAs introduced by coercion
+#> Warning in var(x, na.rm = TRUE): NAs introduced by coercion
+#> Warning in var(x, na.rm = TRUE): NAs introduced by coercion
+#> Warning in var(x, na.rm = TRUE): NAs introduced by coercion
+#> Warning in var(x, na.rm = TRUE): NAs introduced by coercion
+#> Warning in var(x, na.rm = TRUE): NAs introduced by coercion
+#> Warning in var(x, na.rm = TRUE): NAs introduced by coercion
+#> Warning in var(x, na.rm = TRUE): NAs introduced by coercion
+#> Warning in var(x, na.rm = TRUE): NAs introduced by coercion
+#> Warning in var(x, na.rm = TRUE): NAs introduced by coercion
+#> Warning in var(x, na.rm = TRUE): NAs introduced by coercion
+#> Warning in var(x, na.rm = TRUE): NAs introduced by coercion
+#> Warning in var(x, na.rm = TRUE): NAs introduced by coercion
+#> Warning in var(x, na.rm = TRUE): NAs introduced by coercion
+#> Warning in var(x, na.rm = TRUE): NAs introduced by coercion
+#> Warning in var(x, na.rm = TRUE): NAs introduced by coercion
+#> Warning in var(x, na.rm = TRUE): NAs introduced by coercion
+#> Warning in var(x, na.rm = TRUE): NAs introduced by coercion
+#> Warning in var(x, na.rm = TRUE): NAs introduced by coercion
+#> Warning in var(x, na.rm = TRUE): NAs introduced by coercion
+#> Warning in var(x, na.rm = TRUE): NAs introduced by coercion
+#> Warning in var(x, na.rm = TRUE): NAs introduced by coercion
+#> Warning in var(x, na.rm = TRUE): NAs introduced by coercion
+#> Warning in var(x, na.rm = TRUE): NAs introduced by coercion
+#> Warning in var(x, na.rm = TRUE): NAs introduced by coercion
+#> Warning in var(x, na.rm = TRUE): NAs introduced by coercion
+#> Warning in var(x, na.rm = TRUE): NAs introduced by coercion
+#> Warning in var(x, na.rm = TRUE): NAs introduced by coercion
 
 # calculating within mesocarnivore species
 res_clade_site_distance_within <- 
   clade_site_distance(df.TS.TE = df_longevities_canidae_trait, 
-                      df.occ = df_occ_canidae, 
+                      df.occ = df_occurrence_canidae, 
                       time.slice = 0.1, 
                       round.digits = 1,
                       dist.trait = dist_body_mass, 
@@ -291,7 +471,21 @@ all_mnd_site2 |>
     axis.title.y = element_text(size = 9),
     panel.grid.minor = element_blank()
   )
+#> Warning: Using `size` aesthetic for lines was deprecated in ggplot2 3.4.0.
+#> ℹ Please use `linewidth` instead.
+#> This warning is displayed once per session.
+#> Call `lifecycle::last_lifecycle_warnings()` to see where this warning was
+#> generated.
+#> Scale for x is already present.
+#> Adding another scale for x, which will replace the existing scale.
+#> `geom_smooth()` using formula = 'y ~ x'
+#> Warning: Removed 126 rows containing non-finite outside the scale range
+#> (`stat_smooth()`).
+#> Warning: Removed 110 rows containing missing values or values outside the scale range
+#> (`geom_line()`).
 ```
+
+![](time-series-metrics_files/figure-html/unnamed-chunk-12-1.png)
 
 ### Reach criteria
 
@@ -300,7 +494,7 @@ Reach criteria for coexistence
 ``` r
 res_clade_reach_coexistence <- 
   clade_reach_coexistence(df.TS.TE = df_longevities_canidae,
-                          df.occ = df_occ_canidae, 
+                          df.occ = df_occurrence_canidae, 
                           time.slice = 0.1, 
                           round.digits = 5,
                           species = "species",
@@ -318,7 +512,7 @@ Reach criteria for mean trait distance metrics
 ``` r
 res_clade_reach_distance <- 
   clade_reach_distance(df.TS.TE = df_longevities_canidae,
-                       df.occ = df_occ_canidae, 
+                       df.occ = df_occurrence_canidae, 
                        time.slice = 0.1, 
                        dist.trait = dist_body_mass, 
                        nearest.taxon = 1,
@@ -334,7 +528,7 @@ res_clade_reach_distance <-
 
 res_clade_reach_distance_between <- 
   clade_reach_distance(df.TS.TE = df_longevities_canidae_trait,
-                       df.occ = df_occ_canidae, 
+                       df.occ = df_occurrence_canidae, 
                        time.slice = 0.1, 
                        group = "diet_cat",
                        group.focal.compare = c("meso", "hyper"),
@@ -353,7 +547,7 @@ res_clade_reach_distance_between <-
 
 res_clade_reach_distance_within <- 
   clade_reach_distance(df.TS.TE = df_longevities_canidae_trait,
-                       df.occ = df_occ_canidae, 
+                       df.occ = df_occurrence_canidae, 
                        time.slice = 0.1, 
                        group = "diet_cat",
                        group.focal.compare = c("meso", "hyper"),
@@ -404,9 +598,18 @@ all_mnd_clade_reach2 |>
     axis.title.y = element_text(size = 9),
     panel.grid.minor = element_blank()
   )
+#> Scale for x is already present.
+#> Adding another scale for x, which will replace the existing scale.
+#> `geom_smooth()` using formula = 'y ~ x'
+#> Warning: Removed 87 rows containing non-finite outside the scale range
+#> (`stat_smooth()`).
+#> Warning: Removed 87 rows containing missing values or values outside the scale range
+#> (`geom_line()`).
 ```
 
-## Individual species analysis
+![](time-series-metrics_files/figure-html/unnamed-chunk-16-1.png)
+
+## Interspecific Competition at Individual Species Level
 
 In individual species analyses the focus is on the “perception” of each
 individual species with other co-occurring species. There are two main
@@ -490,7 +693,10 @@ res_indiv_species_coex |>
     panel.grid.minor   = element_blank(),
     plot.margin = margin(t = 5, r = 5, b = 20, l = 5)
   )
+#> `geom_smooth()` using formula = 'y ~ x'
 ```
+
+![](time-series-metrics_files/figure-html/unnamed-chunk-18-1.png)
 
 We can also plot individual species mpd for all species coexisting in
 regional context. For this we will also use data on body mass for all
@@ -566,7 +772,14 @@ res_indiv_regional_species_mpd |>
     panel.grid.minor   = element_blank(),
     plot.margin = margin(t = 5, r = 5, b = 20, l = 5)
   )
+#> `geom_smooth()` using formula = 'y ~ x'
+#> Warning: Removed 1328 rows containing non-finite outside the scale range
+#> (`stat_smooth()`).
+#> Warning: Removed 1328 rows containing missing values or values outside the scale range
+#> (`geom_line()`).
 ```
+
+![](time-series-metrics_files/figure-html/unnamed-chunk-20-1.png)
 
 In order to calculate the mpd for multiple traits the user must inform
 an object of class dist containing all pairwise distances among species.
@@ -597,7 +810,7 @@ individual species coexistence
 ``` r
 res_indiv_species_site_coex <- 
   IndivSpec_site_coexistence(df.TS.TE = df_longevities_canidae,
-                             df.occ = df_occ_canidae, 
+                             df.occ = df_occurrence_canidae, 
                              time.slice = 0.1,
                              round.digits = 5,
                              species = "species",
@@ -659,7 +872,10 @@ res_indiv_species_site_coex |>
     panel.grid.minor   = element_blank(),
     plot.margin = margin(t = 5, r = 5, b = 20, l = 5)
   )
+#> `geom_smooth()` using formula = 'y ~ x'
 ```
+
+![](time-series-metrics_files/figure-html/unnamed-chunk-23-1.png)
 
 We can calculate mean pairwise distances of individual species
 coexistence metrics based on site co-occurrence
@@ -668,7 +884,7 @@ coexistence metrics based on site co-occurrence
 
 indiv_species_site_mpd <- 
   IndivSpec_site_distance(df.TS.TE = df_longevities_canidae, 
-                     df.occ = df_occ_canidae, 
+                     df.occ = df_occurrence_canidae, 
                      time.slice = 0.1, 
                      dist.trait = dist_body_mass, 
                      nearest.taxon = "all",
@@ -689,7 +905,7 @@ We will calculate individual mean coexistence using reach criteria
 
 res_indiv_species_reach_coex <- 
   IndivSpecies_reach_coexistence(df.TS.TE = df_longevities_canidae,
-                                 df.occ = df_occ_canidae,
+                                 df.occ = df_occurrence_canidae,
                                  time.slice = 0.1, 
                                  round.digits = 1,
                                  species = "species",
@@ -753,7 +969,10 @@ res_indiv_species_reach_coex |>
     panel.grid.minor   = element_blank(),
     plot.margin = margin(t = 5, r = 5, b = 20, l = 5)
   )
+#> `geom_smooth()` using formula = 'y ~ x'
 ```
+
+![](time-series-metrics_files/figure-html/unnamed-chunk-26-1.png)
 
 Individual reach coexistence mpd and mnd
 
@@ -763,7 +982,7 @@ res_indiv_species_reach_distance <-
                            dist.trait = dist_body_mass, 
                            nearest.taxon = "all",
                            crs = 4326, 
-                           df.occ = df_occ_canidae,
+                           df.occ = df_occurrence_canidae,
                            time.slice = 0.1, 
                            round.digits = 1,
                            species = "species",
@@ -826,4 +1045,21 @@ res_indiv_species_reach_distance |>
     panel.grid.minor   = element_blank(),
     plot.margin = margin(t = 5, r = 5, b = 20, l = 5)
   )
+#> `geom_smooth()` using formula = 'y ~ x'
+#> Warning: Removed 1328 rows containing non-finite outside the scale range
+#> (`stat_smooth()`).
+#> Warning: Removed 1328 rows containing missing values or values outside the scale range
+#> (`geom_line()`).
 ```
+
+![](time-series-metrics_files/figure-html/unnamed-chunk-28-1.png)
+
+## Interspecific Competition at Assemblage Level
+
+Calculating distance metrics at site and grid scale
+
+Graciotti, Rodolfo P, Lucas M V Porto, Salatiel Gonçalves-Neto, and
+Tiago B Quental. 2025. “Ecological and Spatial Overlap Indicate
+Interspecific Competition During North American Canid Radiation.” Edited
+by Stewart Edie and Hélène Morlon. *Evolution* 79 (9): 1835–47.
+<https://doi.org/10.1093/evolut/qpaf113>.

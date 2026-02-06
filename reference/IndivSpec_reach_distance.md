@@ -12,18 +12,19 @@ IndivSpec_reach_distance(
   time.slice,
   dist.trait,
   nearest.taxon,
-  round.digits,
-  species,
-  TS,
-  TE,
-  lat,
-  lon,
-  Max.age = "Max.age",
-  Min.age = "Min.age",
-  crs = 4326,
   group = NULL,
   group.focal.compare = NULL,
-  type.comparison = NULL
+  type.comparison = NULL,
+  trait = NULL,
+  round.digits = 1,
+  species = "species",
+  TS = "TS",
+  TE = "TE",
+  Max.age = "Max.age",
+  Min.age = "Min.age",
+  lat = "lat",
+  lon = "lon",
+  crs = 4326
 )
 ```
 
@@ -47,51 +48,18 @@ IndivSpec_reach_distance(
   Numeric. The time interval (in the same units as TS and TE) between
   consecutive time slices for temporal binning.
 
-- round.digits:
+- dist.trait:
 
-  Integer. The number of decimal places to round time slice values.
-  Default is 1. This affects temporal binning precision.
+  A distance matrix object (class `dist` or `matrix`) containing
+  pairwise trait distances between species. Row and column names must
+  match species names in `df.TS.TE`. If NULL, distances will be computed
+  from the trait column using Euclidean distance.
 
-- species:
+- nearest.taxon:
 
-  Character. The name of the column in `df.TS.TE` and `df.occ`
-  containing species identifiers. Default is "species".
-
-- TS:
-
-  Character. The name of the column in `df.TS.TE` containing origination
-  (first appearance) times for each species. Default is "TS".
-
-- TE:
-
-  Character. The name of the column in `df.TS.TE` containing extinction
-  (last appearance) times for each species. Default is "TE".
-
-- lat:
-
-  Numeric. The latitude coordinate of the occurrence record in `df.occ`.
-
-- lon:
-
-  Numeric. The longitude coordinate of the occurrence records in
-  `df.occ`.
-
-- Max.age:
-
-  Character. The name of the column in `df.occ` containing the maximum
-  (oldest) age estimate for each occurrence record. Default is
-  "Max.age".
-
-- Min.age:
-
-  Character. The name of the column in `df.occ` containing the minimum
-  (youngest) age estimate for each occurrence record. Default is
-  "Min.age".
-
-- crs:
-
-  Numeric. The code indicating the coordinate reference system to be
-  used for latitude and longitude of occurrence records in `df.occ`
+  Numeric or character. The number of nearest neighbors to consider when
+  calculating mean distances. Use `1` for mean nearest neighbor distance
+  (MNND), or `"all"` for mean pairwise distance (MPD).
 
 - group:
 
@@ -118,12 +86,51 @@ IndivSpec_reach_distance(
 
   - NULL (default): Count all co-occurrences regardless of group.
 
-- remove.singletons:
+- round.digits:
 
-  Logical. Should singleton species (species occurring alone at a site
-  with no co-occurring species) be excluded from mean and variance
-  calculations? Default is TRUE. When TRUE, singletons are treated as
-  NA; when FALSE, they contribute 0 to the mean.
+  Integer. The number of decimal places to round time slice values.
+  Default is 1. This affects temporal binning precision.
+
+- species:
+
+  Character. The name of the column in `df.TS.TE` and `df.occ`
+  containing species identifiers. Default is "species".
+
+- TS:
+
+  Character. The name of the column in `df.TS.TE` containing origination
+  (first appearance) times for each species. Default is "TS".
+
+- TE:
+
+  Character. The name of the column in `df.TS.TE` containing extinction
+  (last appearance) times for each species. Default is "TE".
+
+- Max.age:
+
+  Character. The name of the column in `df.occ` containing the maximum
+  (oldest) age estimate for each occurrence record. Default is
+  "Max.age".
+
+- Min.age:
+
+  Character. The name of the column in `df.occ` containing the minimum
+  (youngest) age estimate for each occurrence record. Default is
+  "Min.age".
+
+- lat:
+
+  Numeric. The latitude coordinate of the occurrence record in `df.occ`.
+
+- lon:
+
+  Numeric. The longitude coordinate of the occurrence records in
+  `df.occ`.
+
+- crs:
+
+  Numeric. The code indicating the coordinate reference system to be
+  used for latitude and longitude of occurrence records in `df.occ`
 
 ## Value
 
@@ -146,3 +153,50 @@ A data frame with three columns:
 
   Numeric. The time point representing each slice, typically the upper
   (older) boundary of the time bin.
+
+## Examples
+
+``` r
+if (FALSE) { # \dontrun{
+# Example temporal data with traits
+df_longevities <- data.frame(
+  species = c("sp1", "sp2", "sp3", "sp4"),
+  TS      = c(100, 96, 92, 88),
+  TE      = c(70, 65, 60, 55),
+  trait   = c(1.2, 2.5, 3.1, 4.0),
+  group   = c("A", "A", "B", "B")
+)
+
+# Occurrence data
+df_occ <- data.frame(
+  species = c("sp1","sp1","sp2","sp3","sp4","sp4"),
+  Max.age = c(100, 96, 95, 92, 88, 86),
+  Min.age = c(92, 90, 88, 82, 80, 78),
+  site    = c("s1","s2","s1","s1","s2","s3")
+)
+
+# Compute species-level reach distances (MPD)
+res_mpd <- IndivSpec_reach_distance(
+  df.TS.TE = df_longevities,
+  df.occ   = df_occ,
+  time.slice = 5,
+  trait      = "trait",
+  dist.trait = NULL,
+  nearest.taxon = "all"
+)
+
+# Compute species-level reach distances (MNND) between groups
+res_between <- IndivSpec_reach_distance(
+  df.TS.TE = df_longevities,
+  df.occ   = df_occ,
+  time.slice = 5,
+  trait      = "trait",
+  nearest.taxon = 1,
+  group = "group",
+  group.focal.compare = c("A", "B"),
+  type.comparison = "between"
+)
+
+head(res_mpd)
+} # }
+```

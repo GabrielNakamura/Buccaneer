@@ -206,7 +206,6 @@ result <- IndivSpec_site_distance(
   dist.trait = NULL,
   nearest.taxon = "all"
 )
-#> Error in loadNamespace(x): there is no package called ‘tidyr’
 
 # Calculate MNND between groups at each site
 result_between <- IndivSpec_site_distance(
@@ -220,7 +219,18 @@ result_between <- IndivSpec_site_distance(
   group.focal.compare = c("A", "B"),
   type.comparison = "between"
 )
-#> Error in loadNamespace(x): there is no package called ‘tidyr’
+#> Warning: argument is not numeric or logical: returning NA
+#> Warning: argument is not numeric or logical: returning NA
+#> Warning: argument is not numeric or logical: returning NA
+#> Warning: argument is not numeric or logical: returning NA
+#> Warning: argument is not numeric or logical: returning NA
+#> Warning: argument is not numeric or logical: returning NA
+#> Warning: NAs introduced by coercion
+#> Warning: NAs introduced by coercion
+#> Warning: NAs introduced by coercion
+#> Warning: NAs introduced by coercion
+#> Warning: NAs introduced by coercion
+#> Warning: NAs introduced by coercion
 
 
 result_within <- IndivSpec_site_distance(
@@ -234,5 +244,4 @@ result_within <- IndivSpec_site_distance(
   group.focal.compare = c("A", "B"),
   type.comparison = "within"
 )
-#> Error in loadNamespace(x): there is no package called ‘tidyr’
 ```
