@@ -119,16 +119,6 @@ head(res_regional_coexistence)
 #> 4           4         85
 #> 5           4         80
 #> 6           4         75
-
-# Plot richness through time
-plot(res_regional_coexistence$time.slice,
-     res_regional_coexistence$coexistence,
-     type = "l",
-     xlab = "Time (Ma)",
-     ylab = "Regional Species Richness",
-     main = "Species Richness Through Time")
-
-
 # Using custom column names
 df_custom <- data.frame(
   taxon = c("sp1", "sp2", "sp3"),

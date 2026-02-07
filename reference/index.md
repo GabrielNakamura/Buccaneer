@@ -55,9 +55,15 @@
   : Calculate Site-Based Species Occurrence Across Time Slices
 - [`comp_slice_occ_cooccurr()`](https://gabrielnakamura.github.io/Buccaneer/reference/comp_slice_occ_cooccurr.md)
   : Calculate Species Co-occurrence Matrices Based on Time Slice Overlap
+- [`df_longevities_canidae`](https://gabrielnakamura.github.io/Buccaneer/reference/df_longevities_canidae.md)
+  : Longevities for 133 Canidae species
+- [`df_occurrence_canidae`](https://gabrielnakamura.github.io/Buccaneer/reference/df_occurrence_canidae.md)
+  : Occurrence records
 - [`get_summary_interval()`](https://gabrielnakamura.github.io/Buccaneer/reference/get_summary_interval.md)
   : Compute Summary Statistics from Fossil Records Across Time Intervals
 - [`get_summary_slices()`](https://gabrielnakamura.github.io/Buccaneer/reference/get_summary_slices.md)
   : Get Summary Information for Species Across Time Slices
 - [`plot_occ_bins()`](https://gabrielnakamura.github.io/Buccaneer/reference/plot_occ_bins.md)
   : Plot Fossil Occurrence Records and Species Age Ranges
+- [`traits_canidae`](https://gabrielnakamura.github.io/Buccaneer/reference/traits_canidae.md)
+  : Trait data for 133 Canidae species
