@@ -30,11 +30,21 @@ also part of the {`Buccaneer`} package and is comprised by:
   and Extinction Time (TE) obtained with Bayesian framework called
   [PyRate](https://besjournals.onlinelibrary.wiley.com/doi/full/10.1111/2041-210X.12263)
 
-- Occurrence record data:
+- Occurrence record data: A data frame with fossil occurrence records
+  retrieved from [Paleobiology Database](https://paleobiodb.org/#/)
+  including only North American canids. For details in data process and
+  curatorial work check out Graciotti et al. (2025)
 
-- Species traits:
+- Species traits: A data frame with ecomorphological characterization of
+  species with traits that present important proxies for determining
+  species niches. For downstream analysis we use mostly body mass and
+  LDA to infer diet of species. For details on how this data was
+  computed see Graciotti et al. (2025)
 
 ## Loading data and packages
+
+In the following examples, we will use three datasets that are embedded
+in the `Buccaneer` package and can be loaded as follows:
 
 ``` r
 
@@ -45,6 +55,24 @@ data("df_occurrence_canidae") # occurrence data
 ```
 
 ## Interspecific competition at clade level
+
+At this section we present metrics to calculate proxy metrics that
+represent interspecific competition at clade level. By competition at
+clade level we mean the competition described by the variation in the
+absolute number of coexisting species or by how the morphospace
+occupation change through time. We perform this characterization at
+different scales:
+
+    - Regional: Considering all species present at a given time slice as 
+        coexisting species
+        
+    - Local (or Site): We consider a coexistence only species present at the 
+        same timeslice and spatial area.
+        
+    - Reach: A coexistence is considered only when the potential dispersion
+       threshold distance in space between a pair of species is satisfied. 
+       For more details in reach criteria see @graciotti_ecological_2025
+       
 
 ### Regional scale
 
@@ -634,7 +662,7 @@ assemblage, this last being defined as a grid of customized size.
 
 ``` r
 res_indiv_species_coex <- 
-  IndivSpecies_regional_coex(df.TS.TE = df_longevities_canidae, 
+  IndivSpec_regional_coex(df.TS.TE = df_longevities_canidae, 
                              time.slice = 0.1,
                              round.digits = 1,
                              species = "species",
@@ -1057,6 +1085,8 @@ res_indiv_species_reach_distance |>
 ## Interspecific Competition at Assemblage Level
 
 Calculating distance metrics at site and grid scale
+
+## References
 
 Graciotti, Rodolfo P, Lucas M V Porto, Salatiel Gonçalves-Neto, and
 Tiago B Quental. 2025. “Ecological and Spatial Overlap Indicate

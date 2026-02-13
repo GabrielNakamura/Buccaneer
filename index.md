@@ -25,3 +25,6 @@ devtools::install_github("GabrielNakamura/Buccaneer", ref = "main")
 ``` r
 help(package = "Buccaneer")
 ```
+
+For examples check the [package
+webpage](https://gabrielnakamura.github.io/Buccaneer/index.html)

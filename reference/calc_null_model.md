@@ -59,7 +59,8 @@ calculated from the randomized occurrence data.
 The function performs the following steps for each time slice:
 
 1.  Generates `nperm` random permutations of the occurrence matrix using
-    `vegan::permatfull()` with fixed row and column margins
+    [`vegan::permatfull()`](https://vegandevs.github.io/vegan/reference/permatfull.html)
+    with fixed row and column margins
 
 2.  For each permutation, creates a species co-occurrence matrix
 

@@ -7,6 +7,8 @@
 - [`IndivSpec_reach_distance()`](https://gabrielnakamura.github.io/Buccaneer/reference/IndivSpec_reach_distance.md)
   : Calculate Mean Individual Species Trait Distances Across Time Slices
   With Reach Criteria
+- [`IndivSpec_regional_coex()`](https://gabrielnakamura.github.io/Buccaneer/reference/IndivSpec_regional_coex.md)
+  : Calculate Regional Individual Species Coexistence Across Time Slices
 - [`IndivSpec_regional_distance()`](https://gabrielnakamura.github.io/Buccaneer/reference/IndivSpec_regional_distance.md)
   : Calculate Mean Trait Distance for Individual Species Co-occurring at
   Regional Scale
@@ -17,8 +19,6 @@
   Local Sites
 - [`IndivSpecies_reach_coexistence()`](https://gabrielnakamura.github.io/Buccaneer/reference/IndivSpecies_reach_coexistence.md)
   : Compute Individual Species Coexistence based on reach criteria
-- [`IndivSpecies_regional_coex()`](https://gabrielnakamura.github.io/Buccaneer/reference/IndivSpecies_regional_coex.md)
-  : Calculate Regional Individual Species Coexistence Across Time Slices
 - [`assemblage_nspecies()`](https://gabrielnakamura.github.io/Buccaneer/reference/assemblage_nspecies.md)
   : Calculate the number of species in each grid/assemblage/site
 - [`assemblage_site_trait_distance()`](https://gabrielnakamura.github.io/Buccaneer/reference/assemblage_site_trait_distance.md)

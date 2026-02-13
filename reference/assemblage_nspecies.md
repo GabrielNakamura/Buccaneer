@@ -69,3 +69,50 @@ assemblage_nspecies(
 
   Character indicating the name of the column containing the information
   on assemblage location.
+
+## Value
+
+A data frame with three columns:
+
+- `time.slice`: time slice identifier
+
+- `sites`: site or assemblage identifier
+
+- `n.species`: number of species present at that site and time slice
+
+## Examples
+
+``` r
+# Example species longevities
+df_longevities <- data.frame(
+  species = c("sp1", "sp2", "sp3", "sp4"),
+  TS = c(100, 95, 90, 85),
+  TE = c(60, 55, 50, 45)
+)
+
+# Example occurrence data
+df_occurrences <- data.frame(
+  species = c("sp1", "sp2", "sp3", "sp1", "sp4"),
+  Max.age = c(90, 90, 90, 80, 80),
+  Min.age = c(70, 70, 70, 60, 60),
+  site = c("site1", "site1", "site2", "site2", "site1")
+)
+
+# Calculate number of species per site and time slice
+assemblage_nspecies(
+  df.TS.TE = df_longevities,
+  df.occ = df_occurrences,
+  time.slice = 10
+)
+#>    time.slice sites n.species
+#> 1        <NA>  <NA>        NA
+#> 2          90 site1         2
+#> 3          90 site2         1
+#> 4          80 site1         3
+#> 5          80 site2         2
+#> 6          70 site1         3
+#> 7          70 site2         2
+#> 8          60 site2         1
+#> 9          60 site1         1
+#> 10       <NA>  <NA>        NA
+```
