@@ -47,6 +47,37 @@ lower age limit for occurrence record.}
 \item{site}{Character indicating the name of the column containing the
 information on assemblage location.}
 }
+\value{
+A data frame with three columns:
+\itemize{
+\item \code{time.slice}: time slice identifier
+\item \code{sites}: site or assemblage identifier
+\item \code{n.species}: number of species present at that site and time slice
+}
+}
 \description{
 Calculate the number of species in each grid/assemblage/site
+}
+\examples{
+# Example species longevities
+df_longevities <- data.frame(
+  species = c("sp1", "sp2", "sp3", "sp4"),
+  TS = c(100, 95, 90, 85),
+  TE = c(60, 55, 50, 45)
+)
+
+# Example occurrence data
+df_occurrences <- data.frame(
+  species = c("sp1", "sp2", "sp3", "sp1", "sp4"),
+  Max.age = c(90, 90, 90, 80, 80),
+  Min.age = c(70, 70, 70, 60, 60),
+  site = c("site1", "site1", "site2", "site2", "site1")
+)
+
+# Calculate number of species per site and time slice
+assemblage_nspecies(
+  df.TS.TE = df_longevities,
+  df.occ = df_occurrences,
+  time.slice = 10
+)
 }

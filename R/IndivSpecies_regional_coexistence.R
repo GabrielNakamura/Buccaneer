@@ -34,8 +34,8 @@
 #'   TS = c(100, 90, 80),
 #'   TE = c(50, 40, 30)
 #' )
-#' IndivSpecies_regional_coex(df, time.slice = 10)
-IndivSpecies_regional_coex <-
+#' IndivSpec_regional_coex(df, time.slice = 10)
+IndivSpec_regional_coex <-
   function(df.TS.TE,
            time.slice,
            round.digits = 1,

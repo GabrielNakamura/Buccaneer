@@ -2,11 +2,11 @@
 
 export(Assemblage_regional_richness)
 export(IndivSpec_reach_distance)
+export(IndivSpec_regional_coex)
 export(IndivSpec_regional_distance)
 export(IndivSpec_site_coexistence)
 export(IndivSpec_site_distance)
 export(IndivSpecies_reach_coexistence)
-export(IndivSpecies_regional_coex)
 export(assemblage_nspecies)
 export(assemblage_site_trait_distance)
 export(assemblage_site_trait_distance_null)
