@@ -32,12 +32,12 @@ LazyData: true
 URL: https://gabrielnakamura.github.io/Buccaneer/
 Config/testthat/edition: 3
 Imports: 
-    dplyr (>= 1.0.0),
-    ggplot2 (>= 3.3.0),
+    dplyr,
+    ggplot2,
     lattice,
     picante,
-    purrr (>= 0.3.0),
-    stringr (>= 1.4.0),
+    purrr,
+    stringr,
     stats,
     sf,
     class, 
