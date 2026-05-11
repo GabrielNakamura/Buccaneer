@@ -138,7 +138,18 @@ different scales:</p>
 <div class="section level3">
 <h3 id="regional-scale">Regional scale<a class="anchor" aria-label="anchor" href="#regional-scale"></a>
 </h3>
-<p>Calculating time series at clade level and regional scale</p>
+<div class="section level4">
+<h4 id="taxonomic">Taxonomic<a class="anchor" aria-label="anchor" href="#taxonomic"></a>
+</h4>
+<p>Here, we calculate metrics that serve as proxies for coexistence at a
+regional scale. In this case, “regional” refers to the entire North
+American continent. The first metric is simply the number of species
+coexisting within each time slice, as defined by the time.slice
+argument. Functions that include the term <code>coexistence</code>
+return outputs expressed as the number of taxonomic units. In contrast,
+functions that include the term <code>distance</code> express
+coexistence in terms of the mean trait distance among species. This
+pattern is valid for all metrics in this package.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">res_clade_regional</span> <span class="op">&lt;-</span></span>
 <span>  <span class="fu"><a href="../reference/clade_regional_coexistence.html">clade_regional_coexistence</a></span><span class="op">(</span>df.TS.TE <span class="op">=</span> <span class="va">df_longevities_canidae</span>,</span>
@@ -147,17 +158,20 @@ different scales:</p>
 <span>                             species <span class="op">=</span> <span class="st">"species"</span>,</span>
 <span>                             TS <span class="op">=</span> <span class="st">"TS"</span>,</span>
 <span>                             TE <span class="op">=</span> <span class="st">"TE"</span><span class="op">)</span></span></code></pre></div>
-<p>Here we calculate the mean distances using a general function that
-allows to set up the group comparison in which the mean will be
-calculate. It can be <code>between</code> to calculate mean distances
-between a focal and a target group or <code>within</code> to calculate
-the mean trait distance only within the focal group. To this end we will
-use the <code>diet_cat</code> column of the <code>trait_canidae</code>
-data frame, that contains a<br>
-classification of canidae species in two categories: hypercarnivores and
-mesocarnivores.</p>
-<p>First we need to join this information to the
-<code>df_longvities_canidae</code> data frame</p>
+</div>
+<div class="section level4">
+<h4 id="functional-distance">Functional distance<a class="anchor" aria-label="anchor" href="#functional-distance"></a>
+</h4>
+<p>Here, we calculate mean distances using a general function that
+allows us to define how groups are compared. The argument can be set to
+<code>between</code>, to calculate mean distances between a focal and a
+target group, or <code>within</code>, to calculate mean trait distances
+only within the focal group. For this purpose, we use the
+<code>diet_cat</code> column from the <code>trait_canidae</code> data
+frame, which classifies canid species into two categories:
+hypercarnivores and mesocarnivores.</p>
+<p>First, we need to join this information with the
+<code>df_longvities_canidae</code> data frame.</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">df_longevities_canidae_trait</span> <span class="op">&lt;-</span> </span>
 <span>  <span class="va">df_longevities_canidae</span> <span class="op">|&gt;</span> </span>
@@ -251,6 +265,7 @@ we need to join the results to plot in one graphic</p>
 <span>  <span class="op">)</span></span>
 <span><span class="co">#&gt; `geom_smooth()` using formula = 'y ~ x'</span></span></code></pre></div>
 <p><img src="time-series-metrics_files/figure-html/unnamed-chunk-7-1.png" class="r-plt" alt="" width="2187.5"></p>
+</div>
 </div>
 <div class="section level3">
 <h3 id="site-scale">Site scale<a class="anchor" aria-label="anchor" href="#site-scale"></a>
@@ -1080,13 +1095,13 @@ criteria</p>
 <div class="section level2">
 <h2 class="unnumbered" id="references">References<a class="anchor" aria-label="anchor" href="#references"></a>
 </h2>
-<div id="refs" class="references csl-bib-body hanging-indent" entry-spacing="0">
+<div id="refs" class="references csl-bib-body hanging-indent">
 <div id="ref-graciotti_ecological_2025" class="csl-entry">
 Graciotti, Rodolfo P, Lucas M V Porto, Salatiel Gonçalves-Neto, and
 Tiago B Quental. 2025. <span>“Ecological and Spatial Overlap Indicate
 Interspecific Competition During <span>North</span>
-<span>American</span> Canid Radiation.”</span> Edited by Stewart Edie
-and Hélène Morlon. <em>Evolution</em> 79 (9): 1835–47. <a href="https://doi.org/10.1093/evolut/qpaf113" class="external-link">https://doi.org/10.1093/evolut/qpaf113</a>.
+<span>American</span> Canid Radiation.”</span> <em>Evolution</em> 79
+(9): 1835–47. <a href="https://doi.org/10.1093/evolut/qpaf113" class="external-link">https://doi.org/10.1093/evolut/qpaf113</a>.
 </div>
 </div>
 </div>

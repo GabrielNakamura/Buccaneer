@@ -1,6 +1,7 @@
 # Time series metrics
 
 ``` r
+
 library(ggplot2)
 library(dplyr)
 #> 
@@ -48,6 +49,7 @@ in the `Buccaneer` package and can be loaded as follows:
 
 ``` r
 
+
 data("df_longevities_canidae") # longevities for one replicate
 #data("occurrences_canidae") # occurrence data
 data("traits_canidae") # trait data
@@ -76,9 +78,20 @@ different scales:
 
 ### Regional scale
 
-Calculating time series at clade level and regional scale
+#### Taxonomic
+
+Here, we calculate metrics that serve as proxies for coexistence at a
+regional scale. In this case, “regional” refers to the entire North
+American continent. The first metric is simply the number of species
+coexisting within each time slice, as defined by the time.slice
+argument. Functions that include the term `coexistence` return outputs
+expressed as the number of taxonomic units. In contrast, functions that
+include the term `distance` express coexistence in terms of the mean
+trait distance among species. This pattern is valid for all metrics in
+this package.
 
 ``` r
+
 res_clade_regional <-
   clade_regional_coexistence(df.TS.TE = df_longevities_canidae,
                              time.slice = 0.1,
@@ -88,19 +101,21 @@ res_clade_regional <-
                              TE = "TE")
 ```
 
-Here we calculate the mean distances using a general function that
-allows to set up the group comparison in which the mean will be
-calculate. It can be `between` to calculate mean distances between a
-focal and a target group or `within` to calculate the mean trait
-distance only within the focal group. To this end we will use the
-`diet_cat` column of the `trait_canidae` data frame, that contains a  
-classification of canidae species in two categories: hypercarnivores and
-mesocarnivores.
+#### Functional distance
 
-First we need to join this information to the `df_longvities_canidae`
-data frame
+Here, we calculate mean distances using a general function that allows
+us to define how groups are compared. The argument can be set to
+`between`, to calculate mean distances between a focal and a target
+group, or `within`, to calculate mean trait distances only within the
+focal group. For this purpose, we use the `diet_cat` column from the
+`trait_canidae` data frame, which classifies canid species into two
+categories: hypercarnivores and mesocarnivores.
+
+First, we need to join this information with the `df_longvities_canidae`
+data frame.
 
 ``` r
+
 df_longevities_canidae_trait <- 
   df_longevities_canidae |> 
   left_join(traits_canidae, by = "species")
@@ -120,6 +135,7 @@ varying the number of closest species in the morphospace considered in
 the calculation
 
 ``` r
+
 ld1 <- traits_canidae$LD1
 names(ld1) <- traits_canidae$species
 dist_body_mass <- dist(ld1) # computing pairwise distance matrix for body mass
@@ -158,6 +174,7 @@ Let’s check out the results of these two competition metrics. First we
 need to join the results to plot in one graphic
 
 ``` r
+
 all_mnd_regional <- rbind(res_regional_mnd_between, res_regional_mnd_within)
 all_mnd_regional2 <- 
   data.frame(all_mnd_regional, 
@@ -169,6 +186,7 @@ all_mnd_regional2 <-
 Plotting the results
 
 ``` r
+
 res_clade_regional |>
   mutate(time.slice = as.numeric(time.slice)) |>
   ggplot(aes(x = time.slice, y = coexistence)) +
@@ -209,6 +227,7 @@ res_clade_regional |>
 ### Site scale
 
 ``` r
+
 res_clade_site <- 
   clade_site_coexistence(df.TS.TE = df_longevities_canidae, 
                          df.occ = df_occurrence_canidae, 
@@ -225,6 +244,7 @@ res_clade_site <-
 Plotting the results
 
 ``` r
+
 res_clade_site |> 
   ggplot(aes(x = as.numeric(time.slice), y = mean.coexistence)) +
   geom_line(aes(x = as.numeric(time.slice), y = mean.coexistence)) +
@@ -249,6 +269,7 @@ res_clade_site |>
 We can also calculate the distance in morphospace using site criteria
 
 ``` r
+
 res_clade_site_distance <- 
   clade_site_distance(df.TS.TE = df_longevities_canidae, 
                       df.occ = df_occurrence_canidae, 
@@ -469,6 +490,7 @@ Let’s check out the results of these competition metrics. First we need
 to join the results to plot in one graphic
 
 ``` r
+
 all_mnd_site <- rbind(res_clade_site_distance, res_clade_site_distance_between, res_clade_site_distance_within)
 all_mnd_site2 <- 
   data.frame(all_mnd_site, 
@@ -480,6 +502,7 @@ all_mnd_site2 <-
 Plotting the results
 
 ``` r
+
 all_mnd_site2 |> 
   ggplot(aes(x = as.numeric(time.slice), y = mean.distance, group = group_res, color = group_res)) +
   geom_line(aes(x = as.numeric(time.slice), y = mean.distance)) +
@@ -520,6 +543,7 @@ all_mnd_site2 |>
 Reach criteria for coexistence
 
 ``` r
+
 res_clade_reach_coexistence <- 
   clade_reach_coexistence(df.TS.TE = df_longevities_canidae,
                           df.occ = df_occurrence_canidae, 
@@ -538,6 +562,7 @@ res_clade_reach_coexistence <-
 Reach criteria for mean trait distance metrics
 
 ``` r
+
 res_clade_reach_distance <- 
   clade_reach_distance(df.TS.TE = df_longevities_canidae,
                        df.occ = df_occurrence_canidae, 
@@ -596,6 +621,7 @@ res_clade_reach_distance_within <-
 Joining the results and plotting
 
 ``` r
+
 all_mnd_clade_reach <- rbind(res_clade_reach_distance, res_clade_reach_distance_between, res_clade_reach_distance_within)
 all_mnd_clade_reach2 <- 
   data.frame(all_mnd_clade_reach, 
@@ -607,6 +633,7 @@ all_mnd_clade_reach2 <-
 Plotting
 
 ``` r
+
 all_mnd_clade_reach2 |> 
   ggplot(aes(x = as.numeric(time.slice), y = mean.distance, group = group_res, color = group_res)) +
   geom_line(aes(x = as.numeric(time.slice), y = mean.distance)) +
@@ -661,6 +688,7 @@ assemblage, this last being defined as a grid of customized size.
 ### Regional scale
 
 ``` r
+
 res_indiv_species_coex <- 
   IndivSpec_regional_coex(df.TS.TE = df_longevities_canidae, 
                              time.slice = 0.1,
@@ -673,6 +701,7 @@ res_indiv_species_coex <-
 We can plot the time series for each species
 
 ``` r
+
 res_indiv_species_coex |>
   filter(
     species %in% c(
@@ -738,6 +767,7 @@ body mass.
 
 ``` r
 
+
 res_indiv_regional_species_mpd <-
   IndivSpec_regional_distance(df.TS.TE = df_longevities_canidae,
                               time.slice = 0.1, 
@@ -752,6 +782,7 @@ res_indiv_regional_species_mpd <-
 Plotting the results for individual species mpd
 
 ``` r
+
 res_indiv_regional_species_mpd |>
   filter(
     species %in% c(
@@ -819,6 +850,7 @@ calculating the mpd considering all species co-occurring in a time
 slice.
 
 ``` r
+
 res_indiv_regional_species_mnd <- 
   IndivSpec_regional_distance(df.TS.TE = df_longevities_canidae, 
                             time.slice = 0.1, 
@@ -836,6 +868,7 @@ Here we will perform the same calculations but using site criteria for
 individual species coexistence
 
 ``` r
+
 res_indiv_species_site_coex <- 
   IndivSpec_site_coexistence(df.TS.TE = df_longevities_canidae,
                              df.occ = df_occurrence_canidae, 
@@ -852,6 +885,7 @@ res_indiv_species_site_coex <-
 plotting species coexistence considering site coexistence
 
 ``` r
+
 res_indiv_species_site_coex |>
   filter(
     species %in% c(
@@ -910,6 +944,7 @@ coexistence metrics based on site co-occurrence
 
 ``` r
 
+
 indiv_species_site_mpd <- 
   IndivSpec_site_distance(df.TS.TE = df_longevities_canidae, 
                      df.occ = df_occurrence_canidae, 
@@ -931,6 +966,7 @@ We will calculate individual mean coexistence using reach criteria
 
 ``` r
 
+
 res_indiv_species_reach_coex <- 
   IndivSpecies_reach_coexistence(df.TS.TE = df_longevities_canidae,
                                  df.occ = df_occurrence_canidae,
@@ -948,6 +984,7 @@ res_indiv_species_reach_coex <-
 plotting individual species coexistence with reach criteria
 
 ``` r
+
 
 res_indiv_species_reach_coex |>
   filter(
@@ -1005,6 +1042,7 @@ res_indiv_species_reach_coex |>
 Individual reach coexistence mpd and mnd
 
 ``` r
+
 res_indiv_species_reach_distance <- 
   IndivSpec_reach_distance(df.TS.TE = df_longevities_canidae, 
                            dist.trait = dist_body_mass, 
@@ -1025,6 +1063,7 @@ res_indiv_species_reach_distance <-
 Plotting the result
 
 ``` r
+
 res_indiv_species_reach_distance |>
   filter(
     species %in% c(
@@ -1090,6 +1129,5 @@ Calculating distance metrics at site and grid scale
 
 Graciotti, Rodolfo P, Lucas M V Porto, Salatiel Gonçalves-Neto, and
 Tiago B Quental. 2025. “Ecological and Spatial Overlap Indicate
-Interspecific Competition During North American Canid Radiation.” Edited
-by Stewart Edie and Hélène Morlon. *Evolution* 79 (9): 1835–47.
-<https://doi.org/10.1093/evolut/qpaf113>.
+Interspecific Competition During North American Canid Radiation.”
+*Evolution* 79 (9): 1835–47. <https://doi.org/10.1093/evolut/qpaf113>.
