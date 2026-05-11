@@ -25,7 +25,7 @@
 #' @param fixedmar Character, stating which row/column sums should be preserved
 #'     in the assemblage composition matrix (sites in the rows and species in the
 #'     columns). Options are "none", "rows", "columns" or "both".
-#' @param mtype Character, indicanting the type of null model to be performed.
+#' @param mtype Character, indicating the type of null model to be performed.
 #'     \code{"prab"} is the option for presence-absence (detection/non-detection)
 #'     matrix and \code{"count"} for matrix with count data.
 #' @param df.occ A data frame containing fossil occurrence records with at least
